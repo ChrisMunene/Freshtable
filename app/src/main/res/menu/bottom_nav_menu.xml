@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_kitchen"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="My Kitchen" />
+
+    <item
+        android:id="@+id/action_scanner"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="Scanner" />
+
+    <item
+        android:id="@+id/action_calendar"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="Calendar" />
+    <item
+        android:id="@+id/action_recipes"
+        android:icon="@drawable/recipes_icon"
+        android:title="Recipes"
+        app:itemIconSize="24dp" />
+
+</menu>
