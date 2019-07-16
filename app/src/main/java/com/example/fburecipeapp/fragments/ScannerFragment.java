@@ -13,9 +13,13 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.fburecipeapp.models.Receipt;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +30,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.fburecipeapp.R;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +48,7 @@ public class ScannerFragment extends Fragment {
     private FloatingActionButton fab;
     private ProgressDialog pd;
     private ImageView ivPreview;
-    public final String APP_TAG = "Receipt Scanner";
+    public final String TAG = "ScannerFragment";
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     File photoFile;
 
@@ -70,7 +78,10 @@ public class ScannerFragment extends Fragment {
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(),"Create Post", Toast.LENGTH_SHORT);
+                final String description = descriptionInput.getText().toString();
+                final ParseUser user = ParseUser.getCurrentUser();
+                final ParseFile file = new ParseFile(photoFile);
+                createPost(description, file, user);
             }
         });
 
@@ -80,6 +91,41 @@ public class ScannerFragment extends Fragment {
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
 
+    }
+
+    // Creates a new post in Parse
+    private void createPost(String description, ParseFile image, ParseUser user){
+        pd.show();
+        final Receipt newReceipt = new Receipt();
+        newReceipt.setDescription(description);
+        newReceipt.setImage(image);
+        newReceipt.setUser(user);
+
+        newReceipt.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "Post Created Successfully");
+                    Toast.makeText(getContext(), "Posted Successfully!", Toast.LENGTH_SHORT).show();
+                    // Navigate to timeline
+//                    Fragment frag = new HomeFragment();
+//                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                    ft.replace(R.id.flContainer, frag);
+//                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//                    ft.addToBackStack(null);
+//                    ft.commit();
+                } else {
+                    e.printStackTrace();
+                }
+
+                //Reset input form
+                descriptionInput.setText("");
+                ivPreview.setImageResource(0);
+
+                // Dismiss progress dialog
+                pd.dismiss();
+            }
+        });
     }
 
     // Launch Camera
@@ -108,11 +154,11 @@ public class ScannerFragment extends Fragment {
         // Get safe storage directory for photos
         // Use `getExternalFilesDir` on Context to access package-specific directories.
         // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
+        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d(APP_TAG, "failed to create directory");
+            Log.d(TAG, "failed to create directory");
         }
 
         // Return the file target for the photo based on filename
