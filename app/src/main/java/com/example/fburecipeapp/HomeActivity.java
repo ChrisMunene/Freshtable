@@ -1,17 +1,18 @@
 package com.example.fburecipeapp;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.fburecipeapp.fragments.ScannerFragment;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
     private FragmentManager fragmentManager = getSupportFragmentManager();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -19,24 +20,26 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment;
+            Fragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.action_kitchen:
-                    mTextMessage.setText("My Kitchen");
-                    return true;
+                    Toast.makeText(HomeActivity.this, "Kitchen", Toast.LENGTH_SHORT);
+                    break;
                 case R.id.action_scanner:
-                    mTextMessage.setText("Scanner");
-                    return true;
+                    fragment = new ScannerFragment();
+                    break;
                 case R.id.action_recipes:
-                    mTextMessage.setText("Recipes");
-                    return true;
+                    Toast.makeText(HomeActivity.this, "Kitchen", Toast.LENGTH_SHORT);
+                    break;
                 case R.id.action_calendar:
-                    mTextMessage.setText("Calendar");
-                    return true;
+                    Toast.makeText(HomeActivity.this, "Kitchen", Toast.LENGTH_SHORT);
+                    break;
             }
 
-            fragmentManager.beginTransaction(); //.replace(R.id.container, fragment).commit();
-            return false;
+
+            //Todo: Remove this if statement when all fragments are complete
+            if (fragment != null) fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+            return true;
         }
     };
 
@@ -45,7 +48,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        mTextMessage = findViewById(R.id.message);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
