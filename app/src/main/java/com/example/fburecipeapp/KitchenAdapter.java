@@ -1,6 +1,7 @@
 package com.example.fburecipeapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -19,27 +21,42 @@ import java.util.List;
 
 public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHolder> {
 
-        private List<FoodType> mTypes;
-        private Context context;
+        public List<FoodType> mTypes;
+        public Context context;
 
-        public static class ViewHolder extends RecyclerView.ViewHolder  {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-                public TextView typeTextView;
-                public ImageButton addBtn;
-                public ImageView typeImage;
+            public TextView typeTextView;
+            public ImageButton addBtn;
+            public ImageView typeImage;
+            public Context context;
+            public CardView card;
 
-                public ViewHolder(View itemView){
-                        super(itemView);
+            public ViewHolder(View itemView) {
+                super(itemView);
 
-                        typeTextView = itemView.findViewById(R.id.tvType);
-                        addBtn = itemView.findViewById(R.id.addBtn);
-                        typeImage = itemView.findViewById(R.id.imageViewType);
+                typeTextView = itemView.findViewById(R.id.tvType);
+                addBtn = itemView.findViewById(R.id.addBtn);
+                typeImage = itemView.findViewById(R.id.imageViewType);
+                card = itemView.findViewById(R.id.card_view);
+                card.setOnClickListener(this);
+
+            }
+
+            @Override
+            public void onClick(View v) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Intent intent = new Intent(v.getContext(), KitchenMenuActivity.class);
+                    v.getContext().startActivity(intent);
                 }
 
+            }
         }
 
-        public KitchenAdapter (List<FoodType> types){
-                mTypes = types;
+
+        public KitchenAdapter (List<FoodType> types) {
+            mTypes = types;
         }
 
         public ViewHolder onCreateViewHolder(ViewGroup parent, int ViewType) {
@@ -58,7 +75,6 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
                 FoodType foodType = mTypes.get(position);
 
                 holder.typeTextView.setText(foodType.getType());
-                //holder.addBtn.setId(Integer.valueOf(foodType.getObject()));
                 ParseFile image = foodType.getImage();
                 if (image != null) {
                         Glide.with(context).load(image.getUrl()).into(holder.typeImage);

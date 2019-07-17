@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +28,7 @@ public class KitchenFragment extends Fragment {
     protected ArrayList<FoodType> types;
     protected KitchenAdapter kitchenAdapter;
     public ImageButton addBtn;
+    public CardView card;
 
 //    final String[] Meats = { "Chicken", "Pork", "Steak", "Sausage", "Lamb", "Bacon", "Ham", "Duck", "Turkey"};
 //    final String[] Dairy = {"Butter", "Cheese", "Yogurt", "Milk", "Ice Cream", "Cream"};
@@ -51,15 +53,6 @@ public class KitchenFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-//        addBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final Intent intent = new Intent(getContext(), KitchenMenuActivity.class);
-//                startActivity(intent);
-//                getActivity().finish();
-//
-//            }
-//        });
 
         types = new ArrayList<>();
         kitchenAdapter = new KitchenAdapter(types);

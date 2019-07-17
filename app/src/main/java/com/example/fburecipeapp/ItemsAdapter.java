@@ -1,57 +1,51 @@
 package com.example.fburecipeapp;
 
-//public class ItemsAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHolder> {
-
-//    private Context context;
-//    private List<Items>
+//public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 //
-//    public static class ViewHolder extends RecyclerView.ViewHolder  {
+//    public Context context;
+//    public JSONArray[] mItems;
 //
-//        public TextView typeTextView;
-//        public ImageButton addBtn;
-//        public ImageView typeImage;
-//
-//        public ViewHolder(View itemView){
-//            super(itemView);
-//
-//            typeTextView = itemView.findViewById(R.id.tvType);
-//            addBtn = itemView.findViewById(R.id.addBtn);
-//            typeImage = itemView.findViewById(R.id.imageViewType);
-//        }
-//
-//    }
-//
-//    public ItemsAdapter (List<FoodType> types){
-//        mTypes = types;
-//    }
-//
-//    public KitchenAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int ViewType) {
+//    @NonNull
+//    @Override
+//    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 //        context = parent.getContext();
 //        LayoutInflater inflater = LayoutInflater.from(context);
-//        Log.d("Viewholder", "Viewholder success");
 //
-//        View postView = inflater.inflate(R.layout.kitchen_item, parent, false);
-//        KitchenAdapter.ViewHolder viewHolder = new KitchenAdapter.ViewHolder(postView);
+//        View postView = inflater.inflate(R.layout.single_food_option, parent, false);
+//        ViewHolder viewHolder = new ViewHolder(postView);
 //        return viewHolder;
 //    }
 //
 //    @Override
-//    public void onBindViewHolder(@NonNull KitchenAdapter.ViewHolder holder, int position) {
+//    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+//        FoodType foodType = mItems.get(position);
 //
-//        FoodType foodType = mTypes.get(position);
+//        holder.foodItem.setText(foodType.getItems());
 //
-//        holder.typeTextView.setText(foodType.getType());
-//        holder.addBtn.setId(Integer.valueOf(foodType.getObject()));
-//        ParseFile image = foodType.getImage();
-//        if (image != null) {
-//            Glide.with(context).load(image.getUrl()).into(holder.typeImage);
-//
-//        }
 //    }
 //
 //    @Override
 //    public int getItemCount() {
-//        // Log.d("item count", String.format("%s" , mTypes.size()));
-//        return mTypes.size();
+//        return 0;
 //    }
+//
+//    public class ViewHolder extends RecyclerView.ViewHolder {
+//
+//        public TextView foodItem;
+//        public CheckBox checkBox;
+//
+//        public ViewHolder(View itemView) {
+//            super(itemView);
+//
+//            foodItem = itemView.findViewById(R.id.tvFoodItem);
+//            checkBox = itemView.findViewById(R.id.checkBox);
+//        }
+//
+//    }
+//
+//    public ItemsAdapter (JSONArray[] items) {
+//        mItems = items;
+//    }
+//
+//
 //}
