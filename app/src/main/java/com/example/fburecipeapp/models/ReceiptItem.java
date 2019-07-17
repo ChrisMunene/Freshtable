@@ -1,17 +1,24 @@
 package com.example.fburecipeapp.models;
 
-public class ReceiptItem {
+import android.util.Log;
 
-    private int quantity;
+import com.parse.ParseClassName;
+import com.parse.ParseObject;
+
+@ParseClassName("ReceiptItem")
+public class ReceiptItem extends ParseObject {
+
+    private float quantity;
     private String description;
     private String price;
+    private static final String TAG = "Item";
 
     public ReceiptItem(String description, String price) {
         this.description = description;
         this.price = price;
     }
 
-    public int getQuantity() {
+    public float getQuantity() {
         return quantity;
     }
 
@@ -21,6 +28,11 @@ public class ReceiptItem {
 
     public String getPrice() {
         return price;
+    }
+
+    public void print(){
+        String item = String.format("%s %s", description, price);
+        Log.d(TAG,item);
     }
 
 }

@@ -21,11 +21,7 @@
             android:label="@string/title_activity_home"></activity>
 =======
             android:label="@string/title_activity_home" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 >>>>>>> fd28a7f... Scanner - Integrate OCR api and Regex.
 
@@ -40,6 +36,11 @@
         </provider>
 
         <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

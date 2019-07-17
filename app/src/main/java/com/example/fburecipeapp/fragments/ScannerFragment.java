@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.models.Receipt;
+import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
@@ -33,6 +34,7 @@ import com.example.fburecipeapp.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -46,7 +48,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +65,12 @@ public class ScannerFragment extends Fragment {
     private ProgressDialog pd;
     private ImageView ivPreview;
     private AsyncHttpClient client;
+    private String[] foodItems = {"Oil, Peanut Butter, Jam, Honey, Sugar, Spices, Flour, Oatmeal, " +
+            "Eggs, Yogurt, Butter, Milk, Cheese, Cream, Ice Cream, Bananas, " +
+            "Apples, Pears, Oranges, Mangoes, Grapes, Kiwi, Watermelon, Pineapple, Peach, Plum, Cherries," +
+            "Carrots, Tomatoes, Potatoes, Lettuce, Kale, Cucumber, Corn, Peas, Avocado" +
+            "Chicken, Pork, Steak, Sausage, Lamb, Bacon, Ham, Duck, Turkey, Fish"};
+
     private final static String OCR_URL = "https://api.ocr.space/parse/image";
     public final String TAG = "ScannerFragment";
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
@@ -102,16 +112,13 @@ public class ScannerFragment extends Fragment {
         //Initialize http client
         client =  new AsyncHttpClient();
 
-
-
         // Initialize Progress Dialog
         pd = new ProgressDialog(getContext());
         pd.setTitle("Loading...");
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
 
-        getPost();
-
+        //fetchAndScanReceipt("PbCbHLVFWP");
     }
 
     // Creates a new post in Parse
@@ -149,10 +156,33 @@ public class ScannerFragment extends Fragment {
         });
     }
 
-    private void getPost(){
+    private void fetchAndScanReceipt(String id){
         pd.show();
+
+        final Receipt.Query receiptQuery = new Receipt.Query();
+        receiptQuery.whereId(id);
+        receiptQuery.findInBackground(new FindCallback<Receipt>() {
+            @Override
+            public void done(List<Receipt> receipts, ParseException e) {
+                if(e == null){
+                    Receipt receipt = receipts.get(0);
+                    String url = receipt.getImage().getUrl();
+                    Log.d(TAG, String.format("Receipt %s ", url));
+                    scanReceipt(url);
+                } else {
+                    e.printStackTrace();
+                }
+
+                pd.dismiss();
+            }
+        });
+
+    }
+
+    private void scanReceipt(String url){
+        if(!pd.isShowing()) pd.show();
         RequestParams params = new RequestParams();
-        params.put("url", "https://i2.wp.com/www.hungry-runner.com/wp-content/uploads/2013/06/TJ.jpg?ssl=1");
+        params.put("url", url );
         params.put("isCreateSearchablePdf", false);
         params.put("isSearchablePdfHideTextLayer", false);
         params.put("filetype", "jpg");
@@ -162,7 +192,6 @@ public class ScannerFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-
                     JSONArray results = response.getJSONArray("ParsedResults");
                     String parsedText = results.getJSONObject(0).getString("ParsedText");
                     String[] lines = parsedText.split("\n");
@@ -172,13 +201,10 @@ public class ScannerFragment extends Fragment {
                         Pattern p = Pattern.compile("([a-zA-Z0-9]*)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\s*\\d*)+");
                         Matcher m = p.matcher(line);
                         if(m.find()){
-                            Log.d("Match", m.group());
-                            Log.d("Misc", m.group(1));
-                            Log.d("Desc", m.group(2));
-                            Log.d("Price", m.group(3));
-
+                            //Log.d("Match", m.group());
+                            ReceiptItem item = new ReceiptItem(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
+                            item.print();
                         }
-
                     }
                     pd.dismiss();
                 } catch (JSONException e) {
@@ -191,7 +217,7 @@ public class ScannerFragment extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, errorResponse.toString());
+                throwable.printStackTrace();
                 pd.dismiss();
             }
 
