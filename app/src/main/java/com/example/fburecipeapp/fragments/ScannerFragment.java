@@ -30,15 +30,27 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.fburecipeapp.R;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import cz.msebera.android.httpclient.Header;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -48,6 +60,8 @@ public class ScannerFragment extends Fragment {
     private FloatingActionButton fab;
     private ProgressDialog pd;
     private ImageView ivPreview;
+    private AsyncHttpClient client;
+    private final static String OCR_URL = "https://api.ocr.space/parse/image";
     public final String TAG = "ScannerFragment";
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     File photoFile;
@@ -85,11 +99,18 @@ public class ScannerFragment extends Fragment {
             }
         });
 
+        //Initialize http client
+        client =  new AsyncHttpClient();
+
+
+
         // Initialize Progress Dialog
         pd = new ProgressDialog(getContext());
         pd.setTitle("Loading...");
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
+
+        getPost();
 
     }
 
@@ -126,6 +147,57 @@ public class ScannerFragment extends Fragment {
                 pd.dismiss();
             }
         });
+    }
+
+    private void getPost(){
+        pd.show();
+        RequestParams params = new RequestParams();
+        params.put("url", "https://pbs.twimg.com/media/DM3DpDPW0AUIDbv.jpg");
+        params.put("isCreateSearchablePdf", false);
+        params.put("isSearchablePdfHideTextLayer", false);
+        params.put("filetype", "jpg");
+        params.put("isTable", true);
+        client.addHeader("apikey", "25e4ce8d0788957");
+        client.post(OCR_URL,params, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+
+                    JSONArray results = response.getJSONArray("ParsedResults");
+                    String parsedText = results.getJSONObject(0).getString("ParsedText");
+                    String[] lines = parsedText.split("\n");
+                    Log.d(TAG, parsedText);
+                    Log.d(TAG, "--------------------------------");
+                    for (String line: lines) {
+                        Pattern p = Pattern.compile("(\\d*[a-zA-Z]?+)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\d*)+");
+                        Matcher m = p.matcher(line);
+                        if(m.find()){
+                            Log.d("Match", line);
+                        }
+
+                    }
+                    pd.dismiss();
+                } catch (JSONException e) {
+                    String message = e.getMessage();
+                    Log.e(TAG, message);
+                    pd.dismiss();
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, errorResponse.toString());
+                pd.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                throwable.printStackTrace();
+                pd.dismiss();
+            }
+        });
+
     }
 
     // Launch Camera
