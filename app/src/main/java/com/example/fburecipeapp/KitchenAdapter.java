@@ -56,7 +56,9 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
                 FoodType foodType = mTypes.get(position);
+
                 holder.typeTextView.setText(foodType.getType());
+                //holder.addBtn.setId(Integer.valueOf(foodType.getObject()));
                 ParseFile image = foodType.getImage();
                 if (image != null) {
                         Glide.with(context).load(image.getUrl()).into(holder.typeImage);

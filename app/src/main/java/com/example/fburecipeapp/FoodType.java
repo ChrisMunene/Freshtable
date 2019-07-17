@@ -6,11 +6,15 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import org.json.JSONArray;
+
 @ParseClassName("foodTypes")
 public class FoodType extends ParseObject {
 
     public static final String TYPE = "Type";
     public static final String IMAGE = "Image";
+    public static final String OBJECT_ID = "objectId";
+    public static final String ITEMS = "Items";
 
     public String getType() {
         return getString(TYPE);
@@ -26,6 +30,14 @@ public class FoodType extends ParseObject {
 
     public void setImage(ParseFile Image) {
         put(IMAGE, Image);
+    }
+
+    public String getObject() {
+        return getString(OBJECT_ID);
+    }
+
+    public JSONArray getItems() {
+        return getJSONArray(ITEMS);
     }
 
     public static class Query extends ParseQuery<FoodType> {

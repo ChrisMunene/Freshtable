@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ public class KitchenFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     protected ArrayList<FoodType> types;
     protected KitchenAdapter kitchenAdapter;
+    public ImageButton addBtn;
 
 //    final String[] Meats = { "Chicken", "Pork", "Steak", "Sausage", "Lamb", "Bacon", "Ham", "Duck", "Turkey"};
 //    final String[] Dairy = {"Butter", "Cheese", "Yogurt", "Milk", "Ice Cream", "Cream"};
@@ -44,9 +46,20 @@ public class KitchenFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //Log.d("Kitchen Fragment", "Adapter set successfully");
         recyclerView = view.findViewById(R.id.rvTypes);
+        addBtn = view.findViewById(R.id.addBtn);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+//        addBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final Intent intent = new Intent(getContext(), KitchenMenuActivity.class);
+//                startActivity(intent);
+//                getActivity().finish();
+//
+//            }
+//        });
 
         types = new ArrayList<>();
         kitchenAdapter = new KitchenAdapter(types);
