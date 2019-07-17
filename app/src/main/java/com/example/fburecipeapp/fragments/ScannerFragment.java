@@ -152,7 +152,7 @@ public class ScannerFragment extends Fragment {
     private void getPost(){
         pd.show();
         RequestParams params = new RequestParams();
-        params.put("url", "https://pbs.twimg.com/media/DM3DpDPW0AUIDbv.jpg");
+        params.put("url", "https://i2.wp.com/www.hungry-runner.com/wp-content/uploads/2013/06/TJ.jpg?ssl=1");
         params.put("isCreateSearchablePdf", false);
         params.put("isSearchablePdfHideTextLayer", false);
         params.put("filetype", "jpg");
@@ -169,10 +169,14 @@ public class ScannerFragment extends Fragment {
                     Log.d(TAG, parsedText);
                     Log.d(TAG, "--------------------------------");
                     for (String line: lines) {
-                        Pattern p = Pattern.compile("(\\d*[a-zA-Z]?+)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\d*)+");
+                        Pattern p = Pattern.compile("([a-zA-Z0-9]*)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\s*\\d*)+");
                         Matcher m = p.matcher(line);
                         if(m.find()){
-                            Log.d("Match", line);
+                            Log.d("Match", m.group());
+                            Log.d("Misc", m.group(1));
+                            Log.d("Desc", m.group(2));
+                            Log.d("Price", m.group(3));
+
                         }
 
                     }
