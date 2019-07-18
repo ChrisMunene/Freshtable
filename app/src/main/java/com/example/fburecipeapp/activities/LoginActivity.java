@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        currentUser = ParseUser.getCurrentUser();
 
         if (currentUser!= null) {
             final Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
@@ -43,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
             loginBtn = findViewById(R.id.loginBtn);
             usernameInput = findViewById(R.id.username_et);
             passwordInput = findViewById(R.id.password_et);
-            currentUser = ParseUser.getCurrentUser();
 
             loginBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
