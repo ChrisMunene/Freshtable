@@ -2,6 +2,11 @@ package com.example.fburecipeapp.helpers;
 
 import android.app.Application;
 
+import com.example.fburecipeapp.models.Receipt;
+import com.example.fburecipeapp.models.ReceiptItem;
+
+import com.example.fburecipeapp.models.FoodType;
+
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -23,6 +28,10 @@ public class ParseApplication extends Application {
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         builder.networkInterceptors().add(httpLoggingInterceptor);
+
+        ParseObject.registerSubclass(FoodType.class);
+        ParseObject.registerSubclass(Receipt.class);
+        ParseObject.registerSubclass(ReceiptItem.class);
 
         // set applicationId, and server server based on the values in the Heroku settings.
         // clientKey is not needed unless explicitly configured

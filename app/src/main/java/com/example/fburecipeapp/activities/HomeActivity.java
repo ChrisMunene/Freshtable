@@ -1,19 +1,22 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.activities;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 
 import com.example.fburecipeapp.fragments.CalendarFragment;
+import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.fragments.KitchenFragment;
+import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.example.fburecipeapp.fragments.ScannerFragment;
 
 public class HomeActivity extends AppCompatActivity {
+
+    private Fragment fragment;
 
     private FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -22,27 +25,23 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.action_kitchen:
-                    Toast.makeText(HomeActivity.this, "Kitchen", Toast.LENGTH_SHORT);
+                    fragment = new KitchenFragment();
                     break;
                 case R.id.action_scanner:
                     fragment = new ScannerFragment();
-                    // Toast.makeText(HomeActivity.this, "Scanner", Toast.LENGTH_SHORT);
                     break;
                 case R.id.action_recipes:
-                    Toast.makeText(HomeActivity.this, "Recipes", Toast.LENGTH_SHORT);
                     break;
                 case R.id.action_calendar:
                     fragment = new CalendarFragment();
-                    // Toast.makeText(HomeActivity.this, "calendar", Toast.LENGTH_SHORT);
                     break;
+
             }
 
+            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commitNow();
 
-            //Todo: Remove this if statement when all fragments are complete
-            if (fragment != null) fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
             return true;
         }
     };
@@ -53,6 +52,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navView.setSelectedItemId(R.id.action_kitchen);
+
     }
 
 }
