@@ -34,7 +34,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FoodType foodType = mItems.get(position);
-        holder.foodItem.setText("eggs");
+        holder.foodItem.setText("egg");
 
     }
 

@@ -34,7 +34,7 @@ public class FoodType extends ParseObject {
         return getString(OBJECT_ID);
     }
 
-    public String[] getItems() {
+    public String[] getItems(int i) {
         return (getString(ITEMS).split(","));
     }
 

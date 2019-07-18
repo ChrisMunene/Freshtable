@@ -1,5 +1,6 @@
 package com.example.fburecipeapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class KitchenFragment extends Fragment {
     protected KitchenAdapter kitchenAdapter;
     public ImageButton addBtn;
     public CardView card;
+    public ImageButton logoutBtn;
+    private ParseUser currentUser;
 
 //    final String[] Meats = { "Chicken", "Pork", "Steak", "Sausage", "Lamb", "Bacon", "Ham", "Duck", "Turkey"};
 //    final String[] Dairy = {"Butter", "Cheese", "Yogurt", "Milk", "Ice Cream", "Cream"};
@@ -49,6 +53,8 @@ public class KitchenFragment extends Fragment {
         //Log.d("Kitchen Fragment", "Adapter set successfully");
         recyclerView = view.findViewById(R.id.rvTypes);
         addBtn = view.findViewById(R.id.addBtn);
+        logoutBtn = view.findViewById(R.id.logoutBtn);
+        currentUser = ParseUser.getCurrentUser();
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -59,6 +65,24 @@ public class KitchenFragment extends Fragment {
         recyclerView.setAdapter(kitchenAdapter);
         Log.d("Kitchen Fragment", "Adapter set successfully");
         loadTypes();
+
+
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentUser != null) {
+                    ParseUser.logOut();
+                    currentUser = ParseUser.getCurrentUser(); // this will now be null
+                    final Intent intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else {
+                    final Intent intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                }
+            }
+        });
 
     }
 

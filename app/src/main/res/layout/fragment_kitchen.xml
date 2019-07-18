@@ -6,6 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageButton
+        android:id="@+id/logoutBtn"
+        android:layout_width="32dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:background="#00FFFFFF"
+        android:scaleType="fitEnd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/flContainer"
+        app:srcCompat="@drawable/logout_icon" />
+
     <TextView
         android:id="@+id/tvKitchenTitle"
         android:layout_width="wrap_content"

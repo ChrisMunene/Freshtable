@@ -2,13 +2,12 @@ package com.example.fburecipeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -19,6 +18,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBtn;
     private EditText usernameInput;
     private EditText passwordInput;
+    private ParseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +28,17 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.loginBtn);
         usernameInput = findViewById(R.id.username_et);
         passwordInput = findViewById(R.id.password_et);
+        currentUser = ParseUser.getCurrentUser();
+
+        if (currentUser!= null) {
+            final Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            final String username = usernameInput.getText().toString();
+            final String password = passwordInput.getText().toString();
+            login(username, password);
+        }
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
