@@ -13,6 +13,10 @@ public class ReceiptItem extends ParseObject {
     private String price;
     private static final String TAG = "Item";
 
+    public ReceiptItem(){
+
+    }
+
     public ReceiptItem(String description, String price) {
         this.description = description;
         this.price = price;

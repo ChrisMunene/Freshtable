@@ -16,18 +16,8 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".activities.KitchenMenuActivity"></activity>
         <activity
-<<<<<<< HEAD
-            android:name=".HomeActivity"
-<<<<<<< HEAD
-=======
             android:name=".activities.HomeActivity"
->>>>>>> 803096f... Scanner - Add dialog for editing list items.
             android:label="@string/title_activity_home"></activity>
-=======
-            android:label="@string/title_activity_home" >
-
-        </activity>
->>>>>>> fd28a7f... Scanner - Integrate OCR api and Regex.
 
         <provider
             android:name="androidx.core.content.FileProvider"
