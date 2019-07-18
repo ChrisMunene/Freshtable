@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.KitchenFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
@@ -34,7 +35,9 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.action_recipes:
                     break;
                 case R.id.action_calendar:
+                    fragment = new CalendarFragment();
                     break;
+
             }
 
             fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commitNow();
