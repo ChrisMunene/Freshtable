@@ -6,12 +6,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 @ParseClassName("foodTypes")
 public class FoodType extends ParseObject {
@@ -37,7 +33,7 @@ public class FoodType extends ParseObject {
         put(IMAGE, Image);
     }
 
-    public String getObject() {
+    public String getTypeId() {
         return getString(OBJECT_ID);
     }
 

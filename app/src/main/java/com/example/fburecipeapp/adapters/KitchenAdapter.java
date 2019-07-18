@@ -15,9 +15,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.fburecipeapp.models.FoodType;
-import com.example.fburecipeapp.activities.KitchenMenuActivity;
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.activities.KitchenMenuActivity;
+import com.example.fburecipeapp.models.FoodType;
 import com.parse.ParseFile;
 
 import java.util.List;
@@ -51,7 +51,12 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
             public void onClick(View v) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
+                    FoodType foodType = mTypes.get(position);
                     Intent intent = new Intent(v.getContext(), KitchenMenuActivity.class);
+                    objectId = foodType.getObjectId();
+                    //Pass id to target through intent
+                    //intent.putExtra(foodType.getTypeId(), Parcels.wrap(foodType));
+                    intent.putExtra("objectId", objectId);
                     v.getContext().startActivity(intent);
                 }
 

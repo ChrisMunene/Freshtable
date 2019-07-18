@@ -1,4 +1,4 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,17 +10,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 
     public Context context;
-    public ArrayList<FoodType> mItems;
-    public String objectId;
-    public List<FoodType> mTypes;
+    public List<String> mItems;
 
     @NonNull
     @Override
@@ -35,8 +32,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        FoodType foodType = mItems.get(position);
-        holder.foodItem.setText("egg");
+        String foodItem = mItems.get(position);
+        holder.bind(foodItem);
 
     }
 
@@ -47,19 +44,22 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView foodItem;
+        public TextView tvFoodItem;
         public CheckBox checkBox;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            foodItem = itemView.findViewById(R.id.tvFoodItem);
+            tvFoodItem = itemView.findViewById(R.id.tvFoodItem);
             checkBox = itemView.findViewById(R.id.checkBox);
+        }
+        public void bind(String foodItem){
+            tvFoodItem.setText(foodItem);
         }
 
     }
 
-    public ItemsAdapter (ArrayList<FoodType> items) {
+    public ItemsAdapter (List<String> items) {
         mItems = items;
     }
 
