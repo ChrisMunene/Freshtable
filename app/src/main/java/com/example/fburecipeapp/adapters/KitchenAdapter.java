@@ -1,4 +1,4 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.activities.KitchenMenuActivity;
+import com.example.fburecipeapp.R;
 import com.parse.ParseFile;
 
 import java.util.List;

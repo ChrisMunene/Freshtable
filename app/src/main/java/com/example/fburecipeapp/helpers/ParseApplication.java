@@ -2,9 +2,11 @@ package com.example.fburecipeapp.helpers;
 
 import android.app.Application;
 
-import com.example.fburecipeapp.FoodType;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
+
+import com.example.fburecipeapp.models.FoodType;
+
 import com.parse.Parse;
 import com.parse.ParseObject;
 

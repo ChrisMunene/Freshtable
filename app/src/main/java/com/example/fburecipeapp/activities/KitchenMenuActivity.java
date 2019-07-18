@@ -1,4 +1,4 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.activities;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +12,8 @@ import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.fburecipeapp.R;
 
 public class KitchenMenuActivity extends AppCompatActivity {
 

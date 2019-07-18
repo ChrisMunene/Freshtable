@@ -1,9 +1,11 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.activities;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.fragments.KitchenFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.fragment.app.Fragment;

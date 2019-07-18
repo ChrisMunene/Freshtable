@@ -1,4 +1,4 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;

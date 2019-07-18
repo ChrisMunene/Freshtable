@@ -14,12 +14,16 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.fburecipeapp.adapters.EditListAdapter;
+import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,11 +69,6 @@ public class ScannerFragment extends Fragment {
     private ProgressDialog pd;
     private ImageView ivPreview;
     private AsyncHttpClient client;
-    private String[] foodItems = {"Oil, Peanut Butter, Jam, Honey, Sugar, Spices, Flour, Oatmeal, " +
-            "Eggs, Yogurt, Butter, Milk, Cheese, Cream, Ice Cream, Bananas, " +
-            "Apples, Pears, Oranges, Mangoes, Grapes, Kiwi, Watermelon, Pineapple, Peach, Plum, Cherries," +
-            "Carrots, Tomatoes, Potatoes, Lettuce, Kale, Cucumber, Corn, Peas, Avocado" +
-            "Chicken, Pork, Steak, Sausage, Lamb, Bacon, Ham, Duck, Turkey, Fish"};
 
     private final static String OCR_URL = "https://api.ocr.space/parse/image";
     public final String TAG = "ScannerFragment";
@@ -118,7 +117,7 @@ public class ScannerFragment extends Fragment {
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
 
-        //fetchAndScanReceipt("PbCbHLVFWP");
+        fetchAndScanReceipt("PbCbHLVFWP");
     }
 
     // Creates a new post in Parse
@@ -168,12 +167,16 @@ public class ScannerFragment extends Fragment {
                     Receipt receipt = receipts.get(0);
                     String url = receipt.getImage().getUrl();
                     Log.d(TAG, String.format("Receipt %s ", url));
-                    scanReceipt(url);
+                    pd.dismiss();
+
+                    showEditDialog();
+                    //scanReceipt(url);
                 } else {
                     e.printStackTrace();
+                    pd.dismiss();
                 }
 
-                pd.dismiss();
+
             }
         });
 
@@ -324,6 +327,12 @@ public class ScannerFragment extends Fragment {
         Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
         // Return result
         return rotatedBitmap;
+    }
+
+    private void showEditDialog(){
+        FragmentManager fm = getFragmentManager();
+        EditItemsFragment frag = EditItemsFragment.newInstance();
+        frag.show(fm, "fragment_eidt_items");
     }
 
 }
