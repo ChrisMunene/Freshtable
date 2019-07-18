@@ -2,6 +2,8 @@ package com.example.fburecipeapp;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
+import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -27,12 +29,14 @@ public class HomeActivity extends AppCompatActivity {
                     break;
                 case R.id.action_scanner:
                     fragment = new ScannerFragment();
+                    // Toast.makeText(HomeActivity.this, "Scanner", Toast.LENGTH_SHORT);
                     break;
                 case R.id.action_recipes:
-                    Toast.makeText(HomeActivity.this, "Kitchen", Toast.LENGTH_SHORT);
+                    Toast.makeText(HomeActivity.this, "Recipes", Toast.LENGTH_SHORT);
                     break;
                 case R.id.action_calendar:
-                    Toast.makeText(HomeActivity.this, "Kitchen", Toast.LENGTH_SHORT);
+                    fragment = new CalendarFragment();
+                    // Toast.makeText(HomeActivity.this, "calendar", Toast.LENGTH_SHORT);
                     break;
             }
 
