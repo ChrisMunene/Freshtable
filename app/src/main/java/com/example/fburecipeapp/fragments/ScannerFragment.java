@@ -13,9 +13,18 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.fburecipeapp.adapters.EditListAdapter;
+import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.Receipt;
+import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,11 +35,30 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.fburecipeapp.R;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import cz.msebera.android.httpclient.Header;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -40,7 +68,10 @@ public class ScannerFragment extends Fragment {
     private FloatingActionButton fab;
     private ProgressDialog pd;
     private ImageView ivPreview;
-    public final String APP_TAG = "Receipt Scanner";
+    private AsyncHttpClient client;
+
+    private final static String OCR_URL = "https://api.ocr.space/parse/image";
+    public final String TAG = "ScannerFragment";
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     File photoFile;
 
@@ -70,15 +101,135 @@ public class ScannerFragment extends Fragment {
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(),"Create Post", Toast.LENGTH_SHORT);
+                final String description = descriptionInput.getText().toString();
+                final ParseUser user = ParseUser.getCurrentUser();
+                final ParseFile file = new ParseFile(photoFile);
+                createPost(description, file, user);
             }
         });
+
+        //Initialize http client
+        client =  new AsyncHttpClient();
 
         // Initialize Progress Dialog
         pd = new ProgressDialog(getContext());
         pd.setTitle("Loading...");
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
+
+        fetchAndScanReceipt("PbCbHLVFWP");
+    }
+
+    // Creates a new post in Parse
+    private void createPost(String description, ParseFile image, ParseUser user){
+        pd.show();
+        final Receipt newReceipt = new Receipt();
+        newReceipt.setDescription(description);
+        newReceipt.setImage(image);
+        newReceipt.setUser(user);
+
+        newReceipt.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "Post Created Successfully");
+                    Toast.makeText(getContext(), "Posted Successfully!", Toast.LENGTH_SHORT).show();
+                    // Navigate to timeline
+//                    Fragment frag = new HomeFragment();
+//                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                    ft.replace(R.id.flContainer, frag);
+//                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//                    ft.addToBackStack(null);
+//                    ft.commit();
+                } else {
+                    e.printStackTrace();
+                }
+
+                //Reset input form
+                descriptionInput.setText("");
+                ivPreview.setImageResource(0);
+
+                // Dismiss progress dialog
+                pd.dismiss();
+            }
+        });
+    }
+
+    private void fetchAndScanReceipt(String id){
+        pd.show();
+
+        final Receipt.Query receiptQuery = new Receipt.Query();
+        receiptQuery.whereId(id);
+        receiptQuery.findInBackground(new FindCallback<Receipt>() {
+            @Override
+            public void done(List<Receipt> receipts, ParseException e) {
+                if(e == null){
+                    Receipt receipt = receipts.get(0);
+                    String url = receipt.getImage().getUrl();
+                    Log.d(TAG, String.format("Receipt %s ", url));
+                    pd.dismiss();
+
+                    showEditDialog();
+                    //scanReceipt(url);
+                } else {
+                    e.printStackTrace();
+                    pd.dismiss();
+                }
+
+
+            }
+        });
+
+    }
+
+    private void scanReceipt(String url){
+        if(!pd.isShowing()) pd.show();
+        RequestParams params = new RequestParams();
+        params.put("url", url );
+        params.put("isCreateSearchablePdf", false);
+        params.put("isSearchablePdfHideTextLayer", false);
+        params.put("filetype", "jpg");
+        params.put("isTable", true);
+        client.addHeader("apikey", "25e4ce8d0788957");
+        client.post(OCR_URL,params, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    JSONArray results = response.getJSONArray("ParsedResults");
+                    String parsedText = results.getJSONObject(0).getString("ParsedText");
+                    String[] lines = parsedText.split("\n");
+                    Log.d(TAG, parsedText);
+                    Log.d(TAG, "--------------------------------");
+                    for (String line: lines) {
+                        Pattern p = Pattern.compile("([a-zA-Z0-9]*)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\s*\\d*)+");
+                        Matcher m = p.matcher(line);
+                        if(m.find()){
+                            //Log.d("Match", m.group());
+                            ReceiptItem item = new ReceiptItem(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
+                            item.print();
+                        }
+                    }
+                    pd.dismiss();
+                } catch (JSONException e) {
+                    String message = e.getMessage();
+                    Log.e(TAG, message);
+                    pd.dismiss();
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                throwable.printStackTrace();
+                pd.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                throwable.printStackTrace();
+                pd.dismiss();
+            }
+        });
 
     }
 
@@ -108,11 +259,11 @@ public class ScannerFragment extends Fragment {
         // Get safe storage directory for photos
         // Use `getExternalFilesDir` on Context to access package-specific directories.
         // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
+        File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d(APP_TAG, "failed to create directory");
+            Log.d(TAG, "failed to create directory");
         }
 
         // Return the file target for the photo based on filename
@@ -176,6 +327,12 @@ public class ScannerFragment extends Fragment {
         Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
         // Return result
         return rotatedBitmap;
+    }
+
+    private void showEditDialog(){
+        FragmentManager fm = getFragmentManager();
+        EditItemsFragment frag = EditItemsFragment.newInstance();
+        frag.show(fm, "fragment_eidt_items");
     }
 
 }

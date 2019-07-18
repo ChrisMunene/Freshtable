@@ -1,8 +1,12 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.activities;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+
+import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.fragments.KitchenFragment;
+import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -22,11 +26,10 @@ public class HomeActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_kitchen:
-                    System.out.println("kitchen");
-                    //mTextMessage.setText("My Kitchen");
                     fragment = new KitchenFragment();
                     break;
                 case R.id.action_scanner:
+                    fragment = new ScannerFragment();
                     break;
                 case R.id.action_recipes:
                     break;
