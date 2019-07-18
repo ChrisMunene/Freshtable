@@ -23,6 +23,7 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
 
         public List<FoodType> mTypes;
         public Context context;
+        public String objectId;
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 

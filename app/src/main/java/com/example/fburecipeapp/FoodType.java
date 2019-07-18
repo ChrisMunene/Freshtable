@@ -12,7 +12,7 @@ public class FoodType extends ParseObject {
     public static final String TYPE = "Type";
     public static final String IMAGE = "Image";
     public static final String OBJECT_ID = "objectId";
-    //public static final JSONArray ITEMS = "Items";
+    public static final String ITEMS = "Items";
 
     public String getType() {
         return getString(TYPE);
@@ -34,9 +34,9 @@ public class FoodType extends ParseObject {
         return getString(OBJECT_ID);
     }
 
-//    public JSONArray getItems() {
-//        return getJSONArray(ITEMS);
-//    }
+    public String[] getItems() {
+        return (getString(ITEMS).split(","));
+    }
 
     public static class Query extends ParseQuery<FoodType> {
         public Query() {
