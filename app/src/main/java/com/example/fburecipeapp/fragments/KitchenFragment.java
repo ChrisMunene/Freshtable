@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
@@ -37,10 +38,6 @@ public class KitchenFragment extends Fragment {
     public ImageButton logoutBtn;
     private ParseUser currentUser;
 
-//    final String[] Meats = { "Chicken", "Pork", "Steak", "Sausage", "Lamb", "Bacon", "Ham", "Duck", "Turkey"};
-//    final String[] Dairy = {"Butter", "Cheese", "Yogurt", "Milk", "Ice Cream", "Cream"};
-//    final String[] Vegetables = {"Carrots", "Tomatoes", "Potatoes", "Lettuce", "Kale", "Cucumber", "Corn", "Peas", "Avocado"};
-//    final String[] Fruits = {"Bananas", "Apples", "Pears", "Oranges", "Mangoes", "Grapes", "Kiwi", "Watermelon", "Pineapple", "Peach", "Plum", "Cherries"};
 
     @Nullable
     @Override
