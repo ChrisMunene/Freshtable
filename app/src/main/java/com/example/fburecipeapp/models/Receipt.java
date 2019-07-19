@@ -6,6 +6,10 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+
+import java.util.List;
+
 @ParseClassName("Receipt")
 public class Receipt extends ParseObject {
     private static final String KEY_IMAGE = "image";
@@ -13,6 +17,7 @@ public class Receipt extends ParseObject {
     private static final String KEY_CREATED_AT = "createdAt";
     private static final String KEY_ID = "objectId";
     private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_RECEIPT_ITEMS = "receiptItems";
 
     public String getDescription(){
         return getString(KEY_DESCRIPTION);
@@ -32,6 +37,14 @@ public class Receipt extends ParseObject {
 
     public void setImage(ParseFile image){
         put(KEY_IMAGE, image);
+    }
+
+    public void setReceiptItems(List<String> receiptItems){
+        put(KEY_RECEIPT_ITEMS, receiptItems);
+    }
+
+    public JSONArray getReceiptItems(){
+        return getJSONArray(KEY_RECEIPT_ITEMS);
     }
 
     public ParseFile getImage(){

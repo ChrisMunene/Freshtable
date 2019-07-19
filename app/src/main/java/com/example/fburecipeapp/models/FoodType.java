@@ -35,6 +35,7 @@ public class FoodType extends ParseObject {
     }
 
     // get specific food items
+
     public List<String> getFoodItems(){
         String items = getString("Items");
         return Arrays.asList(items.split(","));

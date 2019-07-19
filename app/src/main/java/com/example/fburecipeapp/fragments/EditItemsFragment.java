@@ -37,6 +37,16 @@ public class EditItemsFragment extends DialogFragment {
         return fragment;
     }
 
+    public interface EditItemsDialogListener{
+        void onFinishEditingList(List<String> foodItems);
+    }
+
+    public void sendBackResult(List<String> selectedFoodItems){
+        EditItemsDialogListener listener = (EditItemsDialogListener) getTargetFragment();
+        listener.onFinishEditingList(selectedFoodItems);
+        dismiss();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -57,6 +67,7 @@ public class EditItemsFragment extends DialogFragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvFoodTypes.setLayoutManager(linearLayoutManager);
 
+
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,7 +79,12 @@ public class EditItemsFragment extends DialogFragment {
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                // Submit selected items to parse server
+                // Get selected items
+                List<String> selectedFoodItems = adapter.getSelectedFoodItems();
+                for(String item: selectedFoodItems){
+                    Log.d("Item", item);
+                }
+                sendBackResult(selectedFoodItems);
             }
         });
 
@@ -81,10 +97,11 @@ public class EditItemsFragment extends DialogFragment {
             public void done(List<FoodType> types, ParseException e) {
                 if (e == null) {
 
+                    // For each food type, get individual ingredients
                     for(FoodType type: types){
-                       List foodItems = type.getFoodItems();
-                       foodTypes.addAll(foodItems);
-                       adapter.notifyDataSetChanged(); // update adapter
+                       List items = type.getFoodItems();
+                       foodTypes.addAll(items);
+                       adapter.notifyDataSetChanged();
                     }
 
                 }

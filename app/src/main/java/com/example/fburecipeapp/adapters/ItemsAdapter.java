@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -48,10 +49,12 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView tvFoodItem;
+
         public CheckBox checkBox;
 
         public ViewHolder(View itemView) {
             super(itemView);
+
 
             tvFoodItem = itemView.findViewById(R.id.tvFoodItem);
             checkBox = itemView.findViewById(R.id.checkBox);
@@ -82,4 +85,5 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
     public ArrayList getSelectedItems() {
         return selectedList;
     }
+
 }

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.KitchenFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
@@ -35,7 +36,9 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.action_recipes:
                     break;
                 case R.id.action_calendar:
+                    fragment = new CalendarFragment();
                     break;
+
             }
 
             // replaces empty container with whichever fragment is called

@@ -45,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
             loginBtn = findViewById(R.id.loginBtn);
             usernameInput = findViewById(R.id.username_et);
             passwordInput = findViewById(R.id.password_et);
-            //currentUser = ParseUser.getCurrentUser();
 
             loginBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
