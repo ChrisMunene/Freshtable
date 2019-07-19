@@ -43,20 +43,21 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
                 addBtn = itemView.findViewById(R.id.addBtn);
                 typeImage = itemView.findViewById(R.id.imageViewType);
                 card = itemView.findViewById(R.id.card_view);
-                card.setOnClickListener(this);
+                card.setOnClickListener(this); // setting the onClickListener to cardview
 
             }
 
             @Override
             public void onClick(View v) {
+
                 int position = getAdapterPosition();
+
                 if (position != RecyclerView.NO_POSITION) {
                     FoodType foodType = mTypes.get(position);
-                    Intent intent = new Intent(v.getContext(), KitchenMenuActivity.class);
                     objectId = foodType.getObjectId();
-                    //Pass id to target through intent
-                    //intent.putExtra(foodType.getTypeId(), Parcels.wrap(foodType));
-                    intent.putExtra("objectId", objectId);
+
+                    Intent intent = new Intent(v.getContext(), KitchenMenuActivity.class);
+                    intent.putExtra("objectId", objectId); // pass id to target through intent
                     v.getContext().startActivity(intent);
                 }
 
@@ -83,17 +84,16 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
 
                 FoodType foodType = mTypes.get(position);
 
-                holder.typeTextView.setText(foodType.getType());
+                holder.typeTextView.setText(foodType.getType()); // setting Parse food category to our layout
                 ParseFile image = foodType.getImage();
                 if (image != null) {
-                        Glide.with(context).load(image.getUrl()).into(holder.typeImage);
+                        Glide.with(context).load(image.getUrl()).into(holder.typeImage); // setting ParseFile image to our layout
 
                 }
         }
 
         @Override
         public int getItemCount() {
-               // Log.d("item count", String.format("%s" , mTypes.size()));
                 return mTypes.size();
         }
 }
