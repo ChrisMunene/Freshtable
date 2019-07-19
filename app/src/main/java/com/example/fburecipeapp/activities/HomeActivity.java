@@ -1,18 +1,18 @@
 package com.example.fburecipeapp.activities;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.KitchenFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.view.MenuItem;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -20,6 +20,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private FragmentManager fragmentManager = getSupportFragmentManager();
 
+    // sets up bottom navigation bar - used to hold and call each fragment/screen
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -40,6 +41,7 @@ public class HomeActivity extends AppCompatActivity {
 
             }
 
+            // replaces empty container with whichever fragment is called
             fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commitNow();
 
             return true;

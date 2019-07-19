@@ -28,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
 
         currentUser = ParseUser.getCurrentUser();
 
+        // allows persistance of user when app is reopened
         if (currentUser!= null) {
             final Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -61,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    // creates new Parse user and logs in
     private void login(String username, String password) {
         pd.show();
         // Invoke background login
