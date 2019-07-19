@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.fburecipeapp.ItemsAdapter;
+import com.example.fburecipeapp.adapters.ItemsAdapter;
 import com.example.fburecipeapp.models.FoodType;
 import com.parse.FindCallback;
 import com.parse.ParseException;

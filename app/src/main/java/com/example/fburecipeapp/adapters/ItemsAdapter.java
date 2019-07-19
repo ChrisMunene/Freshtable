@@ -1,4 +1,4 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.models.FoodType;
 
 import java.util.ArrayList;

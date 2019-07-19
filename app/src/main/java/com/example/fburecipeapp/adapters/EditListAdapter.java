@@ -2,11 +2,13 @@ package com.example.fburecipeapp.adapters;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -21,12 +23,14 @@ import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.models.FoodType;
 import com.parse.ParseFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHolder>{
 
     private Context context;
     private List<String> foodTypes;
+    private List<String> selectedFoodItems = new ArrayList<>();
 
     public EditListAdapter(Context context, List<String> foodTypes) {
         this.context = context;
@@ -42,8 +46,9 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.setIsRecyclable(false);
         String foodItem = foodTypes.get(position);
-        holder.bind(foodItem);
+        holder.bind(foodItem, position);
     }
 
     @Override
@@ -62,8 +67,26 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
         }
 
         // Binds data to the view
-        public void bind(String foodItem){
+        public void bind(final String foodItem, final int position){
+            // Set the fooditem
             cbFoodItem.setText(foodItem);
+
+            // Reset the state of the checkbox - Because the recyclerview retains the state of recycled components.
+            cbFoodItem.setChecked(selectedFoodItems.contains(foodItem));
+
+            // Set on check listener
+            cbFoodItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton checkBox, boolean checked) {
+                    if(checked){
+                        // If selected item is not in list, add to list
+                        if(!selectedFoodItems.contains(foodItem))selectedFoodItems.add(foodItem);
+                    } else {
+                        // If deselected item is in list, remove it
+                        if(selectedFoodItems.contains(foodItem)) selectedFoodItems.remove(foodItem);
+                    }
+                }
+            });
         }
     }
 
@@ -78,4 +101,9 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
         foodTypes.addAll(list);
         notifyDataSetChanged();
     }
+
+    public List<String> getSelectedFoodItems(){
+        return selectedFoodItems;
+    }
+
 }

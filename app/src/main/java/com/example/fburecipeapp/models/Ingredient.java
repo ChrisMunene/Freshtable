@@ -5,19 +5,19 @@ import android.util.Log;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
-@ParseClassName("ReceiptItem")
-public class ReceiptItem extends ParseObject {
+@ParseClassName("Ingredient")
+public class Ingredient extends ParseObject {
 
     private float quantity;
     private String description;
     private String price;
     private static final String TAG = "Item";
 
-    public ReceiptItem(){
+    public Ingredient(){
 
     }
 
-    public ReceiptItem(String description, String price) {
+    public Ingredient(String description, String price) {
         this.description = description;
         this.price = price;
     }

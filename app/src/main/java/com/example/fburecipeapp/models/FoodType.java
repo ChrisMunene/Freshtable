@@ -37,10 +37,7 @@ public class FoodType extends ParseObject {
         put(IMAGE, Image);
     }
 
-    public String getObject() {
-        return getString(OBJECT_ID);
-    }
-
+    // Get individual food items and convert to a list
     public List<String> getFoodItems(){
         String items = getString("Items");
         return Arrays.asList(items.split(","));

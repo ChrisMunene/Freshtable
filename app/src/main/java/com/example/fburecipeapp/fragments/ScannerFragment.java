@@ -14,16 +14,12 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.fburecipeapp.adapters.EditListAdapter;
-import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Receipt;
-import com.example.fburecipeapp.models.ReceiptItem;
+import com.example.fburecipeapp.models.Ingredient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,10 +45,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,7 +57,7 @@ import cz.msebera.android.httpclient.Header;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ScannerFragment extends Fragment {
+public class ScannerFragment extends Fragment implements EditItemsFragment.EditItemsDialogListener {
     private EditText descriptionInput;
     private Button createBtn;
     private FloatingActionButton fab;
@@ -103,8 +98,8 @@ public class ScannerFragment extends Fragment {
             public void onClick(View view) {
                 final String description = descriptionInput.getText().toString();
                 final ParseUser user = ParseUser.getCurrentUser();
-                final ParseFile file = new ParseFile(photoFile);
-                createPost(description, file, user);
+                final ParseFile file = new ParseFile(photoFile);;
+               // createPost(description, file, user);
             }
         });
 
@@ -117,30 +112,24 @@ public class ScannerFragment extends Fragment {
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
 
-        fetchAndScanReceipt("PbCbHLVFWP");
+        //fetchAndScanReceipt("PbCbHLVFWP");
     }
 
     // Creates a new post in Parse
-    private void createPost(String description, ParseFile image, ParseUser user){
+    private void createPost(String description, ParseFile image, ParseUser user, List<String> receiptItems){
         pd.show();
         final Receipt newReceipt = new Receipt();
         newReceipt.setDescription(description);
         newReceipt.setImage(image);
         newReceipt.setUser(user);
+        newReceipt.setReceiptItems(receiptItems);
 
         newReceipt.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.d(TAG, "Post Created Successfully");
+                    Log.d(TAG, "Post Created Successfully ");
                     Toast.makeText(getContext(), "Posted Successfully!", Toast.LENGTH_SHORT).show();
-                    // Navigate to timeline
-//                    Fragment frag = new HomeFragment();
-//                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                    ft.replace(R.id.flContainer, frag);
-//                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//                    ft.addToBackStack(null);
-//                    ft.commit();
                 } else {
                     e.printStackTrace();
                 }
@@ -169,7 +158,7 @@ public class ScannerFragment extends Fragment {
                     Log.d(TAG, String.format("Receipt %s ", url));
                     pd.dismiss();
 
-                    showEditDialog();
+                    //showEditDialog();
                     //scanReceipt(url);
                 } else {
                     e.printStackTrace();
@@ -182,10 +171,18 @@ public class ScannerFragment extends Fragment {
 
     }
 
-    private void scanReceipt(String url){
-        if(!pd.isShowing()) pd.show();
+    private void scanReceipt(){
+        if(!pd.isShowing()) {
+            pd.setTitle("Processing Receipt....");
+            pd.show();
+        }
+
         RequestParams params = new RequestParams();
-        params.put("url", url );
+        try {
+            params.put("file", photoFile );
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         params.put("isCreateSearchablePdf", false);
         params.put("isSearchablePdfHideTextLayer", false);
         params.put("filetype", "jpg");
@@ -205,11 +202,12 @@ public class ScannerFragment extends Fragment {
                         Matcher m = p.matcher(line);
                         if(m.find()){
                             //Log.d("Match", m.group());
-                            ReceiptItem item = new ReceiptItem(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
+                            Ingredient item = new Ingredient(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
                             item.print();
                         }
                     }
                     pd.dismiss();
+                    showEditDialog();
                 } catch (JSONException e) {
                     String message = e.getMessage();
                     Log.e(TAG, message);
@@ -286,13 +284,15 @@ public class ScannerFragment extends Fragment {
                 // by this point we have the camera photo on disk
                 // Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 // Rotate the image to the correct orientation
-                Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
+               // Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
 
                 // RESIZE BITMAP, see section below
                 // Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rotatedImage, SOME_WIDTH);
 
                 // Load the taken image into a preview
-                ivPreview.setImageBitmap(rotatedImage);
+                //ivPreview.setImageBitmap(rotatedImage);
+
+                scanReceipt();
 
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
@@ -331,8 +331,18 @@ public class ScannerFragment extends Fragment {
 
     private void showEditDialog(){
         FragmentManager fm = getFragmentManager();
-        EditItemsFragment frag = EditItemsFragment.newInstance();
-        frag.show(fm, "fragment_eidt_items");
+        if(fm != null){
+            EditItemsFragment frag = EditItemsFragment.newInstance();
+            frag.setTargetFragment(this, 0);
+            frag.show(fm, "fragment_edit_items");
+        }
     }
 
+    @Override
+    public void onFinishEditingList(List<String> foodItems) {
+        final String description = descriptionInput.getText().toString();
+        final ParseUser user = ParseUser.getCurrentUser();
+        final ParseFile file = new ParseFile(photoFile);
+        createPost(description, file, user, foodItems);
+    }
 }
