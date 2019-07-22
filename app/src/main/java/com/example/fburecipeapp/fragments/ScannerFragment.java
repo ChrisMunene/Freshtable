@@ -1,7 +1,9 @@
 package com.example.fburecipeapp.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -14,12 +16,14 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.fburecipeapp.helpers.PathProvider;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.Ingredient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
+import androidx.loader.content.CursorLoader;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,7 +50,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -68,6 +75,7 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
     private final static String OCR_URL = "https://api.ocr.space/parse/image";
     public final String TAG = "ScannerFragment";
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
+    public final static int PICK_PHOTO_CODE = 1046;
     File photoFile;
 
     @Nullable
@@ -80,7 +88,7 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         descriptionInput = view.findViewById(R.id.descriptionInput);
-        createBtn = view.findViewById(R.id.createBtn);
+        createBtn = view.findViewById(R.id.uploadFileBtn);
         fab = view.findViewById(R.id.fab);
         ivPreview = view.findViewById(R.id.ivPreview);
 
@@ -96,10 +104,7 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String description = descriptionInput.getText().toString();
-                final ParseUser user = ParseUser.getCurrentUser();
-                final ParseFile file = new ParseFile(photoFile);;
-               // createPost(description, file, user);
+               onPickPhoto(view);
             }
         });
 
@@ -178,6 +183,7 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
         }
 
         RequestParams params = new RequestParams();
+
         try {
             params.put("file", photoFile );
         } catch (FileNotFoundException e) {
@@ -270,6 +276,20 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
         return file;
     }
 
+    // Trigger gallery selection for a photo
+    public void onPickPhoto(View view) {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+        }
+    }
+
     // Returns a unique file name using current timestamp.
     public String generateUniqueFileName(){
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -279,24 +299,54 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                // by this point we have the camera photo on disk
-                // Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // Rotate the image to the correct orientation
-               // Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
+        switch (requestCode){
+            case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // by this point we have the camera photo on disk
+                    // Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                    // Rotate the image to the correct orientation
+                    // Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
 
-                // RESIZE BITMAP, see section below
-                // Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rotatedImage, SOME_WIDTH);
+                    // RESIZE BITMAP, see section below
+                    // Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rotatedImage, SOME_WIDTH);
 
-                // Load the taken image into a preview
-                //ivPreview.setImageBitmap(rotatedImage);
+                    // Load the taken image into a preview
+                    //ivPreview.setImageBitmap(rotatedImage);
 
-                scanReceipt();
+                    scanReceipt();
 
-            } else { // Result was a failure
-                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-            }
+                } else { // Result was a failure
+                    Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case PICK_PHOTO_CODE:
+                if (resultCode == RESULT_OK && data != null) {
+                    Uri photoUri = data.getData();
+
+                    // Do something with the photo based on Uri
+                    Bitmap selectedImage = null;
+                    try {
+                        selectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+                        photoFile = getPhotoFileUri(generateUniqueFileName());
+                        FileOutputStream fOut = new FileOutputStream(photoFile);
+                        selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                        fOut.flush();
+                        fOut.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    // Load the selected image into a preview
+                    ivPreview.setImageBitmap(selectedImage);
+
+                    scanReceipt();
+                } else {
+                    Toast.makeText(getContext(), "Problem picking image", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            default:
+                return;
         }
     }
 
@@ -345,4 +395,5 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
         final ParseFile file = new ParseFile(photoFile);
         createPost(description, file, user, foodItems);
     }
+
 }

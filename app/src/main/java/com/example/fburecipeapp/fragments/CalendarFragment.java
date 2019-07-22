@@ -137,7 +137,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
             super.onPostExecute(calendarDays);
             // adds dot on respective dates
-            widget.addDecorator(new EventDecorator(Color.BLUE, calendarDays));
+            widget.addDecorator(new EventDecorator(Color.RED, calendarDays));
         }
     }
 
