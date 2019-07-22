@@ -37,7 +37,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String foodItem = mItems.get(position);
-        holder.bind(foodItem); // setting Parse item text to our layout
+        holder.bind(foodItem); // setting item text to our layout
 
     }
 
@@ -60,7 +60,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             checkBox = itemView.findViewById(R.id.checkBox);
         }
         public void bind(final String foodItem){
-            tvFoodItem.setText(foodItem); // getting the Parse item text
+            tvFoodItem.setText(foodItem);
 
             // when the check box is clicked, want to change the boolean to the opposite of what it was
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

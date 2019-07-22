@@ -15,13 +15,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.fburecipeapp.activities.LoginActivity;
-import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.SwipeableRecyclerViewTouchListener;
+import com.example.fburecipeapp.activities.LoginActivity;
+import com.example.fburecipeapp.activities.TypeSelectionActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
-import com.parse.FindCallback;
-import com.parse.ParseException;
+import com.example.fburecipeapp.models.FoodType;
 import com.parse.ParseUser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,9 @@ public class KitchenFragment extends Fragment {
     public CardView card;
     public ImageButton logoutBtn;
     private ParseUser currentUser;
+    public ImageButton addFoodBtn;
+    public JSONArray JSONsavedItems;
+    public List<String> savedItems;
 
 
     @Nullable
@@ -49,22 +55,19 @@ public class KitchenFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        //Log.d("Kitchen Fragment", "Adapter set successfully");
-        recyclerView = view.findViewById(R.id.rvTypes);
-        addBtn = view.findViewById(R.id.addBtn);
         logoutBtn = view.findViewById(R.id.logoutBtn);
-        currentUser = ParseUser.getCurrentUser();
+        addFoodBtn = view.findViewById(R.id.addFoodBtn);
+        JSONsavedItems = new JSONArray();
+        savedItems = new ArrayList<>();
+        kitchenAdapter = new KitchenAdapter(savedItems);
+        recyclerView = view.findViewById(R.id.rvSaved);
+        recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
 
-        types = new ArrayList<>();
-        kitchenAdapter = new KitchenAdapter(types);
-        recyclerView.setAdapter(kitchenAdapter);
-        Log.d("Kitchen Fragment", "Adapter set successfully");
-        loadTypes();
+        loadSavedItems();
 
 
         // brings user to login activity when logout button is pressed
@@ -85,22 +88,64 @@ public class KitchenFragment extends Fragment {
             }
         });
 
+        addFoodBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(getContext(), TypeSelectionActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+
+            }
+        });
+
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(recyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+
+                    @Override
+                            public boolean canSwipeLeft(int position) {
+                                return true;
+                            }
+                            public boolean canSwipeRight(int position) {
+                                return false;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    savedItems.remove(position);
+                                    kitchenAdapter.notifyItemRemoved(position);
+                                }
+                                kitchenAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    savedItems.remove(position);
+                                    kitchenAdapter.notifyItemRemoved(position);
+                                }
+                                kitchenAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+        recyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
-    // queries food  categories from Parse
-    protected void loadTypes() {
-        FoodType.Query query = new FoodType.Query();
-        query.findInBackground(new FindCallback<FoodType>() {
-            public void done(List<FoodType> type, ParseException e) {
-                if (e == null) {
-                    Log.d("item count", String.format("%s" , type.size()));
-                    types.addAll(type);
-                    kitchenAdapter.notifyDataSetChanged(); // update adapter
-                }
-                else {
+    // loads the specific items for the food category
+    public void loadSavedItems() {
+        currentUser = ParseUser.getCurrentUser();
+        JSONsavedItems = currentUser.getJSONArray("userItems");
+        if (JSONsavedItems != null) {
+            for (int i = 0; i < JSONsavedItems.length(); i++) {
+                try {
+                    savedItems.add(JSONsavedItems.getString(i));
+                    kitchenAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        });
+        }
+        //Log.d("savedItems", Integer.toString(savedItems.size()));
     }
 }
