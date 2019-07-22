@@ -81,9 +81,6 @@ public class EditItemsFragment extends DialogFragment {
             public void onClick(View view) {
                 // Get selected items
                 List<String> selectedFoodItems = adapter.getSelectedFoodItems();
-                for(String item: selectedFoodItems){
-                    Log.d("Item", item);
-                }
                 sendBackResult(selectedFoodItems);
             }
         });
