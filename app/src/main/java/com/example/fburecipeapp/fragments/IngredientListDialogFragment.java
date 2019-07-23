@@ -7,21 +7,23 @@ import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.adapters.EditListAdapter;
 import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.example.fburecipeapp.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +40,16 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
 
     private RecyclerView rvIngredients;
     private List<String> foodTypes;
+    private List<ReceiptItem> receiptItems;
+    private List<String> precheckedIngredients = new ArrayList<>();
     private EditListAdapter adapter;
     private Button submitBtn;
+    private static final String TAG = IngredientListDialogFragment.class.getSimpleName();
 
-    public static IngredientListDialogFragment newInstance() {
+    public static IngredientListDialogFragment newInstance(List<ReceiptItem> receiptItems) {
         final IngredientListDialogFragment fragment = new IngredientListDialogFragment();
         final Bundle args = new Bundle();
+        args.putParcelable("ReceiptItems", Parcels.wrap(receiptItems));
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,7 +67,8 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         submitBtn = view.findViewById(R.id.submitBtn);
         rvIngredients = view.findViewById(R.id.rvFoodTypes);
         foodTypes = new ArrayList<>();
-        adapter = new EditListAdapter(getContext(), foodTypes);
+        receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
+        adapter = new EditListAdapter(getContext(), foodTypes, precheckedIngredients);
         rvIngredients.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rvIngredients.setLayoutManager(linearLayoutManager);
@@ -105,6 +112,7 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
                         adapter.notifyDataSetChanged();
                     }
 
+                    getPrecheckedIngredients();
                 }
                 else {
                     e.printStackTrace();
@@ -117,6 +125,20 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         Listener listener = (Listener) getTargetFragment();
         listener.onFinishEditingList(selectedFoodItems);
         dismiss();
+    }
+
+    // List the ingredient found in a receipt
+    public void getPrecheckedIngredients(){
+        for (ReceiptItem receiptItem: receiptItems){
+            for(String ingredient: foodTypes){
+                // toLowercase used because .contains is case sensitive -- Java SMH :(
+                if(receiptItem.getDescription().toLowerCase().contains(ingredient.toLowerCase()) && !precheckedIngredients.contains(ingredient.toLowerCase())){
+                    precheckedIngredients.add(ingredient);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
+
     }
 
 }

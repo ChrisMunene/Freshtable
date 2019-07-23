@@ -1,9 +1,7 @@
 package com.example.fburecipeapp.fragments;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -16,14 +14,12 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.fburecipeapp.helpers.PathProvider;
 import com.example.fburecipeapp.models.Receipt;
-import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,7 +34,6 @@ import com.example.fburecipeapp.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -52,11 +47,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -75,7 +67,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     private AsyncHttpClient client;
 
     private final static String OCR_URL = "https://api.ocr.space/parse/image";
-    public final String TAG = "ScannerFragment";
+    public final String TAG = ScannerFragment.class.getSimpleName();
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public final static int PICK_PHOTO_CODE = 1046;
     File photoFile;
@@ -119,7 +111,6 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
 
-        //fetchAndScanReceipt("PbCbHLVFWP");
     }
 
     // Creates a new post in Parse
@@ -151,33 +142,6 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         });
     }
 
-    private void fetchAndScanReceipt(String id){
-        pd.show();
-
-        final Receipt.Query receiptQuery = new Receipt.Query();
-        receiptQuery.whereId(id);
-        receiptQuery.findInBackground(new FindCallback<Receipt>() {
-            @Override
-            public void done(List<Receipt> receipts, ParseException e) {
-                if(e == null){
-                    Receipt receipt = receipts.get(0);
-                    String url = receipt.getImage().getUrl();
-                    Log.d(TAG, String.format("Receipt %s ", url));
-                    pd.dismiss();
-
-                    //showEditDialog();
-                    //scanReceipt(url);
-                } else {
-                    e.printStackTrace();
-                    pd.dismiss();
-                }
-
-
-            }
-        });
-
-    }
-
     private void scanReceipt(){
         if(!pd.isShowing()) {
             pd.setTitle("Processing Receipt....");
@@ -205,16 +169,18 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
                     String[] lines = parsedText.split("\n");
                     Log.d(TAG, parsedText);
                     Log.d(TAG, "--------------------------------");
+                    List<ReceiptItem> receiptItems = new ArrayList<>();
                     for (String line: lines) {
                         Pattern p = Pattern.compile("([a-zA-Z0-9]*)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\s*\\d*)+");
                         Matcher m = p.matcher(line);
                         if(m.find()){
-                            Ingredient item = new Ingredient(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
+                            ReceiptItem item = new ReceiptItem(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
+                            receiptItems.add(item);
                             item.print();
                         }
                     }
                     pd.dismiss();
-                    showEditDialog();
+                    showEditDialog(receiptItems);
                 } catch (JSONException e) {
                     String message = e.getMessage();
                     Log.e(TAG, message);
@@ -225,14 +191,16 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                throwable.printStackTrace();
+                Log.e(TAG, "Scan failed", throwable);
                 pd.dismiss();
+                showEditDialog(null);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                throwable.printStackTrace();
+                Log.e(TAG, "Scan failed", throwable);
                 pd.dismiss();
+                showEditDialog(null);
             }
         });
 
@@ -387,10 +355,10 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         return rotatedBitmap;
     }
 
-    private void showEditDialog(){
+    private void showEditDialog(List<ReceiptItem> receiptItems){
         FragmentManager fm = getFragmentManager();
         if(fm != null){
-            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance();
+            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance(receiptItems);
             frag.setTargetFragment(this, 0);
             frag.show(fm, "fragment_edit_items");
         }
@@ -402,18 +370,6 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseFile file = new ParseFile(photoFile);
         createPost(description, file, user, foodItems);
-    }
-
-    // List the ingredient found in a receipt
-    public static List ingredientMatches(Ingredient receiptItem, List<String> ingredients){
-        List<String> foundIngredients = new ArrayList<>();
-        for(String ingredient: ingredients){
-            if(receiptItem.getDescription().contains(ingredient)){
-                foundIngredients.add(ingredient);
-            }
-        }
-
-        return foundIngredients;
     }
 
 }

@@ -58,4 +58,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.0'
     implementation 'com.loopj.android:android-async-http:1.4.9'
+    implementation 'org.parceler:parceler-api:1.1.12'
+    annotationProcessor 'org.parceler:parceler:1.1.12'
 }

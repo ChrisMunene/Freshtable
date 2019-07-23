@@ -2,22 +2,21 @@ package com.example.fburecipeapp.models;
 
 import android.util.Log;
 
-import com.parse.ParseClassName;
-import com.parse.ParseObject;
+import org.parceler.Parcel;
 
-@ParseClassName("Ingredient")
-public class Ingredient extends ParseObject {
+@Parcel
+public class ReceiptItem {
 
     private float quantity;
     private String description;
     private String price;
     private static final String TAG = "Item";
 
-    public Ingredient(){
+    public ReceiptItem(){
 
     }
 
-    public Ingredient(String description, String price) {
+    public ReceiptItem(String description, String price) {
         this.description = description;
         this.price = price;
     }

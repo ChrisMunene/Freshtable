@@ -30,11 +30,15 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
 
     private Context context;
     private List<String> foodTypes;
-    private List<String> selectedFoodItems = new ArrayList<>();
+    private List<String> selectedFoodItems;
 
-    public EditListAdapter(Context context, List<String> foodTypes) {
+    public EditListAdapter(Context context, List<String> foodTypes, List<String> precheckedIngredients) {
         this.context = context;
         this.foodTypes= foodTypes;
+        this.selectedFoodItems = precheckedIngredients;
+        for(String item: precheckedIngredients){
+            Log.d("Adapter", item);
+        }
     }
 
     @NonNull

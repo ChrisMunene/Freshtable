@@ -2,7 +2,6 @@ package com.example.fburecipeapp.helpers;
 
 import android.app.Application;
 
-import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
 
 import com.example.fburecipeapp.models.FoodType;
@@ -31,7 +30,6 @@ public class ParseApplication extends Application {
 
         ParseObject.registerSubclass(FoodType.class);
         ParseObject.registerSubclass(Receipt.class);
-        ParseObject.registerSubclass(Ingredient.class);
 
         // set applicationId, and server server based on the values in the Heroku settings.
         // clientKey is not needed unless explicitly configured
