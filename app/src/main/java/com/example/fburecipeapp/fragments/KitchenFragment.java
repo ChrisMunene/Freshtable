@@ -21,7 +21,9 @@ import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.activities.TypeSelectionActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.example.fburecipeapp.models.FoodType;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +45,7 @@ public class KitchenFragment extends Fragment {
     public ImageButton addFoodBtn;
     public JSONArray JSONsavedItems;
     public List<String> savedItems;
+    public ArrayList<String> removedItems;
 
 
     @Nullable
@@ -59,12 +62,14 @@ public class KitchenFragment extends Fragment {
         addFoodBtn = view.findViewById(R.id.addFoodBtn);
         JSONsavedItems = new JSONArray();
         savedItems = new ArrayList<>();
+        removedItems = new ArrayList<>();
         kitchenAdapter = new KitchenAdapter(savedItems);
         recyclerView = view.findViewById(R.id.rvSaved);
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        currentUser = ParseUser.getCurrentUser();
 
 
         loadSavedItems();
@@ -113,8 +118,20 @@ public class KitchenFragment extends Fragment {
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
+                                    removedItems.add(savedItems.get(position));
                                     savedItems.remove(position);
                                     kitchenAdapter.notifyItemRemoved(position);
+
+                                    currentUser = ParseUser.getCurrentUser();
+                                    JSONsavedItems = currentUser.getJSONArray("userItems");
+                                    JSONsavedItems.remove(position);
+                                    currentUser.put("userItems", JSONsavedItems);
+                                    currentUser.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            Log.d("Parse", "items removed from Parse");
+                                        }
+                                    });
                                 }
                                 kitchenAdapter.notifyDataSetChanged();
                             }
@@ -146,6 +163,5 @@ public class KitchenFragment extends Fragment {
                 }
             }
         }
-        //Log.d("savedItems", Integer.toString(savedItems.size()));
     }
 }
