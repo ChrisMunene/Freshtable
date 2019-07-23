@@ -6,21 +6,17 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 @ParseClassName("foodTypes")
 public class FoodType extends ParseObject {
 
     public static final String TYPE = "Type";
     public static final String IMAGE = "Image";
-    public static final String OBJECT_ID = "objectId";
     public static final String ITEMS = "Items";
 
+    // get food category
     public String getType() {
         return getString(TYPE);
     }
@@ -29,6 +25,7 @@ public class FoodType extends ParseObject {
         put(TYPE, type);
     }
 
+    // get food category image
     public ParseFile getImage() {
         return getParseFile(IMAGE);
     }
@@ -37,7 +34,8 @@ public class FoodType extends ParseObject {
         put(IMAGE, Image);
     }
 
-    // Get individual food items and convert to a list
+    // get specific food items
+
     public List<String> getFoodItems(){
         String items = getString("Items");
         return Arrays.asList(items.split(","));

@@ -67,6 +67,7 @@ public class KitchenFragment extends Fragment {
         loadTypes();
 
 
+        // brings user to login activity when logout button is pressed
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,13 +87,13 @@ public class KitchenFragment extends Fragment {
 
     }
 
+    // queries food  categories from Parse
     protected void loadTypes() {
         FoodType.Query query = new FoodType.Query();
         query.findInBackground(new FindCallback<FoodType>() {
             public void done(List<FoodType> type, ParseException e) {
                 if (e == null) {
                     Log.d("item count", String.format("%s" , type.size()));
-                    //types.clear();
                     types.addAll(type);
                     kitchenAdapter.notifyDataSetChanged(); // update adapter
                 }

@@ -5,13 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
-import com.example.fburecipeapp.models.FoodType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,8 @@ import java.util.List;
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 
     public Context context;
-    public ArrayList<FoodType> mItems;
-    public String objectId;
-    public List<FoodType> mTypes;
+    public List<String> mItems;
+    ArrayList<String> selectedList = new ArrayList<String>();
 
     @NonNull
     @Override
@@ -36,8 +36,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        FoodType foodType = mItems.get(position);
-        holder.foodItem.setText("egg");
+        String foodItem = mItems.get(position);
+        holder.bind(foodItem); // setting Parse item text to our layout
 
     }
 
@@ -48,21 +48,42 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView foodItem;
+        public TextView tvFoodItem;
+
         public CheckBox checkBox;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            foodItem = itemView.findViewById(R.id.tvFoodItem);
+
+            tvFoodItem = itemView.findViewById(R.id.tvFoodItem);
             checkBox = itemView.findViewById(R.id.checkBox);
+        }
+        public void bind(final String foodItem){
+            tvFoodItem.setText(foodItem); // getting the Parse item text
+
+            // when the check box is clicked, want to change the boolean to the opposite of what it was
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(isChecked) {
+                            selectedList.add(foodItem);
+                        }
+                        else {
+                            selectedList.remove(foodItem);
+                        }
+                }
+            });
         }
 
     }
 
-    public ItemsAdapter (ArrayList<FoodType> items) {
+    public ItemsAdapter (List<String> items) {
         mItems = items;
     }
 
+    public ArrayList getSelectedItems() {
+        return selectedList;
+    }
 
 }
