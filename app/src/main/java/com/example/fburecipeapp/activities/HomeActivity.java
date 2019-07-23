@@ -37,7 +37,6 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.action_calendar:
                     fragment = new CalendarFragment();
                     break;
-
             }
 
             fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commitNow();
