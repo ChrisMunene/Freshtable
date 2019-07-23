@@ -7,6 +7,7 @@ import com.example.fburecipeapp.models.Receipt;
 
 import com.example.fburecipeapp.models.FoodType;
 
+import com.example.fburecipeapp.models.TempIngredients;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -32,6 +33,8 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(FoodType.class);
         ParseObject.registerSubclass(Receipt.class);
         ParseObject.registerSubclass(Ingredient.class);
+        ParseObject.registerSubclass(TempIngredients.class);
+
 
         // set applicationId, and server server based on the values in the Heroku settings.
         // clientKey is not needed unless explicitly configured
