@@ -106,7 +106,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              onPickPhoto(view);
+                onPickPhoto(view);
             }
         });
 

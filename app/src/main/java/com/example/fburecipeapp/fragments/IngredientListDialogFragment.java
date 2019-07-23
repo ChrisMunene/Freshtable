@@ -36,19 +36,14 @@ import java.util.List;
  */
 public class IngredientListDialogFragment extends BottomSheetDialogFragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_ITEM_COUNT = "item_count";
     private RecyclerView rvIngredients;
     private List<String> foodTypes;
     private EditListAdapter adapter;
-    private Button cancelBtn;
     private Button submitBtn;
 
-    // TODO: Customize parameters
     public static IngredientListDialogFragment newInstance() {
         final IngredientListDialogFragment fragment = new IngredientListDialogFragment();
         final Bundle args = new Bundle();
-       // args.putInt(ARG_ITEM_COUNT, itemCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,23 +58,13 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        cancelBtn =view.findViewById(R.id.cancelBtn);
         submitBtn = view.findViewById(R.id.submitBtn);
         rvIngredients = view.findViewById(R.id.rvFoodTypes);
         foodTypes = new ArrayList<>();
         adapter = new EditListAdapter(getContext(), foodTypes);
         rvIngredients.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rvIngredients.setLayoutManager(linearLayoutManager);
-
-
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Return to parent
-                dismiss();
-            }
-        });
 
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override

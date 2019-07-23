@@ -18,6 +18,7 @@ public class Receipt extends ParseObject {
     private static final String KEY_ID = "objectId";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_RECEIPT_ITEMS = "receiptItems";
+    private static final String KEY_TITLE = "title";
 
     public String getDescription(){
         return getString(KEY_DESCRIPTION);
@@ -25,6 +26,14 @@ public class Receipt extends ParseObject {
 
     public void setDescription(String description){
         put(KEY_DESCRIPTION, description);
+    }
+
+    public String getTitle(){
+        return getString(KEY_TITLE);
+    }
+
+    public void setTitle(String title){
+        put(KEY_TITLE, title);
     }
 
     public ParseUser getUser(){
