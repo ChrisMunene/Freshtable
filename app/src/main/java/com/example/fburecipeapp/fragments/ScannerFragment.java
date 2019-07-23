@@ -55,6 +55,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -64,7 +66,7 @@ import cz.msebera.android.httpclient.Header;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ScannerFragment extends Fragment implements EditItemsFragment.EditItemsDialogListener {
+public class ScannerFragment extends Fragment implements IngredientListDialogFragment.Listener {
     private EditText descriptionInput;
     private Button createBtn;
     private FloatingActionButton fab;
@@ -104,7 +106,7 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               onPickPhoto(view);
+              onPickPhoto(view);
             }
         });
 
@@ -207,7 +209,6 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
                         Pattern p = Pattern.compile("([a-zA-Z0-9]*)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\s*\\d*)+");
                         Matcher m = p.matcher(line);
                         if(m.find()){
-                            //Log.d("Match", m.group());
                             Ingredient item = new Ingredient(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
                             item.print();
                         }
@@ -327,18 +328,25 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
                     // Do something with the photo based on Uri
                     Bitmap selectedImage = null;
                     try {
+                        // Get bitmap from Uri
                         selectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+
+                        // Create new file
                         photoFile = getPhotoFileUri(generateUniqueFileName());
+
+                        // Write bitmap to file
                         FileOutputStream fOut = new FileOutputStream(photoFile);
                         selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
                         fOut.flush();
                         fOut.close();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     // Load the selected image into a preview
                     ivPreview.setImageBitmap(selectedImage);
 
+                    // Initiate scanning
                     scanReceipt();
                 } else {
                     Toast.makeText(getContext(), "Problem picking image", Toast.LENGTH_SHORT).show();
@@ -382,7 +390,7 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
     private void showEditDialog(){
         FragmentManager fm = getFragmentManager();
         if(fm != null){
-            EditItemsFragment frag = EditItemsFragment.newInstance();
+            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance();
             frag.setTargetFragment(this, 0);
             frag.show(fm, "fragment_edit_items");
         }
@@ -394,6 +402,18 @@ public class ScannerFragment extends Fragment implements EditItemsFragment.EditI
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseFile file = new ParseFile(photoFile);
         createPost(description, file, user, foodItems);
+    }
+
+    // List the ingredient found in a receipt
+    public static List ingredientMatches(Ingredient receiptItem, List<String> ingredients){
+        List<String> foundIngredients = new ArrayList<>();
+        for(String ingredient: ingredients){
+            if(receiptItem.getDescription().contains(ingredient)){
+                foundIngredients.add(ingredient);
+            }
+        }
+
+        return foundIngredients;
     }
 
 }
