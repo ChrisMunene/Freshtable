@@ -271,16 +271,16 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         switch (requestCode){
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-                    // by this point we have the camera photo on disk
-                    // Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                    // Rotate the image to the correct orientation
-                    // Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
+                     // by this point we have the camera photo on disk
+                     Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                     // Rotate the image to the correct orientation
+                     Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
 
-                    // RESIZE BITMAP, see section below
+                     // TODO - Resize Bitmap
                     // Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rotatedImage, SOME_WIDTH);
 
-                    // Load the taken image into a preview
-                    //ivPreview.setImageBitmap(rotatedImage);
+                     // Load the taken image into a preview
+                    ivPreview.setImageBitmap(rotatedImage);
 
                     scanReceipt();
 
