@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.KitchenFragment;
+import com.example.fburecipeapp.fragments.RecipeFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -34,6 +35,7 @@ public class HomeActivity extends AppCompatActivity {
                     fragment = new ScannerFragment();
                     break;
                 case R.id.action_recipes:
+                    fragment = new RecipeFragment();
                     break;
                 case R.id.action_calendar:
                     fragment = new CalendarFragment();

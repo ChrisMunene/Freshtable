@@ -1,0 +1,71 @@
+package com.example.fburecipeapp.fragments;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.adapters.StaggeredRecyclerViewAdapter;
+import com.example.fburecipeapp.models.Recipe;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RecipeFragment extends Fragment {
+
+    private static final int NUM_COLUMNS = 2;
+
+    private ArrayList<String> mImages = new ArrayList<>();
+    private ArrayList<Recipe> mRecipes = new ArrayList<>();
+    private StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter;
+
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d("Kitchen fragment", "OnCreateView success");
+        return inflater.inflate(R.layout.fragment_recipe, container, false);
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
+        staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext());
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerView.setAdapter(staggeredRecyclerViewAdapter);
+
+        loadRecipes();
+
+    }
+
+    private void loadRecipes() {
+        Recipe.Query query = new Recipe.Query();
+        query.findInBackground(new FindCallback<Recipe>() {
+            public void done(List<Recipe> recipe, ParseException e) {
+                if (e == null) {
+                    Log.d("item count", String.format("%s" , recipe.size()));
+                    mRecipes.addAll(recipe);
+                    staggeredRecyclerViewAdapter.notifyDataSetChanged(); // update adapter
+                }
+                else {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+}
