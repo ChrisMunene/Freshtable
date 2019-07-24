@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +17,21 @@ import androidx.fragment.app.Fragment;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.decorators.EventDecorator;
 import com.example.fburecipeapp.decorators.OneDayDecorator;
+import com.example.fburecipeapp.models.TempIngredients;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.Month;
+import org.threeten.bp.ZoneId;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +45,11 @@ import butterknife.Unbinder;
 public class CalendarFragment extends Fragment implements OnDateSelectedListener{
 
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
-    private static final Map<LocalDate, List<String>> fakeData = new HashMap<LocalDate, List<String>>();
+    private static final Map<LocalDate, List<String>> realData = new HashMap<LocalDate, List<String>>();
+
+    private static final String TAG = "CalendarFragment";
+
+    protected List<TempIngredients> mIngredients;
 
     @BindView(R.id.calendarView) MaterialCalendarView widget;
     @BindView(R.id.textView) TextView textView;
@@ -60,8 +72,10 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         // Set-up initial text
         textView.setText("No Expired Items Here");
 
-        // Set-up fake data
-        setUpData();
+        // Create the data source
+        mIngredients = new ArrayList<>();
+
+        fetchTimelineAsync(0);
 
         widget.setOnDateChangedListener(this);
         widget.setShowOtherDates(MaterialCalendarView.SHOW_ALL);
@@ -98,7 +112,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
      * Get items to set text when a date is clicked
      */
     public List<String> getItems(LocalDate calendarDay) {
-        List<String> items = fakeData.get(calendarDay);
+        List<String> items = realData.get(calendarDay);
 
         if (items == null) {
             List<String> temp = new ArrayList<String>();
@@ -125,7 +139,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
             final ArrayList<CalendarDay> dates = new ArrayList<>();
 
             // dates on which items will expire
-            for (LocalDate temp : fakeData.keySet()) {
+            for (LocalDate temp : realData.keySet()) {
                 final CalendarDay day = CalendarDay.from(temp);
                 dates.add(day);
             }
@@ -137,49 +151,68 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
             super.onPostExecute(calendarDays);
             // adds dot on respective dates
-            widget.addDecorator(new EventDecorator(Color.BLUE, calendarDays));
+            widget.addDecorator(new EventDecorator(Color.RED, calendarDays));
         }
     }
 
     /**
-     * Set up fake data
-     * TODO: replace with information from Parse
+     * Set up data
      */
     private void setUpData() {
-        populateMap(LocalDate.of(2019, 7, 24), "Bread");
-        populateMap(LocalDate.of(2019, 7, 28), "Milk");
-        populateMap(LocalDate.of(2019, 8, 5), "Eggs");
-        populateMap(LocalDate.of(2019, 8, 8), "Strawberries");
-        populateMap(LocalDate.of(2019, 8, 8), "Raspberries");
-        populateMap(LocalDate.of(2019, 7, 30), "Banana");
-        populateMap(LocalDate.of(2019, 7, 28), "Cheese");
-        populateMap(LocalDate.of(2019, 8, 12), "Potatoes");
-        populateMap(LocalDate.of(2019, 9, 15), "Butter");
-        populateMap(LocalDate.of(2019, 7, 29), "Fish");
-        populateMap(LocalDate.of(2019, 7, 29), "Chicken");
-        populateMap(LocalDate.of(2020, 7, 24), "Honey");
-        populateMap(LocalDate.of(2019, 8, 23), "Yogurt");
-        populateMap(LocalDate.of(2020, 8, 7), "Peanut Butter");
-        populateMap(LocalDate.of(2019, 7, 30), "Ham");
+
+        for(TempIngredients ingredient : mIngredients) {
+            Date date = ingredient.getCreatedAt();
+            LocalDate localDate = convertToLocalDateViaMilisecond(date);
+            localDate = localDate.plusDays(ingredient.getDuration());
+
+            String item = ingredient.getName();
+
+            populateMap(localDate, item);
+
+        }
+
     }
 
     /**
-     * Populate map with fake data
+     * Populate map with data
      */
     private void populateMap(LocalDate day, String item) {
-        if (fakeData.containsKey(day)) {
-            fakeData.get(day).add(item);
-        } else {
+        if (realData.containsKey(day) && !realData.containsValue(item)) {
+            realData.get(day).add(item);
+        } else if (!realData.containsValue(item)){
             List<String> items = new ArrayList<String>();
             items.add(item);
-            fakeData.put(day, items);
+            realData.put(day, items);
         }
     }
 
-//    @TargetApi(26)
-//    public java.time.LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
-//        return Instant.ofEpochMilli(dateToConvert.getTime())
-//                .atZone(ZoneId.systemDefault())
-//                .toLocalDate();
-//    }
+    @TargetApi(26)
+    public LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
+        return Instant.ofEpochMilli(dateToConvert.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        // LocalDateTime localDateTime = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        //        LOOK INTO THIS
+    }
+
+
+    public void fetchTimelineAsync(int page) {
+        ParseQuery<TempIngredients> tempIngredientsQuery = new ParseQuery<TempIngredients>(TempIngredients.class);
+        tempIngredientsQuery.include(TempIngredients.KEY_NAME);
+
+        tempIngredientsQuery.findInBackground(new FindCallback<TempIngredients>() {
+            @Override
+            public void done(List<TempIngredients> objects, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Error with query");
+                    e.printStackTrace();
+                    return;
+                }
+                mIngredients.addAll(objects);
+                setUpData();
+            }
+        });
+    }
+
 }

@@ -40,7 +40,6 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.action_calendar:
                     fragment = new CalendarFragment();
                     break;
-
             }
 
             // replaces empty container with whichever fragment is called
