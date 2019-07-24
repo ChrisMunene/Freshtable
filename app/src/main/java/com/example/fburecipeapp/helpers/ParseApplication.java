@@ -2,6 +2,11 @@ package com.example.fburecipeapp.helpers;
 
 import android.app.Application;
 
+import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.Receipt;
+import com.example.fburecipeapp.models.Recipe;
+import com.example.fburecipeapp.models.User;
+
 import com.example.fburecipeapp.models.Receipt;
 
 import com.example.fburecipeapp.models.FoodType;
@@ -9,6 +14,7 @@ import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.TempIngredients;
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -31,7 +37,10 @@ public class ParseApplication extends Application {
 
         ParseObject.registerSubclass(FoodType.class);
         ParseObject.registerSubclass(Receipt.class);
+        ParseUser.registerSubclass(User.class);
+        ParseUser.registerSubclass(Recipe.class);
         ParseObject.registerSubclass(TempIngredients.class);
+
 
         // set applicationId, and server server based on the values in the Heroku settings.
         // clientKey is not needed unless explicitly configured

@@ -19,7 +19,9 @@
         <activity android:name=".activities.KitchenMenuActivity" />
         <activity
             android:name=".activities.HomeActivity"
-            android:label="@string/title_activity_home" />
+            android:label="@string/title_activity_home"></activity>
+        <activity android:name=".activities.TypeSelectionActivity"></activity>
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
