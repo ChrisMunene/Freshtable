@@ -21,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -115,9 +116,10 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
     // Creates a new post in Parse
-    private void createPost(String description, ParseFile image, ParseUser user, List<Ingredient> receiptItems){
+    private void postReceipt(String title, String description, ParseFile image, ParseUser user, List<Ingredient> receiptItems){
         pd.show();
         final Receipt newReceipt = new Receipt();
+        newReceipt.setTitle(title);
         newReceipt.setDescription(description);
         newReceipt.setImage(image);
         newReceipt.setUser(user);
@@ -132,12 +134,14 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
                     Log.e(TAG, "Failed to post receipt", e);
                 }
 
-                //Reset input form
-                descriptionInput.setText("");
+                //Reset image field
                 ivPreview.setImageResource(0);
 
                 // Dismiss progress dialog
                 pd.dismiss();
+
+                // Redirect
+                redirectToFragment(new KitchenFragment());
             }
         });
     }
@@ -365,11 +369,18 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
     @Override
-    public void onFinishEditingList(List<Ingredient> foodItems) {
-        final String description = descriptionInput.getText().toString();
+    public void onFinishEditingList(String title, String description, List<Ingredient> foodItems) {
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseFile file = new ParseFile(photoFile);
-        createPost(description, file, user, foodItems);
+        postReceipt(title, description, file, user, foodItems);
+    }
+
+    private void redirectToFragment(Fragment destination){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.flContainer, destination);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 }

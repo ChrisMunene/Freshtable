@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.adapters.EditListAdapter;
-import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -20,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.fburecipeapp.R;
 import com.parse.FindCallback;
@@ -41,6 +41,8 @@ import java.util.List;
 public class IngredientListDialogFragment extends BottomSheetDialogFragment {
 
     private RecyclerView rvIngredients;
+    private EditText titleInput;
+    private EditText descriptionInput;
     private List<Ingredient> ingredients;
     private List<ReceiptItem> receiptItems;
     private List<Ingredient> precheckedIngredients = new ArrayList<>();
@@ -67,13 +69,15 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         submitBtn = view.findViewById(R.id.submitBtn);
-        rvIngredients = view.findViewById(R.id.rvFoodTypes);
+        rvIngredients = view.findViewById(R.id.rvIngredients);
+        titleInput = view.findViewById(R.id.titleInput);
+        descriptionInput = view.findViewById(R.id.descriptionInput);
         ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
         adapter = new EditListAdapter(getContext(), ingredients, precheckedIngredients);
         rvIngredients.setAdapter(adapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rvIngredients.setLayoutManager(linearLayoutManager);
 
         submitBtn.setOnClickListener(new View.OnClickListener(){
@@ -99,7 +103,7 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     }
 
     public interface Listener {
-        void onFinishEditingList(List<Ingredient> foodItems);
+        void onFinishEditingList(String title, String description, List<Ingredient> foodItems);
     }
 
 
@@ -123,7 +127,9 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
 
     public void sendBackResult(List<Ingredient> selectedFoodItems){
         Listener listener = (Listener) getTargetFragment();
-        listener.onFinishEditingList(selectedFoodItems);
+        String title = titleInput.getText().toString();
+        String description = descriptionInput.getText().toString();
+        listener.onFinishEditingList(title, description, selectedFoodItems);
         dismiss();
     }
 
