@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/my_kitchen_gradient"
     tools:context=".activities.KitchenMenuActivity">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -21,11 +22,14 @@
 
     <Button
         android:id="@+id/kitchenSaveBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="#B5E1E9"
+        android:layout_width="179dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/login_button"
         android:text="Save"
+        android:textColor="#F8F2F2"
+        android:textSize="17sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

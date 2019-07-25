@@ -12,9 +12,9 @@ import java.util.List;
 @ParseClassName("foodTypes")
 public class FoodType extends ParseObject {
 
-    public static final String TYPE = "Type";
-    public static final String IMAGE = "Image";
-    public static final String ITEMS = "Items";
+    private static final String TYPE = "Type";
+    private static final String IMAGE = "Image";
+    private static final String ITEMS = "Items";
 
     // get food category
     public String getType() {

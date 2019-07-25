@@ -65,6 +65,7 @@ public class KitchenFragment extends Fragment {
         removedItems = new ArrayList<>();
         kitchenAdapter = new KitchenAdapter(savedItems);
         recyclerView = view.findViewById(R.id.rvSaved);
+        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new LinearLayoutManager(getContext());

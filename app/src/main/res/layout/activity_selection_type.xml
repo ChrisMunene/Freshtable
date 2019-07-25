@@ -4,38 +4,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:id="@+id/tvKitchen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingBottom="10dp"
-        android:text="Add Items"
-        android:textSize="35sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="match_parent"
+    android:background="@drawable/my_kitchen_gradient">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTypes"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="8dp"
+        android:scrollbarAlwaysDrawHorizontalTrack="false"
+        android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvKitchen" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <ImageButton
         android:id="@+id/returnBtn"
-        android:layout_width="51dp"
-        android:layout_height="47dp"
+        android:layout_width="62dp"
+        android:layout_height="54dp"
         android:background="#00FFFFFF"
+        android:tint="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/return_icon" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="221dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="24dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_add_items" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

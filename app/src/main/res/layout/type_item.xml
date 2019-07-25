@@ -10,7 +10,8 @@
     android:clickable="true"
     card_view:cardCornerRadius="10dp"
     card_view:cardPreventCornerOverlap="false"
-    card_view:cardUseCompatPadding="true">
+    card_view:cardUseCompatPadding="true"
+    card_view:contentPadding="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
