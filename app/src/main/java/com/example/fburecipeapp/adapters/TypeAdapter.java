@@ -98,3 +98,4 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         }
 }
 
+
