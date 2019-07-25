@@ -48,7 +48,7 @@ public class Receipt extends ParseObject {
         put(KEY_IMAGE, image);
     }
 
-    public void setReceiptItems(List<String> receiptItems){
+    public void setReceiptItems(List<Ingredient> receiptItems){
         put(KEY_RECEIPT_ITEMS, receiptItems);
     }
 

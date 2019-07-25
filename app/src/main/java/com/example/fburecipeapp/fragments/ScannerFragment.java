@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -114,7 +115,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
     // Creates a new post in Parse
-    private void createPost(String description, ParseFile image, ParseUser user, List<String> receiptItems){
+    private void createPost(String description, ParseFile image, ParseUser user, List<Ingredient> receiptItems){
         pd.show();
         final Receipt newReceipt = new Receipt();
         newReceipt.setDescription(description);
@@ -126,10 +127,9 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.d(TAG, "Post Created Successfully ");
-                    Toast.makeText(getContext(), "Posted Successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Receipt Saved Successfully!", Toast.LENGTH_SHORT).show();
                 } else {
-                    e.printStackTrace();
+                    Log.e(TAG, "Failed to post receipt", e);
                 }
 
                 //Reset input form
@@ -365,7 +365,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
     @Override
-    public void onFinishEditingList(List<String> foodItems) {
+    public void onFinishEditingList(List<Ingredient> foodItems) {
         final String description = descriptionInput.getText().toString();
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseFile file = new ParseFile(photoFile);
