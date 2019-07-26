@@ -44,8 +44,8 @@ import butterknife.Unbinder;
 
 public class CalendarFragment extends Fragment implements OnDateSelectedListener{
 
-    private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
-    private static final Map<LocalDate, List<String>> realData = new HashMap<LocalDate, List<String>>();
+    private final OneDayDecorator oneDayDecorator;
+    private Map<LocalDate, List<String>> realData;
 
     private static final String TAG = "CalendarFragment";
 
@@ -54,6 +54,11 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     @BindView(R.id.calendarView) MaterialCalendarView widget;
     @BindView(R.id.textView) TextView textView;
     private Unbinder unbinder;
+
+    public CalendarFragment() {
+        this.realData = new HashMap<LocalDate, List<String>>();
+        this.oneDayDecorator = new OneDayDecorator();
+    }
 
     @Nullable
     @Override
@@ -131,7 +136,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         @Override
         protected List<CalendarDay> doInBackground(@NonNull Void... voids) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
