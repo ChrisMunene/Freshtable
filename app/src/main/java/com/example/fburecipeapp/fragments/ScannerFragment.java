@@ -14,12 +14,14 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -114,9 +116,10 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
     // Creates a new post in Parse
-    private void createPost(String description, ParseFile image, ParseUser user, List<String> receiptItems){
+    private void postReceipt(String title, String description, ParseFile image, ParseUser user, List<Ingredient> receiptItems){
         pd.show();
         final Receipt newReceipt = new Receipt();
+        newReceipt.setTitle(title);
         newReceipt.setDescription(description);
         newReceipt.setImage(image);
         newReceipt.setUser(user);
@@ -126,18 +129,19 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.d(TAG, "Post Created Successfully ");
-                    Toast.makeText(getContext(), "Posted Successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Receipt Saved Successfully!", Toast.LENGTH_SHORT).show();
                 } else {
-                    e.printStackTrace();
+                    Log.e(TAG, "Failed to post receipt", e);
                 }
 
-                //Reset input form
-                descriptionInput.setText("");
+                //Reset image field
                 ivPreview.setImageResource(0);
 
                 // Dismiss progress dialog
                 pd.dismiss();
+
+                // Redirect
+                redirectToFragment(new KitchenFragment());
             }
         });
     }
@@ -365,11 +369,18 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
     @Override
-    public void onFinishEditingList(List<String> foodItems) {
-        final String description = descriptionInput.getText().toString();
+    public void onFinishEditingList(String title, String description, List<Ingredient> foodItems) {
         final ParseUser user = ParseUser.getCurrentUser();
         final ParseFile file = new ParseFile(photoFile);
-        createPost(description, file, user, foodItems);
+        postReceipt(title, description, file, user, foodItems);
+    }
+
+    private void redirectToFragment(Fragment destination){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.flContainer, destination);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 }

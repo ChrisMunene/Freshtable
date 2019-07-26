@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
-import com.example.fburecipeapp.SwipeableRecyclerViewTouchListener;
+import com.example.fburecipeapp.helpers.SwipeableRecyclerViewTouchListener;
 import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.activities.TypeSelectionActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;

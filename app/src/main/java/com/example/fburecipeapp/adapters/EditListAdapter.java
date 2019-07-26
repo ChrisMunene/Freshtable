@@ -2,43 +2,30 @@ package com.example.fburecipeapp.adapters;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
-import com.example.fburecipeapp.models.FoodType;
-import com.parse.ParseFile;
+import com.example.fburecipeapp.models.Ingredient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHolder>{
 
     private Context context;
-    private List<String> foodTypes;
-    private List<String> selectedFoodItems;
+    private List<Ingredient> ingredients;
+    private List<Ingredient> selectedFoodItems;
 
-    public EditListAdapter(Context context, List<String> foodTypes, List<String> precheckedIngredients) {
+    public EditListAdapter(Context context, List<Ingredient> ingredients, List<Ingredient> precheckedIngredients) {
         this.context = context;
-        this.foodTypes= foodTypes;
+        this.ingredients = ingredients;
         this.selectedFoodItems = precheckedIngredients;
-        for(String item: precheckedIngredients){
-            Log.d("Adapter", item);
-        }
     }
 
     @NonNull
@@ -51,13 +38,13 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.setIsRecyclable(false);
-        String foodItem = foodTypes.get(position);
-        holder.bind(foodItem, position);
+        Ingredient ingredient = ingredients.get(position);
+        holder.bind(ingredient, position);
     }
 
     @Override
     public int getItemCount() {
-        return foodTypes.size();
+        return ingredients.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
@@ -71,12 +58,12 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
         }
 
         // Binds data to the view
-        public void bind(final String foodItem, final int position){
+        public void bind(Ingredient ingredient, final int position){
             // Set the fooditem
-            cbFoodItem.setText(foodItem);
+            cbFoodItem.setText(ingredient.getName());
 
             // Reset the state of the checkbox - Because the recyclerview retains the state of recycled components.
-            cbFoodItem.setChecked(selectedFoodItems.contains(foodItem));
+            cbFoodItem.setChecked(selectedFoodItems.contains(ingredient));
 
             // Set on check listener
             cbFoodItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -84,10 +71,10 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
                 public void onCheckedChanged(CompoundButton checkBox, boolean checked) {
                     if(checked){
                         // If selected item is not in list, add to list
-                        if(!selectedFoodItems.contains(foodItem))selectedFoodItems.add(foodItem);
+                        if(!selectedFoodItems.contains(ingredient))selectedFoodItems.add(ingredient);
                     } else {
                         // If deselected item is in list, remove it
-                        if(selectedFoodItems.contains(foodItem)) selectedFoodItems.remove(foodItem);
+                        if(selectedFoodItems.contains(ingredient)) selectedFoodItems.remove(ingredient);
                     }
                 }
             });
@@ -96,17 +83,17 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
 
     // Clean all elements of the recycler
     public void clear() {
-        foodTypes.clear();
+        ingredients.clear();
         notifyDataSetChanged();
     }
 
     // Add a list of items -- change to type used
-    public void addAll(List<String> list) {
-        foodTypes.addAll(list);
+    public void addAll(List<Ingredient> list) {
+        ingredients.addAll(list);
         notifyDataSetChanged();
     }
 
-    public List<String> getSelectedFoodItems(){
+    public List<Ingredient> getSelectedFoodItems(){
         return selectedFoodItems;
     }
 
