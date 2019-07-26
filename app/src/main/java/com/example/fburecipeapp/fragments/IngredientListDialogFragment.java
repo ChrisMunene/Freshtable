@@ -6,10 +6,11 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.adapters.EditListAdapter;
-import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.fburecipeapp.R;
 import com.parse.FindCallback;
@@ -39,9 +41,11 @@ import java.util.List;
 public class IngredientListDialogFragment extends BottomSheetDialogFragment {
 
     private RecyclerView rvIngredients;
-    private List<String> foodTypes;
+    private EditText titleInput;
+    private EditText descriptionInput;
+    private List<Ingredient> ingredients;
     private List<ReceiptItem> receiptItems;
-    private List<String> precheckedIngredients = new ArrayList<>();
+    private List<Ingredient> precheckedIngredients = new ArrayList<>();
     private EditListAdapter adapter;
     private Button submitBtn;
     private static final String TAG = IngredientListDialogFragment.class.getSimpleName();
@@ -65,11 +69,14 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         submitBtn = view.findViewById(R.id.submitBtn);
-        rvIngredients = view.findViewById(R.id.rvFoodTypes);
-        foodTypes = new ArrayList<>();
+        rvIngredients = view.findViewById(R.id.rvIngredients);
+        titleInput = view.findViewById(R.id.titleInput);
+        descriptionInput = view.findViewById(R.id.descriptionInput);
+        ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
-        adapter = new EditListAdapter(getContext(), foodTypes, precheckedIngredients);
+        adapter = new EditListAdapter(getContext(), ingredients, precheckedIngredients);
         rvIngredients.setAdapter(adapter);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rvIngredients.setLayoutManager(linearLayoutManager);
 
@@ -77,12 +84,12 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View view) {
                 // Get selected items
-                List<String> selectedFoodItems = adapter.getSelectedFoodItems();
+                List<Ingredient> selectedFoodItems = adapter.getSelectedFoodItems();
                 sendBackResult(selectedFoodItems);
             }
         });
 
-        loadFoodTypes();
+        loadIngredients();
     }
 
     @Override
@@ -96,43 +103,42 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     }
 
     public interface Listener {
-        void onFinishEditingList(List<String> foodItems);
+        void onFinishEditingList(String title, String description, List<Ingredient> foodItems);
     }
 
-    private void loadFoodTypes() {
-        FoodType.Query query = new FoodType.Query();
-        query.findInBackground(new FindCallback<FoodType>() {
-            public void done(List<FoodType> types, ParseException e) {
-                if (e == null) {
 
-                    // For each food type, get individual ingredients
-                    for(FoodType type: types){
-                        List items = type.getFoodItems();
-                        foodTypes.addAll(items);
-                        adapter.notifyDataSetChanged();
+    private void loadIngredients(){
+        Ingredient.Query query = new Ingredient.Query();
+        query.findInBackground(new FindCallback<Ingredient>() {
+            @Override
+            public void done(List<Ingredient> ingredientList, ParseException e) {
+                if(e == null){
+                    for (Ingredient ingredient: ingredientList) {
+                        ingredients.add(ingredient);
+                        adapter.notifyItemInserted(ingredients.size() - 1);
                     }
-
                     getPrecheckedIngredients();
-                }
-                else {
-                    e.printStackTrace();
+                } else {
+                    Log.e(TAG, "Error fetching ingredients", e);
                 }
             }
         });
     }
 
-    public void sendBackResult(List<String> selectedFoodItems){
+    public void sendBackResult(List<Ingredient> selectedFoodItems){
         Listener listener = (Listener) getTargetFragment();
-        listener.onFinishEditingList(selectedFoodItems);
+        String title = titleInput.getText().toString();
+        String description = descriptionInput.getText().toString();
+        listener.onFinishEditingList(title, description, selectedFoodItems);
         dismiss();
     }
 
     // List the ingredient found in a receipt
     public void getPrecheckedIngredients(){
         for (ReceiptItem receiptItem: receiptItems){
-            for(String ingredient: foodTypes){
+            for(Ingredient ingredient: ingredients){
                 // toLowercase used because .contains is case sensitive -- Java SMH :(
-                if(receiptItem.getDescription().toLowerCase().contains(ingredient.toLowerCase()) && !precheckedIngredients.contains(ingredient.toLowerCase())){
+                if(receiptItem.getDescription().toLowerCase().contains(ingredient.getName().toLowerCase()) && !precheckedIngredients.contains(ingredient)){
                     precheckedIngredients.add(ingredient);
                     adapter.notifyDataSetChanged();
                 }

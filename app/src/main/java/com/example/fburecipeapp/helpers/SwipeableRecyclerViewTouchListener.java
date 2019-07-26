@@ -1,4 +1,4 @@
-package com.example.fburecipeapp;
+package com.example.fburecipeapp.helpers;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
