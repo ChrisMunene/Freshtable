@@ -15,12 +15,18 @@ import com.example.fburecipeapp.fragments.RecipeFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.threeten.bp.LocalDate;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class HomeActivity extends AppCompatActivity {
 
     private Fragment fragment;
 
     private FragmentManager fragmentManager = getSupportFragmentManager();
-
+    
     // sets up bottom navigation bar - used to hold and call each fragment/screen
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {

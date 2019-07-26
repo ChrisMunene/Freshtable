@@ -5,6 +5,7 @@ import android.app.Application;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.Recipe;
+import com.example.fburecipeapp.models.Recipes;
 import com.example.fburecipeapp.models.User;
 
 import com.example.fburecipeapp.models.Receipt;
@@ -40,6 +41,7 @@ public class ParseApplication extends Application {
         ParseUser.registerSubclass(User.class);
         ParseUser.registerSubclass(Recipe.class);
         ParseObject.registerSubclass(TempIngredients.class);
+        ParseObject.registerSubclass(Recipes.class);
 
 
         // set applicationId, and server server based on the values in the Heroku settings.
