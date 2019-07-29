@@ -62,6 +62,7 @@ dependencies {
 
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
+    implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
     // firebase
     //implementation 'com.google.firebase:firebase-core:17.0.0'
 }
