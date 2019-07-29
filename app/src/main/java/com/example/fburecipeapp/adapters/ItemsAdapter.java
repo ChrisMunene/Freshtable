@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.models.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,16 @@ import java.util.List;
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 
     public Context context;
-    public List<String> mItems;
-    ArrayList<String> selectedList = new ArrayList<String>();
+    public List<Ingredient> mItems;
+    private List<Ingredient> selectedList;
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
+
+        selectedList = new ArrayList<Ingredient>();
 
         View postView = inflater.inflate(R.layout.single_food_option, parent, false);
         ViewHolder viewHolder = new ViewHolder(postView);
@@ -36,8 +39,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String foodItem = mItems.get(position);
-        holder.bind(foodItem); // setting item text to our layout
+        Ingredient ingredient = mItems.get(position);
+        holder.bind(ingredient); // setting item text to our layout
 
     }
 
@@ -59,18 +62,18 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             tvFoodItem = itemView.findViewById(R.id.tvFoodItem);
             checkBox = itemView.findViewById(R.id.checkBox);
         }
-        public void bind(final String foodItem){
-            tvFoodItem.setText(foodItem);
+        public void bind(final Ingredient ingredient){
+            tvFoodItem.setText(ingredient.getName());
 
             // when the check box is clicked, want to change the boolean to the opposite of what it was
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if(isChecked) {
-                            selectedList.add(foodItem);
+                            selectedList.add(ingredient);
                         }
                         else {
-                            selectedList.remove(foodItem);
+                            selectedList.remove(ingredient);
                         }
                 }
             });
@@ -78,11 +81,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     }
 
-    public ItemsAdapter (List<String> items) {
+    public ItemsAdapter (List<Ingredient> items) {
         mItems = items;
     }
 
-    public ArrayList getSelectedItems() {
+    public List<Ingredient> getSelectedItems() {
         return selectedList;
     }
 

@@ -1,5 +1,6 @@
 package com.example.fburecipeapp.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +23,10 @@ import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.activities.TypeSelectionActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.Receipt;
+import com.example.fburecipeapp.models.User;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -38,14 +44,13 @@ public class KitchenFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     protected ArrayList<FoodType> types;
     protected KitchenAdapter kitchenAdapter;
-    public ImageButton addBtn;
-    public CardView card;
-    public ImageButton logoutBtn;
-    private ParseUser currentUser;
-    public ImageButton addFoodBtn;
-    public JSONArray JSONsavedItems;
-    public List<String> savedItems;
-    public ArrayList<String> removedItems;
+    private ImageButton logoutBtn;
+    private ProgressDialog pd;
+    private User currentUser;
+    private ImageButton addFoodBtn;
+    private List<Ingredient> savedIngredients;
+    private List<Ingredient> removedItems;
+    private final static String TAG = KitchenFragment.class.getSimpleName();
 
 
     @Nullable
@@ -60,17 +65,22 @@ public class KitchenFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         logoutBtn = view.findViewById(R.id.logoutBtn);
         addFoodBtn = view.findViewById(R.id.addFoodBtn);
-        JSONsavedItems = new JSONArray();
-        savedItems = new ArrayList<>();
-        removedItems = new ArrayList<>();
-        kitchenAdapter = new KitchenAdapter(savedItems);
+        savedIngredients = new ArrayList<Ingredient>();
+        removedItems = new ArrayList<Ingredient>();
+        kitchenAdapter = new KitchenAdapter(savedIngredients);
         recyclerView = view.findViewById(R.id.rvSaved);
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        currentUser = ParseUser.getCurrentUser();
+        currentUser = (User) ParseUser.getCurrentUser();
+
+        // Initialize Progress Dialog
+        pd = new ProgressDialog(getContext());
+        pd.setTitle("Loading...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
 
 
         loadSavedItems();
@@ -80,17 +90,10 @@ public class KitchenFragment extends Fragment {
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentUser != null) {
-                    ParseUser.logOut();
-                    currentUser = ParseUser.getCurrentUser(); // this will now be null
-                    final Intent intent = new Intent(getContext(), LoginActivity.class);
-                    startActivity(intent);
-                    getActivity().finish();
-                } else {
-                    final Intent intent = new Intent(getContext(), LoginActivity.class);
-                    startActivity(intent);
-                    getActivity().finish();
-                }
+                ParseUser.logOut();
+                final Intent intent = new Intent(getContext(), LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
             }
         });
 
@@ -119,20 +122,23 @@ public class KitchenFragment extends Fragment {
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                    removedItems.add(savedItems.get(position));
-                                    savedItems.remove(position);
+                                    removedItems.add(savedIngredients.get(position));
+                                    savedIngredients.remove(position);
                                     kitchenAdapter.notifyItemRemoved(position);
 
-                                    currentUser = ParseUser.getCurrentUser();
-                                    JSONsavedItems = currentUser.getJSONArray("userItems");
-                                    JSONsavedItems.remove(position);
-                                    currentUser.put("userItems", JSONsavedItems);
+                                    currentUser.setSavedIngredients(savedIngredients);
                                     currentUser.saveInBackground(new SaveCallback() {
                                         @Override
                                         public void done(ParseException e) {
-                                            Log.d("Parse", "items removed from Parse");
+                                            if(e == null){
+                                                Toast.makeText(getContext(), "Item removed.", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Log.e(TAG, "Error deleting item", e);
+                                            }
                                         }
                                     });
+
+
                                 }
                                 kitchenAdapter.notifyDataSetChanged();
                             }
@@ -140,7 +146,7 @@ public class KitchenFragment extends Fragment {
                             @Override
                             public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                    savedItems.remove(position);
+                                    savedIngredients.remove(position);
                                     kitchenAdapter.notifyItemRemoved(position);
                                 }
                                 kitchenAdapter.notifyDataSetChanged();
@@ -150,19 +156,27 @@ public class KitchenFragment extends Fragment {
         recyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
-    // loads the specific items for the food category
+    // loads the specific fooditems for the food category
     public void loadSavedItems() {
-        currentUser = ParseUser.getCurrentUser();
-        JSONsavedItems = currentUser.getJSONArray("userItems");
-        if (JSONsavedItems != null) {
-            for (int i = 0; i < JSONsavedItems.length(); i++) {
-                try {
-                    savedItems.add(JSONsavedItems.getString(i));
-                    kitchenAdapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        pd.show();
+        User.Query userQuery = new User.Query();
+        userQuery.forCurrentUser().withSavedIngredients();
+        userQuery.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> users, ParseException e) {
+                if(e == null){
+                    for(User user: users){
+                        savedIngredients.addAll(user.getSavedIngredients());
+                        kitchenAdapter.notifyDataSetChanged();
+                    }
+
+                } else {
+                    Log.e(TAG, "Error fetching user", e);
                 }
+                pd.dismiss();
             }
-        }
+        });
+
     }
+
 }

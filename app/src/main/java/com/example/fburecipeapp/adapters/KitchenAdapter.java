@@ -10,15 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.models.Ingredient;
 import com.parse.ParseUser;
 
 import java.util.List;
 
 public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHolder> {
 
-    public Context context;
-    public List<String> savedItems;
-    public ParseUser parseUser;
+    private Context context;
+    private List<Ingredient> savedIngredients;
 
     @NonNull
     @Override
@@ -33,14 +33,14 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull KitchenAdapter.ViewHolder holder, int position) {
-        String foodItem = savedItems.get(position);
-        holder.bind(foodItem);
+        Ingredient ingredient = savedIngredients.get(position);
+        holder.bind(ingredient);
 
     }
 
     @Override
     public int getItemCount() {
-        return savedItems.size();
+        return savedIngredients.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -53,14 +53,15 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
 
             savedItem = itemView.findViewById(R.id.tvSavedItem);
         }
-        public void bind(final String foodItem){
-            savedItem.setText(foodItem);
+
+        public void bind(final Ingredient ingredient){
+            savedItem.setText(ingredient.getName());
 
         }
 
     }
 
-    public KitchenAdapter (List<String> items) {
-        savedItems = items;
+    public KitchenAdapter (List<Ingredient> ingredients) {
+        savedIngredients = ingredients;
     }
 }

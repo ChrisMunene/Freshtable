@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,6 +18,7 @@ import androidx.annotation.Nullable;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
+import com.example.fburecipeapp.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
@@ -118,7 +120,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     // Creates a new post in Parse
     private void postReceipt(String title, String description, ParseFile image, ParseUser user, List<Ingredient> receiptItems){
         pd.show();
-        final Receipt newReceipt = new Receipt();
+        Receipt newReceipt = new Receipt();
         newReceipt.setTitle(title);
         newReceipt.setDescription(description);
         newReceipt.setImage(image);
@@ -129,13 +131,37 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getContext(), "Receipt Saved Successfully!", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Receipt Saved Successfully");
                 } else {
                     Log.e(TAG, "Failed to post receipt", e);
                 }
 
                 //Reset image field
                 ivPreview.setImageResource(0);
+
+                //Update user
+                updateUser(receiptItems);
+
+            }
+        });
+
+    }
+
+    private void updateUser(List<Ingredient> ingredients){
+        User currentUser = (User) ParseUser.getCurrentUser();
+        List<Ingredient> savedIngredients = currentUser.getSavedIngredients();
+        savedIngredients.addAll(ingredients);
+        currentUser.setSavedIngredients(savedIngredients);
+        currentUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "User updated successfully");
+                    Toast.makeText(getContext(), "Receipt Saved Successfully!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Log.e(TAG, "Failed to update user", e);
+                }
 
                 // Dismiss progress dialog
                 pd.dismiss();

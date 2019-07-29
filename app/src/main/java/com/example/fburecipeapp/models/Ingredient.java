@@ -10,6 +10,7 @@ import com.parse.ParseUser;
 public class Ingredient extends ParseObject {
     private static final String KEY_NAME = "name";
     private static final String KEY_IMAGE = "image";
+    private static final String KEY_FOODTYPE = "foodType";
 
     public String getName() {
         return getString(KEY_NAME);
@@ -22,6 +23,11 @@ public class Ingredient extends ParseObject {
     public static class Query extends ParseQuery<Ingredient> {
         public Query(){
             super(Ingredient.class);
+        }
+
+        public Query forFoodType(FoodType type){
+            whereEqualTo(KEY_FOODTYPE, type);
+            return this;
         }
     }
 

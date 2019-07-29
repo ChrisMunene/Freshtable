@@ -40,7 +40,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(FoodType.class);
         ParseObject.registerSubclass(Receipt.class);
         ParseUser.registerSubclass(User.class);
-        ParseUser.registerSubclass(Recipe.class);
+        ParseObject.registerSubclass(Recipe.class);
         ParseObject.registerSubclass(TempIngredients.class);
         ParseObject.registerSubclass(Recipes.class);
         ParseObject.registerSubclass(Ingredient.class);
