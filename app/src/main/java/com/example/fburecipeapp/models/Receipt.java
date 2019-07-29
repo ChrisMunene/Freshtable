@@ -52,8 +52,8 @@ public class Receipt extends ParseObject {
         put(KEY_RECEIPT_ITEMS, receiptItems);
     }
 
-    public JSONArray getReceiptItems(){
-        return getJSONArray(KEY_RECEIPT_ITEMS);
+    public List<Ingredient> getReceiptItems(){
+        return getList(KEY_RECEIPT_ITEMS);
     }
 
     public ParseFile getImage(){
@@ -89,6 +89,11 @@ public class Receipt extends ParseObject {
 
         public Query whereId(String id){
             whereEqualTo(KEY_ID, id);
+            return this;
+        }
+
+        public Query withReceiptItems(){
+            include(KEY_RECEIPT_ITEMS);
             return this;
         }
     }

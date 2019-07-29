@@ -1,5 +1,6 @@
 package com.example.fburecipeapp.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,8 @@ import com.example.fburecipeapp.R;
 
 import com.example.fburecipeapp.adapters.ItemsAdapter;
 import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.Receipt;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -26,15 +29,15 @@ import java.util.List;
 
 public class KitchenMenuActivity extends AppCompatActivity {
 
-    public String objectId;
-    public RecyclerView recyclerView;
-    public RecyclerView.LayoutManager layoutManager;
-    public ArrayList<String> items;
+    private String objectId;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<Ingredient> items;
     protected ItemsAdapter itemsAdapter;
-    public CheckBox checkBox;
-    public Button saveBtn;
-    public Boolean isChecked;
-    ArrayList<String> selectedItemsList = new ArrayList<String>();
+    private CheckBox checkBox;
+    private Button saveBtn;
+    private ProgressDialog pd;
+    private static final String TAG = KitchenMenuActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +54,17 @@ public class KitchenMenuActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        items = new ArrayList<>();
+        items = new ArrayList<Ingredient>();
         itemsAdapter = new ItemsAdapter(items);
         recyclerView.setAdapter(itemsAdapter);
 
-        // objectId tells us which fod  category was chosen so we can show the corresponding item list
+        // Initialize Progress Dialog
+        pd = new ProgressDialog(this);
+        pd.setTitle("Loading...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+
+        // objectId tells us which food  category was chosen so we can show the corresponding item list
         objectId = getIntent().getStringExtra("objectId");
 
         //Pass the id to load items
@@ -65,9 +74,9 @@ public class KitchenMenuActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> selectedItemsList = itemsAdapter.getSelectedItems();
+                List<Ingredient> selectedItemsList = itemsAdapter.getSelectedItems();
                 // Log.d("Selected Items", Integer.toString(selectedItemsList.size()));
-                ParseUser.getCurrentUser().addAll("userItems", selectedItemsList);
+                ParseUser.getCurrentUser().addAll("savedIngredients", selectedItemsList);
                 ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -84,21 +93,41 @@ public class KitchenMenuActivity extends AppCompatActivity {
 
     // loads the specific items for the food category
     public void loadItems(String id) {
-        FoodType.Query query = new FoodType.Query();
-        query.whereEqualTo("objectId", id);
-        query.findInBackground(new FindCallback<FoodType>() {
+        pd.show();
+        FoodType.Query foodTypeQuery = new FoodType.Query();
+        foodTypeQuery.whereEqualTo("objectId", id);
+        foodTypeQuery.findInBackground(new FindCallback<FoodType>() {
             public void done(List<FoodType> types, ParseException e) {
                 if (e == null) {
 
                     for(FoodType type: types){
-                        List foodItems = type.getFoodItems();
-                        items.addAll(foodItems);
-                        itemsAdapter.notifyDataSetChanged(); // update adapter
+                        loadIngredients(type);
                     }
                 }
                 else {
                     e.printStackTrace();
+                    pd.dismiss();
                 }
+            }
+        });
+
+    }
+
+    public void loadIngredients(FoodType type){
+        Ingredient.Query ingredientQuery = new Ingredient.Query();
+        ingredientQuery.forFoodType(type);
+        ingredientQuery.findInBackground(new FindCallback<Ingredient>() {
+            @Override
+            public void done(List<Ingredient> ingredients, ParseException e) {
+                if(e == null){
+                    items.addAll(ingredients);
+                    itemsAdapter.notifyDataSetChanged();
+                    Log.d(TAG, String.format("Id: %s Ingredients: %s", type.getObjectId(), ingredients.size()));
+                } else {
+                    Log.e(TAG, "Error fetching ingredients", e);
+                }
+
+                pd.dismiss();
             }
         });
     }
