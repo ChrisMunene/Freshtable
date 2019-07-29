@@ -5,28 +5,30 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import org.parceler.Parcel;
+
 @ParseClassName("Recipe")
 public class Recipe extends ParseObject {
 
-    public static final String NAME = "recipeName";
-    public static final String IMAGE = "recipeImage";
+    String recipeName = "recipeName";
+    String recipeImage = "recipeImage";
+
+    public Recipe() {}
 
     // get food category
-    public String getRecipe() {
-        return getString(NAME);
+    public String getName() {
+        return getString(recipeName);
     }
 
-    public void setRecipe(String name) {
-        put(NAME, name);
-    }
+    public void setRecipe(String name) { put(recipeName, name); }
 
     // get food category image
     public ParseFile getImage() {
-        return getParseFile(IMAGE);
+        return getParseFile(recipeImage);
     }
 
     public void setImage(ParseFile Image) {
-        put(IMAGE, Image);
+        put(recipeImage, Image);
     }
 
     public static class Query extends ParseQuery<Recipe> {

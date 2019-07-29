@@ -8,12 +8,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.fragments.DetailsFragment;
 import com.example.fburecipeapp.models.Recipe;
+import com.example.fburecipeapp.models.Recipes;
 import com.parse.ParseFile;
 
 import java.util.ArrayList;
@@ -22,14 +27,17 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
     private static final String TAG = "StaggeredRecyclerViewAdapter";
 
-    private ArrayList<Recipe> mRecipes = new ArrayList<>();
+    private ArrayList<Recipes> mRecipes = new ArrayList<>();
     private ArrayList<String> mImages = new ArrayList<>();
+    private FragmentManager fragmentManager;
     private Context mContext;
 
-    public StaggeredRecyclerViewAdapter(ArrayList<Recipe> mRecipes, ArrayList<String> mImages, Context mContext) {
+    public StaggeredRecyclerViewAdapter(ArrayList<Recipes> mRecipes, ArrayList<String> mImages, Context mContext,
+                                        FragmentManager fragmentManager) {
         this.mRecipes = mRecipes;
         this.mImages = mImages;
         this.mContext = mContext;
+        this.fragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -45,7 +53,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
 
-        Recipe recipe = mRecipes.get(position);
+        Recipes recipe = mRecipes.get(position);
         ParseFile image = recipe.getImage();
 
 
@@ -53,7 +61,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
                 .load(image.getUrl())
                 .apply(requestOptions)
                 .into(holder.recipeImg);
-        holder.recipeName.setText(recipe.getRecipe());
+        holder.recipeName.setText(recipe.getName());
 
 
     }
@@ -63,7 +71,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         return mRecipes.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
          ImageView recipeImg;
          TextView recipeName;
 
@@ -71,6 +79,22 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
              super(itemView);
              this.recipeImg = itemView.findViewById(R.id.recipeImg);
              this.recipeName = itemView.findViewById(R.id.tvRecipe);
+             itemView.setOnClickListener(this);
          }
+
+        @Override
+        public void onClick(View v) {
+            // gets item position
+            int position = getAdapterPosition();
+            Recipes recipe = mRecipes.get(position);
+            // make sure the position is valid, i.e. actually exists in the view
+            if (position != RecyclerView.NO_POSITION) {
+                Fragment fragment = new DetailsFragment(recipe.getName(), recipe.getImage(), recipe.getAllIngredients(), recipe.getInstructions());
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flContainer, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        }
     }
 }
