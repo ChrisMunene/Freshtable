@@ -55,7 +55,6 @@ public class TypeSelectionActivity extends AppCompatActivity {
         types = new ArrayList<>();
         typeAdapter = new TypeAdapter(types);
         recyclerView.setAdapter(typeAdapter);
-        Log.d("Kitchen Fragment", "Adapter set successfully");
         loadTypes();
 
         returnBtn.setOnClickListener(new View.OnClickListener() {
