@@ -55,7 +55,7 @@ public class Recipes extends ParseObject {
             super(Recipes.class);
         }
 
-        public Recipes.Query withOneIngredient(ArrayList<String> ingredients){
+        public Recipes.Query withOneIngredient(ArrayList<Ingredient> ingredients){
             whereContainedIn(ingredientsKey, ingredients  );
             return this;
         }

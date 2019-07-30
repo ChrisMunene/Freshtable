@@ -25,6 +25,7 @@ public class User extends ParseUser {
         put(KEY_SAVED_INGREDIENTS, ingredients);
     }
 
+
     public static class Query extends ParseQuery<User> {
         public Query() {
             super(User.class);

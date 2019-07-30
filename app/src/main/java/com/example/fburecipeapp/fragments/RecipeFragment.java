@@ -15,11 +15,15 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.adapters.StaggeredRecyclerViewAdapter;
+import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Recipe;
 import com.example.fburecipeapp.models.Recipes;
+import com.example.fburecipeapp.models.User;
 import com.loopj.android.http.AsyncHttpClient;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -28,21 +32,21 @@ import java.util.List;
 public class RecipeFragment extends Fragment {
 
     private static final int NUM_COLUMNS = 2;
-    private static final String EDAMAME_BASE_URL = "https://api.edamam.com/search";
+    private static final String TAG = "RecipeFragment";
 
     private ArrayList<String> mImages = new ArrayList<>();
     private ArrayList<Recipes> mRecipes = new ArrayList<>();
     private StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter;
     private AsyncHttpClient client;
 
-    private ArrayList<String> myIngredients;
+    private ArrayList<Ingredient> myIngredients;
 
     public RecipeFragment() {
-        myIngredients = new ArrayList<String>();
-        myIngredients.add("Honey");
-        myIngredients.add("Sugar");
-        myIngredients.add("Oil");
-        myIngredients.add("Chicken");
+
+//        myIngredients.add("Honey");
+//        myIngredients.add("Sugar");
+//        myIngredients.add("Oil");
+//        myIngredients.add("Chicken");
     }
 
 
@@ -65,8 +69,10 @@ public class RecipeFragment extends Fragment {
 
         // Initialize http client
         client = new AsyncHttpClient();
+        myIngredients = new ArrayList<Ingredient>();
 
-        loadRecipes();
+        loadUserIngredients();
+
 
     }
 
@@ -104,4 +110,40 @@ public class RecipeFragment extends Fragment {
         });
     }
 
+//    private void loadUserIngredients() {
+//        ParseQuery<User> userIngredientsQuery = new ParseQuery<User>(User.class);
+//        userIngredientsQuery.include(User.USER_ITEMS);
+//
+//        userIngredientsQuery.findInBackground(new FindCallback<User>() {
+//            @Override
+//            public void done(List<User> users, ParseException e) {
+//                if(e != null) {
+//                    Log.e(TAG, "Error with loading user ingredients query!");
+//                    e.printStackTrace();
+//                    return;
+//                }
+//
+//
+//            }
+//        });
+//    }
+
+    private void loadUserIngredients() {
+    User.Query query =  new User.Query();
+    query.forCurrentUser().withSavedIngredients();
+    query.findInBackground(new FindCallback<User>() {
+        @Override
+        public void done(List<User> users, ParseException e) {
+            if(e == null){
+                for(User user: users){
+                    myIngredients.addAll(user.getSavedIngredients());
+
+                }
+
+                loadRecipes();
+            }
+        }
+    });
+
+    }
 }
