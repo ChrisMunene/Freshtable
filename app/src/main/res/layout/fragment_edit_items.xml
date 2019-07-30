@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/my_kitchen_gradient">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvIngredients"
@@ -20,12 +21,21 @@
 
     <Button
         android:id="@+id/submitBtn"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_width="374dp"
+        android:layout_height="44dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+
         android:text="Submit"
+
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/login_button"
+        android:textColor="#F8F2F2"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rvIngredients" />
@@ -42,6 +52,7 @@
         android:hint="Title"
         android:inputType="textPersonName"
         android:padding="10dp"
+        android:background="@drawable/input_fields"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,6 +71,7 @@
         android:gravity="start|top"
         android:hint="Description "
         android:inputType="textMultiLine"
+        android:background="@drawable/input_fields"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleInput" />
@@ -72,8 +84,9 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="146dp"
         android:text="Receipt Details"
-        android:textSize="18sp"
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="#F8F2F2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -82,9 +95,25 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="26dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         android:text="Receipt Items"
+        android:textColor="#F8F2F2"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/descriptionInput" />
+
+    <!--<SeekBar-->
+        <!--android:id="@+id/seekBar3"-->
+        <!--android:layout_width="227dp"-->
+        <!--android:layout_height="22dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:thumb="@drawable/mcv_action_next"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/rvFoodTypes" />-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
