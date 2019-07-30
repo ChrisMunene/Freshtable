@@ -90,7 +90,7 @@ public class ExpandableExampleFragment
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
         //adapter
-        final ExpandableExampleAdapter myItemAdapter = new ExpandableExampleAdapter(new ExampleExpandableDataProvider(), getContext());
+        final ExpandableExampleAdapter myItemAdapter = new ExpandableExampleAdapter(new ExampleExpandableDataProvider());
 
         // wrap for expanding
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(myItemAdapter);

@@ -31,43 +31,41 @@ public class ExpandableExampleAdapter
 
     // NOTE: Make accessible with short name
     private AbstractExpandableDataProvider mProvider;
-    private Context mContext;
     private List<FoodType> mFoodTypes;
     private List<Ingredient> mIngredients;
     private List<Ingredient> selectedIngredients;
 
-    public static abstract class MyBaseViewHolder extends AbstractExpandableItemViewHolder {
-        public FrameLayout mContainer;
-        public TextView mTextView;
+    static abstract class MyBaseViewHolder extends AbstractExpandableItemViewHolder {
+        FrameLayout mContainer;
+        TextView mTextView;
 
-        public MyBaseViewHolder(View v) {
+        MyBaseViewHolder(View v) {
             super(v);
             mContainer = v.findViewById(R.id.container);
             mTextView = v.findViewById(android.R.id.text1);
         }
     }
 
-    public static class MyGroupViewHolder extends MyBaseViewHolder {
-        public ExpandableItemIndicator mIndicator;
+    static class MyGroupViewHolder extends MyBaseViewHolder {
+        ExpandableItemIndicator mIndicator;
 
-        public MyGroupViewHolder(View v) {
+        MyGroupViewHolder(View v) {
             super(v);
             mIndicator = v.findViewById(R.id.indicator);
         }
     }
 
-    public static class MyChildViewHolder extends MyBaseViewHolder {
-        public MyChildViewHolder(View v) {
+    static class MyChildViewHolder extends MyBaseViewHolder {
+        MyChildViewHolder(View v) {
             super(v);
         }
     }
 
-    public ExpandableExampleAdapter(ExampleExpandableDataProvider dataProvider, Context context) {
+    public ExpandableExampleAdapter(ExampleExpandableDataProvider dataProvider) {
         mProvider = dataProvider;
         mFoodTypes = dataProvider.getFoodTypes();
         mIngredients = dataProvider.getIngredients();
         selectedIngredients = new ArrayList<Ingredient>();
-        mContext = context;
 
         // ExpandableItemAdapter requires stable ID, and also
         // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
