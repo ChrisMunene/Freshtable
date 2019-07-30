@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.models.Ingredient;
-import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -54,8 +53,10 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
             savedItem = itemView.findViewById(R.id.tvSavedItem);
         }
 
+
         public void bind(final Ingredient ingredient){
             savedItem.setText(ingredient.getName());
+
 
         }
 

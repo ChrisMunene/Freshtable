@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.decorators.EventDecorator;
@@ -56,8 +57,13 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     protected ArrayList<Ingredient> mIngredients;
 
 
+    private List<String> calendarItems;
+    boolean decoratorPresent;
+
+    private TextView expireText;
+
     @BindView(R.id.calendarView) MaterialCalendarView widget;
-    @BindView(R.id.textView) TextView textView;
+    //@BindView(R.id.textView) TextView textView;
     private Unbinder unbinder;
 
     public CalendarFragment() {
@@ -79,8 +85,14 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        expireText = view.findViewById(R.id.expireText);
+
+        // Set-up initial text
+        //textView.setText("No Expired Items Here");
+
         // Create the data source
         mIngredients = new ArrayList<>();
+        calendarItems = new ArrayList<String>();
 
         fetchTimelineAsync(0);
 
@@ -112,8 +124,19 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
                                @NonNull CalendarDay calendarDay,
                                boolean b) {
         oneDayDecorator.setDate(calendarDay.getDate());
-        widget.invalidateDecorators();
-        textView.setText(b ? formatString(getItems(calendarDay.getDate()).toString()) : "No Expired Items Here");
+
+        //widget.invalidateDecorators();
+        String item = getItems(calendarDay.getDate()).toString();
+
+        if (decoratorPresent == true) {
+            showCalendarDialog(item);
+        }
+        else {
+            expireText.setText("No Expiring Items Here");
+
+        }
+
+       // textView.setText(b ? getItems(calendarDay.getDate()).toString() : "No Expired Items Here");
     }
 
     /**
@@ -149,7 +172,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 //            }, 1500);
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -171,6 +194,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
             super.onPostExecute(calendarDays);
             // adds dot on respective dates
             widget.addDecorator(new EventDecorator(Color.BLUE, calendarDays));
+            decoratorPresent = true;
         }
     }
 
@@ -249,7 +273,13 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         });
     }
 
-    private String formatString(String items) {
-        return items.substring(1, items.length() - 1);
+    private void showCalendarDialog(String item) {
+        FragmentManager fm = getFragmentManager();
+        if (fm != null) {
+            CalendarItemDialogFragment frag = CalendarItemDialogFragment.newInstance(item);
+            frag.setTargetFragment(this, 0);
+            frag.show(fm, "dialog_fragment_calendar_items");
+        }
     }
+
 }
