@@ -23,7 +23,6 @@
         <activity android:name=".activities.TypeSelectionActivity"></activity>
         <activity android:name=".activities.ExpandableExampleActivity">
 
-
         </activity>
 
 

@@ -13,10 +13,12 @@ public abstract class AbstractExpandableDataProvider {
     public static abstract class GroupData extends BaseData {
         public abstract boolean isSectionHeader();
         public abstract long getGroupId();
+        public abstract String getObjectId();
     }
 
     public static abstract class ChildData extends BaseData {
         public abstract long getChildId();
+        public abstract String getObjectId();
     }
 
     public abstract int getGroupCount();
