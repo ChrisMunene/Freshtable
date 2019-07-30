@@ -1,6 +1,12 @@
 package com.example.fburecipeapp.helpers;
 
+import android.util.Log;
+
+import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.models.Ingredient;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -20,28 +26,69 @@ public class ExampleExpandableDataProvider extends AbstractExpandableDataProvide
     private long mLastRemovedChildParentGroupId = -1;
     private int mLastRemovedChildPosition = -1;
 
+    // For logging
+    private final String TAG = this.getClass().getSimpleName();
+
+    //Data stores
+    private final List<FoodType> foodTypes;
+    private final List<Ingredient> ingredients;
+
     public ExampleExpandableDataProvider() {
-        final String groupItems = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        final String childItems = "abc";
+        foodTypes = loadFoodTypes();
 
         mData = new LinkedList<>();
+        ingredients = new ArrayList<Ingredient>();
 
-        for (int i = 0; i < groupItems.length(); i++) {
-            //noinspection UnnecessaryLocalVariable
+        for (int i = 0; i < foodTypes.size() ; i++) {
             final long groupId = i;
-            final String groupText = Character.toString(groupItems.charAt(i));
-            final ConcreteGroupData group = new ConcreteGroupData(groupId, groupText);
-            final List<ChildData> children = new ArrayList<>();
+            FoodType foodType = foodTypes.get(i);
+            final String groupText = foodType.getType();
+            final ConcreteGroupData group = new ConcreteGroupData(groupId, groupText, foodType.getObjectId());
+            final List<ChildData> children = new ArrayList<ChildData>();
 
-            for (int j = 0; j < childItems.length(); j++) {
+            final List<Ingredient> tempIngredients = loadIngredients(foodType);
+            ingredients.addAll(tempIngredients);
+            for(Ingredient ingredient: tempIngredients){
                 final long childId = group.generateNewChildId();
-                final String childText = Character.toString(childItems.charAt(j));
-
-                children.add(new ConcreteChildData(childId, childText));
+                final String childText = ingredient.getName();
+                children.add(new ConcreteChildData(childId, childText, ingredient.getObjectId()));
             }
 
             mData.add(new Pair<>(group, children));
         }
+    }
+
+    public List<FoodType> loadFoodTypes(){
+        FoodType.Query query = new FoodType.Query();
+        List<FoodType> foodTypes = new ArrayList<FoodType>();
+        try {
+            foodTypes = query.find();
+        } catch (ParseException e) {
+            Log.e(TAG, "Error fetching foodtypes", e);
+        }
+
+        return foodTypes;
+    }
+
+    public List<Ingredient> loadIngredients(FoodType type){
+        Ingredient.Query ingredientQuery = new Ingredient.Query();
+        ingredientQuery.forFoodType(type);
+        List<Ingredient> ingredients = new ArrayList<Ingredient>();
+        try {
+             ingredients = ingredientQuery.find();
+        } catch (ParseException e) {
+            Log.e(TAG, "Error fetching ingredients", e);
+        }
+
+        return ingredients;
+    }
+
+    public List<FoodType> getFoodTypes(){
+        return foodTypes;
+    }
+
+    public List<Ingredient> getIngredients(){
+        return ingredients;
     }
 
     @Override
@@ -195,11 +242,17 @@ public class ExampleExpandableDataProvider extends AbstractExpandableDataProvide
         private final String mText;
         private boolean mPinned;
         private long mNextChildId;
+        private String mObjectId;
 
-        ConcreteGroupData(long id, String text) {
+        ConcreteGroupData(long id, String text, String objectId) {
             mId = id;
             mText = text;
             mNextChildId = 0;
+            mObjectId = objectId;
+        }
+
+        public String getObjectId(){
+            return mObjectId;
         }
 
         @Override
@@ -239,10 +292,17 @@ public class ExampleExpandableDataProvider extends AbstractExpandableDataProvide
         private long mId;
         private final String mText;
         private boolean mPinned;
+        private String mObjectId;
 
-        ConcreteChildData(long id, String text) {
+        ConcreteChildData(long id, String text, String objectId) {
             mId = id;
             mText = text;
+            mObjectId = objectId;
+        }
+
+        @Override
+        public String getObjectId(){
+            return mObjectId;
         }
 
         @Override
