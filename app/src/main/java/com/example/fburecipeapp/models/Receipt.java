@@ -6,8 +6,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.json.JSONArray;
-
+import java.util.Collection;
 import java.util.List;
 
 @ParseClassName("Receipt")
@@ -17,7 +16,7 @@ public class Receipt extends ParseObject {
     private static final String KEY_CREATED_AT = "createdAt";
     private static final String KEY_ID = "objectId";
     private static final String KEY_DESCRIPTION = "description";
-    private static final String KEY_RECEIPT_ITEMS = "receiptItems";
+    public static final String KEY_RECEIPT_ITEMS = "receiptItems";
     private static final String KEY_TITLE = "title";
 
     public String getDescription(){
@@ -53,6 +52,7 @@ public class Receipt extends ParseObject {
     }
 
     public List<Ingredient> getReceiptItems(){
+
         return getList(KEY_RECEIPT_ITEMS);
     }
 

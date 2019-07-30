@@ -17,7 +17,8 @@ import androidx.fragment.app.Fragment;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.decorators.EventDecorator;
 import com.example.fburecipeapp.decorators.OneDayDecorator;
-import com.example.fburecipeapp.models.TempIngredients;
+import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.Receipt;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -33,8 +34,11 @@ import org.threeten.bp.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
@@ -44,19 +48,20 @@ import butterknife.Unbinder;
 
 public class CalendarFragment extends Fragment implements OnDateSelectedListener{
 
-    private final OneDayDecorator oneDayDecorator;
-    private Map<LocalDate, List<String>> realData;
-
     private static final String TAG = "CalendarFragment";
 
-    protected List<TempIngredients> mIngredients;
+    private final OneDayDecorator oneDayDecorator;
+    private Map<LocalDate, LinkedHashSet<String>> expiringItemsAndAssociatedDates;
+
+    protected ArrayList<Ingredient> mIngredients;
+
 
     @BindView(R.id.calendarView) MaterialCalendarView widget;
     @BindView(R.id.textView) TextView textView;
     private Unbinder unbinder;
 
     public CalendarFragment() {
-        this.realData = new HashMap<LocalDate, List<String>>();
+        this.expiringItemsAndAssociatedDates = new HashMap<LocalDate, LinkedHashSet<String>>();
         this.oneDayDecorator = new OneDayDecorator();
     }
 
@@ -73,9 +78,6 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Set-up initial text
-        textView.setText("No Expired Items Here");
 
         // Create the data source
         mIngredients = new ArrayList<>();
@@ -95,7 +97,8 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
         widget.addDecorator(oneDayDecorator);
 
-        new ApiSimulator().executeOnExecutor(Executors.newSingleThreadExecutor());
+        // new ApiSimulator().executeOnExecutor(Executors.newSingleThreadExecutor());
+        new ApiSimulator().execute();
     }
 
     @Override
@@ -110,17 +113,17 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
                                boolean b) {
         oneDayDecorator.setDate(calendarDay.getDate());
         widget.invalidateDecorators();
-        textView.setText(b ? getItems(calendarDay.getDate()).toString() : "No Expired Items Here");
+        textView.setText(b ? formatString(getItems(calendarDay.getDate()).toString()) : "No Expired Items Here");
     }
 
     /**
      * Get items to set text when a date is clicked
      */
-    public List<String> getItems(LocalDate calendarDay) {
-        List<String> items = realData.get(calendarDay);
+    public LinkedHashSet<String> getItems(LocalDate calendarDay) {
+        LinkedHashSet<String> items = expiringItemsAndAssociatedDates.get(calendarDay);
 
         if (items == null) {
-            List<String> temp = new ArrayList<String>();
+            LinkedHashSet<String> temp = new LinkedHashSet<String>();
             temp.add("No Expired Items Here");
             return temp;
         }
@@ -135,22 +138,33 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
         @Override
         protected List<CalendarDay> doInBackground(@NonNull Void... voids) {
+
+//            Handler handler = new Handler();
+//
+//            handler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    handler.postDelayed(this, 1500);
+//                }
+//            }, 1500);
+
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            final ArrayList<CalendarDay> dates = new ArrayList<>();
+            ArrayList<CalendarDay> dates = new ArrayList<>();
 
             // dates on which items will expire
-            for (LocalDate temp : realData.keySet()) {
-                final CalendarDay day = CalendarDay.from(temp);
+            for (LocalDate temp : expiringItemsAndAssociatedDates.keySet()) {
+                CalendarDay day = CalendarDay.from(temp);
                 dates.add(day);
             }
 
             return dates;
         }
+
 
         @Override
         protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
@@ -163,18 +177,18 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     /**
      * Set up data
      */
-    private void setUpData() {
+    private void setUpData(Date date) {
 
-        for(TempIngredients ingredient : mIngredients) {
-            Date date = ingredient.getCreatedAt();
+        for(Ingredient ingredient : mIngredients) {
             LocalDate localDate = convertToLocalDateViaMilisecond(date);
-            localDate = localDate.plusDays(ingredient.getDuration());
+            localDate = localDate.plusDays(ingredient.getShelfLife());
 
             String item = ingredient.getName();
 
             populateMap(localDate, item);
 
         }
+        mIngredients.clear();
 
     }
 
@@ -182,12 +196,23 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
      * Populate map with data
      */
     private void populateMap(LocalDate day, String item) {
-        if (realData.containsKey(day) && !realData.containsValue(item)) {
-            realData.get(day).add(item);
-        } else if (!realData.containsValue(item)){
-            List<String> items = new ArrayList<String>();
-            items.add(item);
-            realData.put(day, items);
+        if (expiringItemsAndAssociatedDates.containsKey(day)) {
+            expiringItemsAndAssociatedDates.get(day).add(item);
+        } else {
+            boolean isContained = false;
+
+            for (LinkedHashSet<String> currentItems: expiringItemsAndAssociatedDates.values()) {
+                if (currentItems.contains(item)) {
+                    isContained = true;
+                    break;
+                }
+            }
+
+            if (isContained == false) {
+                LinkedHashSet<String> items = new LinkedHashSet<String>();
+                items.add(item);
+                expiringItemsAndAssociatedDates.put(day, items);
+            }
         }
     }
 
@@ -196,28 +221,35 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         return Instant.ofEpochMilli(dateToConvert.getTime())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
-
-        // LocalDateTime localDateTime = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        //        LOOK INTO THIS
     }
 
 
-    public void fetchTimelineAsync(int page) {
-        ParseQuery<TempIngredients> tempIngredientsQuery = new ParseQuery<TempIngredients>(TempIngredients.class);
-        tempIngredientsQuery.include(TempIngredients.KEY_NAME);
 
-        tempIngredientsQuery.findInBackground(new FindCallback<TempIngredients>() {
+    public void fetchTimelineAsync(int page) {
+        ParseQuery<Receipt> receiptItemQuery = new ParseQuery<Receipt>(Receipt.class);
+        receiptItemQuery.include(Receipt.KEY_RECEIPT_ITEMS); // should this be public???
+
+        receiptItemQuery.findInBackground(new FindCallback<Receipt>() {
             @Override
-            public void done(List<TempIngredients> objects, ParseException e) {
+            public void done(List<Receipt> receipts, ParseException e) {
+                Date date;
+
                 if (e != null) {
-                    Log.e(TAG, "Error with query");
+                    Log.e(TAG, "Error with query!");
                     e.printStackTrace();
                     return;
                 }
-                mIngredients.addAll(objects);
-                setUpData();
+
+                for(Receipt receipt: receipts){
+                    mIngredients.addAll(receipt.getReceiptItems());
+                    date = receipt.getCreatedAt();
+                    setUpData(date);
+                }
             }
         });
     }
 
+    private String formatString(String items) {
+        return items.substring(1, items.length() - 1);
+    }
 }
