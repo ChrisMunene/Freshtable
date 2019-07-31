@@ -6,7 +6,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.util.Collection;
+
+import java.util.Date;
+
 import java.util.List;
 
 @ParseClassName("Receipt")
@@ -18,6 +20,7 @@ public class Receipt extends ParseObject {
     private static final String KEY_DESCRIPTION = "description";
     public static final String KEY_RECEIPT_ITEMS = "receiptItems";
     private static final String KEY_TITLE = "title";
+    public static final String KEY_DATE = "createdAt";
 
     public String getDescription(){
         return getString(KEY_DESCRIPTION);
@@ -54,6 +57,10 @@ public class Receipt extends ParseObject {
     public List<Ingredient> getReceiptItems(){
 
         return getList(KEY_RECEIPT_ITEMS);
+    }
+
+    public Date getDate() {
+        return getDate(KEY_DATE);
     }
 
     public ParseFile getImage(){

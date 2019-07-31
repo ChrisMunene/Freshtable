@@ -8,18 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.fragments.CalendarFragment;
 import com.example.fburecipeapp.fragments.KitchenFragment;
+import com.example.fburecipeapp.fragments.ReceiptFragment;
 import com.example.fburecipeapp.fragments.RecipeFragment;
 import com.example.fburecipeapp.fragments.ScannerFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import org.threeten.bp.LocalDate;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -42,6 +37,9 @@ public class HomeActivity extends AppCompatActivity {
                     break;
                 case R.id.action_recipes:
                     fragment = new RecipeFragment();
+                    break;
+                case R.id.action_receipts:
+                    fragment = new ReceiptFragment();
                     break;
                 case R.id.action_calendar:
                     fragment = new CalendarFragment();
