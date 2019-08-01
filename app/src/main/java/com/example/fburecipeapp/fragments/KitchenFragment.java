@@ -8,32 +8,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
+
 import com.example.fburecipeapp.activities.ExpandableExampleActivity;
 import com.example.fburecipeapp.helpers.SwipeableRecyclerViewTouchListener;
+
 import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.activities.TypeSelectionActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +48,7 @@ public class KitchenFragment extends Fragment {
     private ImageButton addFoodBtn;
     private List<Ingredient> savedIngredients;
     private List<Ingredient> removedItems;
+    private ImageView savedItemImg;
     private final static String TAG = KitchenFragment.class.getSimpleName();
 
 
@@ -64,16 +62,20 @@ public class KitchenFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        Toast.makeText(getContext(), "Press and hold an item to delete", Toast.LENGTH_LONG).show();
+
         logoutBtn = view.findViewById(R.id.logoutBtn);
         addFoodBtn = view.findViewById(R.id.addFoodBtn);
         savedIngredients = new ArrayList<Ingredient>();
         removedItems = new ArrayList<Ingredient>();
         kitchenAdapter = new KitchenAdapter(savedIngredients);
         recyclerView = view.findViewById(R.id.rvSaved);
-        recyclerView.setNestedScrollingEnabled(false);
+        savedItemImg = view.findViewById(R.id.savedItemImg);
+        //recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(kitchenAdapter);
 
-        layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
         currentUser = (User) ParseUser.getCurrentUser();
 
@@ -106,54 +108,6 @@ public class KitchenFragment extends Fragment {
 
             }
         });
-
-        SwipeableRecyclerViewTouchListener swipeTouchListener =
-                new SwipeableRecyclerViewTouchListener(recyclerView,
-                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
-
-                    @Override
-                            public boolean canSwipeLeft(int position) {
-                                return true;
-                            }
-                            public boolean canSwipeRight(int position) {
-                                return false;
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    removedItems.add(savedIngredients.get(position));
-                                    savedIngredients.remove(position);
-                                    kitchenAdapter.notifyItemRemoved(position);
-
-                                    currentUser.setSavedIngredients(savedIngredients);
-                                    currentUser.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            if(e == null){
-                                                Toast.makeText(getContext(), "Item removed.", Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                Log.e(TAG, "Error deleting item", e);
-                                            }
-                                        }
-                                    });
-
-
-                                }
-                                kitchenAdapter.notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-                                    savedIngredients.remove(position);
-                                    kitchenAdapter.notifyItemRemoved(position);
-                                }
-                                kitchenAdapter.notifyDataSetChanged();
-                            }
-                        });
-
-        recyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
     // loads the specific fooditems for the food category

@@ -22,5 +22,9 @@
         android:icon="@drawable/recipes_icon"
         android:title="Recipes"
         app:itemIconSize="24dp" />
+    <item
+        android:id="@+id/action_receipts"
+        android:icon="@drawable/recepits_icon"
+        android:title="Receipts" />
 
 </menu>
