@@ -21,10 +21,6 @@ import com.example.fburecipeapp.R;
 
 import com.example.fburecipeapp.activities.ExpandableActivity;
 
-import com.example.fburecipeapp.activities.ExpandableExampleActivity;
-
-import com.example.fburecipeapp.helpers.SwipeableRecyclerViewTouchListener;
-
 import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.example.fburecipeapp.models.FoodType;
@@ -33,8 +29,6 @@ import com.example.fburecipeapp.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-
-import com.parse.SaveCallback;
 
 
 import java.util.ArrayList;

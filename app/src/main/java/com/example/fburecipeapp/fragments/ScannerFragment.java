@@ -15,9 +15,6 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.fburecipeapp.activities.EditReceiptActivity;
-import com.example.fburecipeapp.activities.HomeActivity;
-import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
