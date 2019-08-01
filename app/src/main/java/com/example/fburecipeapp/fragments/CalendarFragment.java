@@ -2,7 +2,6 @@ package com.example.fburecipeapp.fragments;
 
 import android.annotation.TargetApi;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,18 +28,14 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDate;
-import org.threeten.bp.Month;
 import org.threeten.bp.ZoneId;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,29 +46,34 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
     private static final String TAG = "CalendarFragment";
 
-    private final OneDayDecorator oneDayDecorator;
+    private final OneDayDecorator oneDayDecoratorIcon;
     private Map<LocalDate, LinkedHashSet<String>> expiringItemsAndAssociatedDates;
-
-    protected ArrayList<Ingredient> mIngredients;
-
-
-    private List<String> calendarItems;
-    boolean decoratorPresent;
-
+    protected ArrayList<Ingredient> allIngredients;
     private TextView expireText;
-
-    @BindView(R.id.calendarView) MaterialCalendarView widget;
-    //@BindView(R.id.textView) TextView textView;
     private Unbinder unbinder;
 
+    @BindView(R.id.calendarView) MaterialCalendarView widget;
+
+    /**
+     * Constructs CalendarFragment
+     * Initializes expiringItemsAndAssociatedDates as new HashMap to keep track of all dates on which
+     * items will be expiring along with which items
+     * Initializes oneDayDecoratorIcon as a new Decorator which is responsible for showing the circle
+     * icon on dates an item is expiring on
+     * Initializes allIngredients as an ArrayList which contains all ingredients from the receipts
+     */
     public CalendarFragment() {
         this.expiringItemsAndAssociatedDates = new HashMap<LocalDate, LinkedHashSet<String>>();
-        this.oneDayDecorator = new OneDayDecorator();
+        this.oneDayDecoratorIcon = new OneDayDecorator();
+        this.allIngredients = new ArrayList<Ingredient>();
     }
+
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
         unbinder = ButterKnife.bind(this, view);
         return view;
@@ -84,126 +84,54 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         expireText = view.findViewById(R.id.expireText);
-
-        // Set-up initial text
-        //textView.setText("No Expired Items Here");
-
-        // Create the data source
-        mIngredients = new ArrayList<>();
-        calendarItems = new ArrayList<String>();
 
         fetchTimelineAsync(0);
 
         widget.setOnDateChangedListener(this);
         widget.setShowOtherDates(MaterialCalendarView.SHOW_ALL);
-
-        final LocalDate instance =  LocalDate.now();
-        widget.setSelectedDate(instance);
-
-        final LocalDate min = LocalDate.of(instance.getYear(), Month.JANUARY, 1);
-        final LocalDate max = LocalDate.of(instance.getYear(), Month.DECEMBER, 31);
-
-        widget.state().edit().setMinimumDate(min).setMaximumDate(max).commit();
-
-        widget.addDecorator(oneDayDecorator);
-
-        // new ApiSimulator().executeOnExecutor(Executors.newSingleThreadExecutor());
-        new ApiSimulator().execute();
+        widget.addDecorator(oneDayDecoratorIcon);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
 
     @Override
     public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView,
                                @NonNull CalendarDay calendarDay,
-                               boolean b) {
-        oneDayDecorator.setDate(calendarDay.getDate());
+                               boolean selected) {
+        oneDayDecoratorIcon.setDate(calendarDay.getDate());
 
-        //widget.invalidateDecorators();
-        String item = getItems(calendarDay.getDate()).toString();
+        LinkedHashSet<String> itemsExpiringOnSelectedDate = getItems(calendarDay.getDate());
 
-        if (decoratorPresent == true) {
-            showCalendarDialog(item);
-        }
-        else {
+        if (!itemsExpiringOnSelectedDate.isEmpty()) {
+            showCalendarDialog(itemsExpiringOnSelectedDate.toString());
+        } else {
             expireText.setText("No Expiring Items Here");
-
         }
-
-       // textView.setText(b ? getItems(calendarDay.getDate()).toString() : "No Expired Items Here");
     }
 
     /**
-     * Get items to set text when a date is clicked
+     * Gets a set of strings of ingredients expiring on given date
+     * If there are no items expiring on given date, returns an empty LinkedHashSet
      */
     public LinkedHashSet<String> getItems(LocalDate calendarDay) {
         LinkedHashSet<String> items = expiringItemsAndAssociatedDates.get(calendarDay);
 
         if (items == null) {
             LinkedHashSet<String> temp = new LinkedHashSet<String>();
-            temp.add("No Expired Items Here");
             return temp;
         }
 
         return items;
     }
 
-    /**
-     * Simulate an API call to show how to add decorators
-     */
-    private class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {
-
-        @Override
-        protected List<CalendarDay> doInBackground(@NonNull Void... voids) {
-
-//            Handler handler = new Handler();
-//
-//            handler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    handler.postDelayed(this, 1500);
-//                }
-//            }, 1500);
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            ArrayList<CalendarDay> dates = new ArrayList<>();
-
-            // dates on which items will expire
-            for (LocalDate temp : expiringItemsAndAssociatedDates.keySet()) {
-                CalendarDay day = CalendarDay.from(temp);
-                dates.add(day);
-            }
-
-            return dates;
-        }
-
-
-        @Override
-        protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
-            super.onPostExecute(calendarDays);
-            // adds dot on respective dates
-            widget.addDecorator(new EventDecorator(Color.BLUE, calendarDays));
-            decoratorPresent = true;
-        }
-    }
 
     /**
-     * Set up data
+     * Sets up data given a date
+     * Calculates expiring date and gets ingredient name to send to populateMap
      */
     private void setUpData(Date date) {
 
-        for(Ingredient ingredient : mIngredients) {
+        for(Ingredient ingredient : allIngredients) {
             LocalDate localDate = convertToLocalDateViaMilisecond(date);
             localDate = localDate.plusDays(ingredient.getShelfLife());
 
@@ -212,12 +140,12 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
             populateMap(localDate, item);
 
         }
-        mIngredients.clear();
+        allIngredients.clear();
 
     }
 
     /**
-     * Populate map with data
+     * Given a LocalDate and ingredient name, populates expiringItemsAndAssociatedDates
      */
     private void populateMap(LocalDate day, String item) {
         if (expiringItemsAndAssociatedDates.containsKey(day)) {
@@ -240,6 +168,10 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         }
     }
 
+
+    /**
+     * Given a Date, converts it to a LocalDate
+     */
     @TargetApi(26)
     public LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
         return Instant.ofEpochMilli(dateToConvert.getTime())
@@ -248,10 +180,13 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     }
 
 
-
+    /**
+     * Gets all receipts from Parse Server, populates allIngredients with all receipt items from each receipt
+     * For all dates on which ingredients are going to expire, adds a blue circle decorator
+     */
     public void fetchTimelineAsync(int page) {
         ParseQuery<Receipt> receiptItemQuery = new ParseQuery<Receipt>(Receipt.class);
-        receiptItemQuery.include(Receipt.KEY_RECEIPT_ITEMS); // should this be public???
+        receiptItemQuery.include(Receipt.KEY_RECEIPT_ITEMS);
 
         receiptItemQuery.findInBackground(new FindCallback<Receipt>() {
             @Override
@@ -265,21 +200,39 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
                 }
 
                 for(Receipt receipt: receipts){
-                    mIngredients.addAll(receipt.getReceiptItems());
-                    date = receipt.getCreatedAt();
-                    setUpData(date);
+                    List<Ingredient> ingredients = receipt.getReceiptItems();
+                    if (ingredients != null) {
+                        allIngredients.addAll(ingredients);
+                        date = receipt.getCreatedAt();
+                        setUpData(date);
+                    }
                 }
+
+                ArrayList<CalendarDay> dates = new ArrayList<>();
+
+                // dates on which items will expire
+                for (LocalDate temp : expiringItemsAndAssociatedDates.keySet()) {
+                    CalendarDay day = CalendarDay.from(temp);
+                    dates.add(day);
+                }
+
+                widget.addDecorator(new EventDecorator(Color.BLUE, dates));
+
             }
         });
     }
 
+    /**
+     * Shows Calendar Dialog Fragment upon clicking a day which contains expiring items
+     */
     private void showCalendarDialog(String item) {
         FragmentManager fm = getFragmentManager();
         if (fm != null) {
-            CalendarItemDialogFragment frag = CalendarItemDialogFragment.newInstance(item);
+            CalendarItemCarouselDialogFragment frag = CalendarItemCarouselDialogFragment.newInstance(item);
             frag.setTargetFragment(this, 0);
             frag.show(fm, "dialog_fragment_calendar_items");
         }
     }
+
 
 }

@@ -71,6 +71,8 @@ dependencies {
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
     // firebase
     //implementation 'com.google.firebase:firebase-core:17.0.0'
+    // carousel
+    implementation 'com.synnapps:carouselview:0.1.5'
 }
 
 apply plugin: 'com.google.gms.google-services'

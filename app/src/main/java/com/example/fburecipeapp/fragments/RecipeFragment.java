@@ -39,10 +39,6 @@ public class RecipeFragment extends Fragment {
 
     public RecipeFragment() {
 
-//        myIngredients.add("Honey");
-//        myIngredients.add("Sugar");
-//        myIngredients.add("Oil");
-//        myIngredients.add("Chicken");
     }
 
 
@@ -71,7 +67,6 @@ public class RecipeFragment extends Fragment {
 
 
     }
-
 
     private void loadRecipes() {
         Recipes.Query query = new Recipes.Query();
