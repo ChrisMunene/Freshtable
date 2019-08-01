@@ -43,10 +43,6 @@ public class RecipeFragment extends Fragment {
 
     public RecipeFragment() {
 
-//        myIngredients.add("Honey");
-//        myIngredients.add("Sugar");
-//        myIngredients.add("Oil");
-//        myIngredients.add("Chicken");
     }
 
 
@@ -76,23 +72,6 @@ public class RecipeFragment extends Fragment {
 
     }
 
-//    private void loadRecipes() {
-//        Recipe.Query query = new Recipe.Query();
-//        query.findInBackground(new FindCallback<Recipe>() {
-//            public void done(List<Recipe> recipe, ParseException e) {
-//                if (e == null) {
-//                    Log.d("item count", String.format("%s" , recipe.size()));
-//                    mRecipes.addAll(recipe);
-//                    staggeredRecyclerViewAdapter.notifyDataSetChanged(); // update adapter
-//                }
-//                else {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
-
-
     private void loadRecipes() {
         Recipes.Query query = new Recipes.Query();
         query.withOneIngredient(myIngredients);
@@ -109,24 +88,6 @@ public class RecipeFragment extends Fragment {
             }
         });
     }
-
-//    private void loadUserIngredients() {
-//        ParseQuery<User> userIngredientsQuery = new ParseQuery<User>(User.class);
-//        userIngredientsQuery.include(User.USER_ITEMS);
-//
-//        userIngredientsQuery.findInBackground(new FindCallback<User>() {
-//            @Override
-//            public void done(List<User> users, ParseException e) {
-//                if(e != null) {
-//                    Log.e(TAG, "Error with loading user ingredients query!");
-//                    e.printStackTrace();
-//                    return;
-//                }
-//
-//
-//            }
-//        });
-//    }
 
     private void loadUserIngredients() {
     User.Query query =  new User.Query();
