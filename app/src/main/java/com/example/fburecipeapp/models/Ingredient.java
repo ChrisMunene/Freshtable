@@ -6,11 +6,14 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.List;
+
 @ParseClassName("Ingredient")
 public class Ingredient extends ParseObject {
     private static final String KEY_NAME = "name";
     private static final String KEY_IMAGE = "image";
     private static final String KEY_FOODTYPE = "foodType";
+    private static final String KEY_OBJECT_ID = "objectId";
 
     public String getName() {
         return getString(KEY_NAME);
@@ -27,6 +30,11 @@ public class Ingredient extends ParseObject {
 
         public Query forFoodType(FoodType type){
             whereEqualTo(KEY_FOODTYPE, type);
+            return this;
+        }
+
+        public Query whereObjectIds(List<String> objectIds){
+            whereContainedIn(KEY_OBJECT_ID, objectIds);
             return this;
         }
     }

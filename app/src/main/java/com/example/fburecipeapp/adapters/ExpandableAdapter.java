@@ -1,8 +1,5 @@
 package com.example.fburecipeapp.adapters;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.nfc.Tag;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.helpers.AbstractExpandableDataProvider;
-import com.example.fburecipeapp.helpers.ExampleExpandableDataProvider;
+import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.helpers.ExpandableItemIndicator;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
@@ -25,8 +22,8 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemVie
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpandableExampleAdapter
-        extends AbstractExpandableItemAdapter<ExpandableExampleAdapter.MyGroupViewHolder, ExpandableExampleAdapter.MyChildViewHolder> {
+public class ExpandableAdapter
+        extends AbstractExpandableItemAdapter<ExpandableAdapter.MyGroupViewHolder, ExpandableAdapter.MyChildViewHolder> {
     private static final String TAG = "ExpandableItemAdapter";
 
     // NOTE: Make accessible with short name
@@ -61,11 +58,11 @@ public class ExpandableExampleAdapter
         }
     }
 
-    public ExpandableExampleAdapter(ExampleExpandableDataProvider dataProvider) {
+    public ExpandableAdapter(ExpandableDataProvider dataProvider, List<Ingredient> selectedIngredientsList) {
         mProvider = dataProvider;
         mFoodTypes = dataProvider.getFoodTypes();
         mIngredients = dataProvider.getIngredients();
-        selectedIngredients = new ArrayList<Ingredient>();
+        selectedIngredients = selectedIngredientsList;
 
         // ExpandableItemAdapter requires stable ID, and also
         // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
