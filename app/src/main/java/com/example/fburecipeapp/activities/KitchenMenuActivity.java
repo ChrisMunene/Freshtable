@@ -75,7 +75,6 @@ public class KitchenMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 List<Ingredient> selectedItemsList = itemsAdapter.getSelectedItems();
-                // Log.d("Selected Items", Integer.toString(selectedItemsList.size()));
                 ParseUser.getCurrentUser().addAll("savedIngredients", selectedItemsList);
                 ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
                     @Override

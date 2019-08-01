@@ -16,16 +16,12 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.adapters.StaggeredRecyclerViewAdapter;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.Recipe;
 import com.example.fburecipeapp.models.Recipes;
 import com.example.fburecipeapp.models.User;
 import com.loopj.android.http.AsyncHttpClient;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 

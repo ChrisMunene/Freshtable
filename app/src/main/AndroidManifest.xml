@@ -16,16 +16,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".activities.EditReceiptActivity"
+            android:label="@string/title_activity_edit_receipt"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity android:name=".activities.KitchenMenuActivity" />
         <activity
             android:name=".activities.HomeActivity"
-            android:label="@string/title_activity_home"></activity>
-        <activity android:name=".activities.TypeSelectionActivity"></activity>
-        <activity android:name=".activities.ExpandableExampleActivity">
-
-
-        </activity>
-
+            android:label="@string/title_activity_home" />
+        <activity android:name=".activities.TypeSelectionActivity" />
+        <activity android:name=".activities.ExpandableActivity"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
