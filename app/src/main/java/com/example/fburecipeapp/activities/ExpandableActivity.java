@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import java.util.ArrayList;
+
 public class ExpandableActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG_DATA_PROVIDER = "data provider";
     private static final String FRAGMENT_LIST_VIEW = "list view";
@@ -21,7 +23,7 @@ public class ExpandableActivity extends AppCompatActivity {
         setContentView(R.layout.activity_example);
 
         if (savedInstanceState == null) {
-            Fragment fragment = new ExpandableFragment();
+            Fragment fragment = ExpandableFragment.newInstance(new ArrayList<>());
             fragmentManager.beginTransaction().replace(R.id.mContainer, fragment).commitNow();
         }
     }
