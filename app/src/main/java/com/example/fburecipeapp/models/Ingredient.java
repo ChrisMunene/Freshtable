@@ -4,7 +4,7 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
+
 
 import java.util.List;
 
@@ -14,6 +14,13 @@ public class Ingredient extends ParseObject {
     private static final String KEY_IMAGE = "image";
     private static final String KEY_FOODTYPE = "foodType";
     private static final String KEY_OBJECT_ID = "objectId";
+
+    private static final String KEY_SHELF_LIFE = "shelfLife";
+
+    public int getShelfLife() { return getInt(KEY_SHELF_LIFE); }
+
+    public void setShelfLife(int shelfLife) { put(KEY_SHELF_LIFE, shelfLife); }
+
 
     public String getName() {
         return getString(KEY_NAME);
@@ -38,5 +45,7 @@ public class Ingredient extends ParseObject {
             return this;
         }
     }
+
+
 
 }

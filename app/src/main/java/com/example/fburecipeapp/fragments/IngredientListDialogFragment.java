@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
+
 import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.activities.EditReceiptActivity;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Parcel;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +28,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.adapters.EditListAdapter;
+import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.ReceiptItem;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -87,7 +98,7 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         rvIngredients.setAdapter(adapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        rvIngredients.setLayoutManager(linearLayoutManager);
+        rvIngredients.setLayoutManager(gridLayoutManager);
 
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override
