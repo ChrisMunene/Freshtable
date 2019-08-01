@@ -14,7 +14,7 @@ import java.util.List;
 
 import androidx.core.util.Pair;
 
-public class ExampleExpandableDataProvider extends AbstractExpandableDataProvider {
+public class ExpandableDataProvider extends AbstractExpandableDataProvider {
     private List<Pair<GroupData, List<ChildData>>> mData;
 
     // for undo group item
@@ -33,7 +33,7 @@ public class ExampleExpandableDataProvider extends AbstractExpandableDataProvide
     private final List<FoodType> foodTypes;
     private final List<Ingredient> ingredients;
 
-    public ExampleExpandableDataProvider() {
+    public ExpandableDataProvider() {
         foodTypes = loadFoodTypes();
 
         mData = new LinkedList<>();

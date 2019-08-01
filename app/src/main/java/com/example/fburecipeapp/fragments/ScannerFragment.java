@@ -15,6 +15,9 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.fburecipeapp.activities.EditReceiptActivity;
+import com.example.fburecipeapp.activities.HomeActivity;
+import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.ReceiptItem;
@@ -74,7 +77,9 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     public final String TAG = ScannerFragment.class.getSimpleName();
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public final static int PICK_PHOTO_CODE = 1046;
-    File photoFile;
+    private File photoFile;
+    private Bitmap selectedImage;
+    private Uri photoUri;
 
     @Nullable
     @Override
@@ -321,10 +326,9 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
 
             case PICK_PHOTO_CODE:
                 if (resultCode == RESULT_OK && data != null) {
-                    Uri photoUri = data.getData();
+                    photoUri = data.getData();
 
                     // Do something with the photo based on Uri
-                    Bitmap selectedImage = null;
                     try {
                         // Get bitmap from Uri
                         selectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
@@ -341,6 +345,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                     // Load the selected image into a preview
                     ivPreview.setImageBitmap(selectedImage);
 
@@ -385,10 +390,11 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         return rotatedBitmap;
     }
 
+
     private void showEditDialog(List<ReceiptItem> receiptItems){
         FragmentManager fm = getFragmentManager();
         if(fm != null){
-            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance(receiptItems);
+            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance(receiptItems, photoUri);
             frag.setTargetFragment(this, 0);
             frag.show(fm, "fragment_edit_items");
         }

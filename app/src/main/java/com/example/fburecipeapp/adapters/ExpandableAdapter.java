@@ -1,8 +1,5 @@
 package com.example.fburecipeapp.adapters;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.nfc.Tag;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.helpers.AbstractExpandableDataProvider;
-import com.example.fburecipeapp.helpers.ExampleExpandableDataProvider;
+import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.helpers.ExpandableItemIndicator;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
@@ -25,49 +22,47 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemVie
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpandableExampleAdapter
-        extends AbstractExpandableItemAdapter<ExpandableExampleAdapter.MyGroupViewHolder, ExpandableExampleAdapter.MyChildViewHolder> {
+public class ExpandableAdapter
+        extends AbstractExpandableItemAdapter<ExpandableAdapter.MyGroupViewHolder, ExpandableAdapter.MyChildViewHolder> {
     private static final String TAG = "ExpandableItemAdapter";
 
     // NOTE: Make accessible with short name
     private AbstractExpandableDataProvider mProvider;
-    private Context mContext;
     private List<FoodType> mFoodTypes;
     private List<Ingredient> mIngredients;
     private List<Ingredient> selectedIngredients;
 
-    public static abstract class MyBaseViewHolder extends AbstractExpandableItemViewHolder {
-        public FrameLayout mContainer;
-        public TextView mTextView;
+    static abstract class MyBaseViewHolder extends AbstractExpandableItemViewHolder {
+        FrameLayout mContainer;
+        TextView mTextView;
 
-        public MyBaseViewHolder(View v) {
+        MyBaseViewHolder(View v) {
             super(v);
             mContainer = v.findViewById(R.id.container);
             mTextView = v.findViewById(android.R.id.text1);
         }
     }
 
-    public static class MyGroupViewHolder extends MyBaseViewHolder {
-        public ExpandableItemIndicator mIndicator;
+    static class MyGroupViewHolder extends MyBaseViewHolder {
+        ExpandableItemIndicator mIndicator;
 
-        public MyGroupViewHolder(View v) {
+        MyGroupViewHolder(View v) {
             super(v);
             mIndicator = v.findViewById(R.id.indicator);
         }
     }
 
-    public static class MyChildViewHolder extends MyBaseViewHolder {
-        public MyChildViewHolder(View v) {
+    static class MyChildViewHolder extends MyBaseViewHolder {
+        MyChildViewHolder(View v) {
             super(v);
         }
     }
 
-    public ExpandableExampleAdapter(ExampleExpandableDataProvider dataProvider, Context context) {
+    public ExpandableAdapter(ExpandableDataProvider dataProvider, List<Ingredient> selectedIngredientsList) {
         mProvider = dataProvider;
         mFoodTypes = dataProvider.getFoodTypes();
         mIngredients = dataProvider.getIngredients();
-        selectedIngredients = new ArrayList<Ingredient>();
-        mContext = context;
+        selectedIngredients = selectedIngredientsList;
 
         // ExpandableItemAdapter requires stable ID, and also
         // have to implement the getGroupItemId()/getChildItemId() methods appropriately.

@@ -19,11 +19,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
 
+import com.example.fburecipeapp.activities.ExpandableActivity;
+
 import com.example.fburecipeapp.activities.ExpandableExampleActivity;
+
 import com.example.fburecipeapp.helpers.SwipeableRecyclerViewTouchListener;
 
 import com.example.fburecipeapp.activities.LoginActivity;
-import com.example.fburecipeapp.activities.TypeSelectionActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
@@ -31,6 +33,9 @@ import com.example.fburecipeapp.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+
+import com.parse.SaveCallback;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +108,7 @@ public class KitchenFragment extends Fragment {
         addFoodBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(getContext(), ExpandableExampleActivity.class);
+                final Intent intent = new Intent(getContext(), ExpandableActivity.class);
                 startActivity(intent);
 
             }

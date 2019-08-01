@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,13 +20,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
-import com.example.fburecipeapp.activities.ExpandableExampleActivity;
 import com.example.fburecipeapp.activities.HomeActivity;
-import com.example.fburecipeapp.activities.KitchenMenuActivity;
-import com.example.fburecipeapp.adapters.ExpandableExampleAdapter;
-import com.example.fburecipeapp.helpers.AbstractExpandableDataProvider;
-import com.example.fburecipeapp.helpers.ExampleExpandableDataProvider;
-import com.example.fburecipeapp.models.FoodType;
+import com.example.fburecipeapp.adapters.ExpandableAdapter;
+import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.models.Ingredient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -35,19 +32,22 @@ import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class ExpandableExampleFragment
+public class ExpandableFragment
         extends Fragment
         implements RecyclerViewExpandableItemManager.OnGroupCollapseListener,
         RecyclerViewExpandableItemManager.OnGroupExpandListener {
     private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
-    private static final String TAG = ExpandableExampleFragment.class.getSimpleName();
+    private static final String TAG = ExpandableFragment.class.getSimpleName();
+    private static final String KEY_SELECTED_INGREDIENTS = "selectedIngredientIds";
 
     private FloatingActionButton fabSave;
     private RecyclerView mRecyclerView;
@@ -56,8 +56,16 @@ public class ExpandableExampleFragment
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
     private ProgressDialog pd;
 
-    public ExpandableExampleFragment() {
+    public ExpandableFragment() {
         super();
+    }
+
+    public static ExpandableFragment newInstance(List<String> selectedIngredientIds) {
+        ExpandableFragment fragment = new ExpandableFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(KEY_SELECTED_INGREDIENTS, Parcels.wrap(selectedIngredientIds));
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -89,8 +97,12 @@ public class ExpandableExampleFragment
         mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
+        List<String> selectedIngredientsIds = Parcels.unwrap(getArguments().getParcelable(KEY_SELECTED_INGREDIENTS));
+
+        List<Ingredient> selectedIngredients = getSelectedIngredientFromIds(selectedIngredientsIds);
+
         //adapter
-        final ExpandableExampleAdapter myItemAdapter = new ExpandableExampleAdapter(new ExampleExpandableDataProvider(), getContext());
+        final ExpandableAdapter myItemAdapter = new ExpandableAdapter(new ExpandableDataProvider(), selectedIngredients);
 
         // wrap for expanding
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(myItemAdapter);
@@ -199,6 +211,19 @@ public class ExpandableExampleFragment
 
     private boolean supportsViewElevation() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    }
+
+    private List<Ingredient> getSelectedIngredientFromIds(List<String> objectIds){
+        Ingredient.Query query =  new Ingredient.Query();
+        query.whereObjectIds(objectIds);
+        List<Ingredient> ingredients = new ArrayList<Ingredient>();
+        try {
+            ingredients.addAll(query.find());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return ingredients;
     }
 
 
