@@ -24,10 +24,12 @@ public class SelectedItemAdapter extends RecyclerView.Adapter<SelectedItemAdapte
 
     private Context context;
     private List<Ingredient> selectedFoodItems;
+    public onItemsChangedListener mListener;
 
-    public SelectedItemAdapter(Context context, List<Ingredient> selectedIngredients) {
+    public SelectedItemAdapter(Context context, List<Ingredient> selectedIngredients, onItemsChangedListener listener) {
         this.context = context;
         this.selectedFoodItems = selectedIngredients;
+        mListener = listener;
     }
 
 
@@ -65,7 +67,19 @@ public class SelectedItemAdapter extends RecyclerView.Adapter<SelectedItemAdapte
            tvName.setText(ingredient.getName());
             RequestOptions options = new RequestOptions().fitCenter().circleCrop();
             Glide.with(context).load(ingredient.getImage().getUrl()).apply(options).into(ivSavedItemImg);
+            ivSavedItemImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectedFoodItems.remove(ingredient);
+                    notifyItemRemoved(position);
+                    mListener.onItemsChanged();
+                }
+            });
         }
+    }
+
+    public interface onItemsChangedListener {
+        void onItemsChanged();
     }
 
 

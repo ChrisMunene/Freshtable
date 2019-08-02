@@ -44,7 +44,7 @@ import java.util.List;
 
 public class ExpandableFragment
         extends Fragment
-        implements ExpandableAdapter.onSelectedItemsChangedListener, RecyclerViewExpandableItemManager.OnGroupCollapseListener,
+        implements ExpandableAdapter.onSelectedItemsChangedListener, SelectedItemAdapter.onItemsChangedListener, RecyclerViewExpandableItemManager.OnGroupCollapseListener,
         RecyclerViewExpandableItemManager.OnGroupExpandListener {
     private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
     private static final String TAG = ExpandableFragment.class.getSimpleName();
@@ -111,7 +111,7 @@ public class ExpandableFragment
 
         //adapters
         myItemAdapter = new ExpandableAdapter(new ExpandableDataProvider(), selectedIngredients);
-        selectedItemsAdapter = new SelectedItemAdapter(getContext(), selectedIngredients);
+        selectedItemsAdapter = new SelectedItemAdapter(getContext(), selectedIngredients, this::onItemsChanged);
         myItemAdapter.setOnSelectedItemsChangedListener(this::onSelectedItemsChanged);
 
         // wrap for expanding
@@ -252,5 +252,10 @@ public class ExpandableFragment
     @Override
     public void onSelectedItemsChanged() {
         selectedItemsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemsChanged() {
+        myItemAdapter.notifyDataSetChanged();
     }
 }
