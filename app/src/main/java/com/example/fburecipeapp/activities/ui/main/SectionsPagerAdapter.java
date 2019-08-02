@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private static final String[] TAB_TITLES = {"VIEW", "EDIT"};
+    private static final String[] TAB_TITLES = {"Edit", "View"};
     private final Context mContext;
     private final List<String> mSelectedIngredientIds;
     private Uri mPhotoUri;
@@ -43,10 +43,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         Fragment fragment = PlaceholderFragment.newInstance(position + 1);
         switch (position){
             case 0:
-               fragment = ViewReceiptFragment.newInstance(mPhotoUri);
+               fragment = ExpandableFragment.newInstance(mSelectedIngredientIds);
                break;
             case 1:
-                fragment = ExpandableFragment.newInstance(mSelectedIngredientIds);
+                fragment = ViewReceiptFragment.newInstance(mPhotoUri);
                 break;
             default:
                 break;
