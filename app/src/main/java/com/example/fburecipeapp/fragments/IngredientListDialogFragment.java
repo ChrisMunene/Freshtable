@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.fburecipeapp.R;
+import com.google.android.material.snackbar.Snackbar;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -43,7 +44,7 @@ import java.util.List;
  * </pre>
  * <p>You activity (or fragment) needs to implement {@link IngredientListDialogFragment.Listener}.</p>
  */
-public class IngredientListDialogFragment extends BottomSheetDialogFragment {
+public class IngredientListDialogFragment extends BottomSheetDialogFragment implements EditListAdapter.AddButtonClickListener {
 
     private RecyclerView rvIngredients;
     private EditText titleInput;
@@ -53,6 +54,7 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     private List<Ingredient> precheckedIngredients = new ArrayList<>();
     private EditListAdapter adapter;
     private Button submitBtn;
+    private Uri photoUri;
     private static final String TAG = IngredientListDialogFragment.class.getSimpleName();
 
     public static IngredientListDialogFragment newInstance(List<ReceiptItem> receiptItems, Uri photoUri) {
@@ -80,8 +82,9 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         descriptionInput = view.findViewById(R.id.descriptionInput);
         ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
-        Uri photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
-        adapter = new EditListAdapter(getContext(), precheckedIngredients, photoUri);
+        photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
+        adapter = new EditListAdapter(getContext(), precheckedIngredients);
+        adapter.setOnAddBtnClickedListener(this::onAddButtonClicked);
         rvIngredients.setAdapter(adapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -91,8 +94,18 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View view) {
                 // Get selected items
-                List<Ingredient> selectedFoodItems = adapter.getSelectedFoodItems();
-                sendBackResult(selectedFoodItems);
+                String title = titleInput.getText().toString();
+                String description = descriptionInput.getText().toString();
+
+                if(title.isEmpty()){
+                   titleInput.setError("Please enter a title");
+                } else if(description.isEmpty()) {
+                    descriptionInput.setError("Please enter a description");
+                } else {
+                    List<Ingredient> selectedIngredients = adapter.getSelectedFoodItems();
+                    sendBackResult(selectedIngredients);
+                }
+
             }
         });
 
@@ -107,6 +120,28 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    @Override
+    public void onAddButtonClicked() {
+        String title = titleInput.getText().toString();
+        String description = descriptionInput.getText().toString();
+
+        if(title.isEmpty()){
+            titleInput.setError("Please enter a title");
+        } else if(description.isEmpty()) {
+            descriptionInput.setError("Please enter a description");
+        } else {
+            List<Ingredient> selectedIngredients = adapter.getSelectedFoodItems();
+            ArrayList selectedIngredientIds = new ArrayList<String>();
+            for(Ingredient ingredient: selectedIngredients){
+                selectedIngredientIds.add(ingredient.getObjectId());
+            }
+            final Intent intent = new Intent(getContext(), EditReceiptActivity.class);
+            intent.putParcelableArrayListExtra("selectedIngredientIds", selectedIngredientIds);
+            intent.putExtra("receiptImageUri", Parcels.wrap(photoUri));
+            startActivity(intent);
+        }
     }
 
     public interface Listener {
