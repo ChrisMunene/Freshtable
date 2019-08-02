@@ -70,7 +70,7 @@ public class KitchenFragment extends Fragment {
         removedItems = new ArrayList<Ingredient>();
         kitchenAdapter = new KitchenAdapter(savedIngredients);
         recyclerView = view.findViewById(R.id.rvSaved);
-        savedItemImg = view.findViewById(R.id.savedItemImg);
+        savedItemImg = view.findViewById(R.id.ivSavedItemImg);
         //recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(kitchenAdapter);
 

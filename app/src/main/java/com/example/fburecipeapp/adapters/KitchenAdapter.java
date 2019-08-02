@@ -39,8 +39,8 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
 
-            savedItem = itemView.findViewById(R.id.tvSavedItem);
-            savedItemImage = itemView.findViewById(R.id.savedItemImg);
+            savedItem = itemView.findViewById(R.id.tvName);
+            savedItemImage = itemView.findViewById(R.id.ivSavedItemImg);
 
             removedItems = new ArrayList<Ingredient>();
             currentUser = (User) ParseUser.getCurrentUser();

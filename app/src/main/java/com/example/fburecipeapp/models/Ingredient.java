@@ -1,5 +1,7 @@
 package com.example.fburecipeapp.models;
 
+import androidx.annotation.Nullable;
+
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -46,6 +48,21 @@ public class Ingredient extends ParseObject {
         }
     }
 
-
-
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Ingredient other = (Ingredient) obj;
+        if (this.getObjectId() == null ? other.getObjectId() != null : !this.getObjectId().equals(other.getObjectId()))
+        {
+            return false;
+        }
+        return true;
+    }
 }
