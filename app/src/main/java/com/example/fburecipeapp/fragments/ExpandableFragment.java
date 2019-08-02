@@ -25,6 +25,7 @@ import com.example.fburecipeapp.adapters.ExpandableAdapter;
 import com.example.fburecipeapp.adapters.SelectedItemAdapter;
 import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
@@ -33,6 +34,7 @@ import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -44,7 +46,7 @@ import java.util.List;
 
 public class ExpandableFragment
         extends Fragment
-        implements ExpandableAdapter.onSelectedItemsChangedListener, RecyclerViewExpandableItemManager.OnGroupCollapseListener,
+        implements ExpandableAdapter.onSelectedItemsChangedListener, SelectedItemAdapter.onItemsChangedListener, RecyclerViewExpandableItemManager.OnGroupCollapseListener,
         RecyclerViewExpandableItemManager.OnGroupExpandListener {
     private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
     private static final String TAG = ExpandableFragment.class.getSimpleName();
@@ -53,6 +55,7 @@ public class ExpandableFragment
     private FloatingActionButton fabSave;
     private RecyclerView rvExpandable;
     private RecyclerView rvSelectedItems;
+    private View mLayout;
     private RecyclerView.LayoutManager expandableLayoutManager;
     private RecyclerView.LayoutManager selectedItemsLayoutManager;
     private RecyclerView.Adapter selectedItemsAdapter;
@@ -92,7 +95,7 @@ public class ExpandableFragment
         pd.show();
 
         //noinspection ConstantConditions
-        View mLayout = getView().findViewById(R.id.main_content);
+        mLayout = getView().findViewById(R.id.main_content);
         rvExpandable = getView().findViewById(R.id.rvExpandable);
         rvSelectedItems = getView().findViewById(R.id.rvSelectedItems);
         fabSave = getView().findViewById(R.id.fabSave);
@@ -111,7 +114,7 @@ public class ExpandableFragment
 
         //adapters
         myItemAdapter = new ExpandableAdapter(new ExpandableDataProvider(), selectedIngredients);
-        selectedItemsAdapter = new SelectedItemAdapter(getContext(), selectedIngredients);
+        selectedItemsAdapter = new SelectedItemAdapter(getContext(), selectedIngredients, this::onItemsChanged);
         myItemAdapter.setOnSelectedItemsChangedListener(this::onSelectedItemsChanged);
 
         // wrap for expanding
@@ -121,25 +124,8 @@ public class ExpandableFragment
         fabSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Ingredient> selectedIngredients = myItemAdapter.getSelectedIngredients();
-                if(selectedIngredients.size() > 0){
-                    Log.d(TAG, String.format("Selected Item Count: %s", selectedIngredients.size()));
-                    ParseUser.getCurrentUser().addAll("savedIngredients", selectedIngredients);
-                    ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e == null){
-                                Log.d("Parse", "items added to Parse");
-                                Intent intent = new Intent(getActivity(), HomeActivity.class);
-                                startActivity(intent);
-                            } else {
-                                Log.e(TAG, "Error saving items", e);
-                                Toast.makeText(getContext(), "Error saving items", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
-
+                if(!selectedIngredients.isEmpty()){
+                    updateUser();
                 } else {
                     Snackbar.make(mLayout, "Please select some items", Snackbar.LENGTH_LONG)
                             .show(); // Don’t forget to show!
@@ -248,9 +234,73 @@ public class ExpandableFragment
         }
     }
 
+    public void updateUser(){
+        pd.show();
+        User.Query userQuery = new User.Query();
+        userQuery.forCurrentUser().withSavedIngredients();
+        userQuery.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> users, ParseException e) {
+                if(e == null){
+                    User currentUser = users.get(0);
+                    List<Ingredient> userIngredients = currentUser.getSavedIngredients();
+                    List<Ingredient> listToSave = removeDuplicates(userIngredients);
+                    if(!listToSave.isEmpty()){
+                        saveUser(currentUser, listToSave);
+                    } else {
+                        if(pd.isShowing()) pd.dismiss();
+                        Snackbar.make(mLayout, "Selected items already saved.", Snackbar.LENGTH_LONG)
+                                .show(); // Don’t forget to show!
+                    }
+                } else {
+                    Log.e(TAG, "Error fetching user", e);
+                    pd.dismiss();
+                }
+
+            }
+        });
+
+    }
+
+    public List<Ingredient> removeDuplicates(List<Ingredient> userIngredients){
+        List<Ingredient> listToSave = new ArrayList<Ingredient>();
+        for(Ingredient selectedIngredient: selectedIngredients){
+            if(!userIngredients.contains(selectedIngredient)){
+                listToSave.add(selectedIngredient);
+            }
+        }
+
+        return listToSave;
+    }
+
+    public void saveUser(User currentUser, List<Ingredient> listToSave){
+        currentUser.addAll("savedIngredients", listToSave);
+        currentUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d("Parse", "items added to Parse");
+                    Intent intent = new Intent(getActivity(), HomeActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else {
+                    Log.e(TAG, "Error saving items", e);
+                    Toast.makeText(getContext(), "Error saving items", Toast.LENGTH_SHORT).show();
+                }
+
+                if(pd.isShowing()) pd.dismiss();
+            }
+        });
+    }
+
 
     @Override
     public void onSelectedItemsChanged() {
         selectedItemsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemsChanged() {
+        myItemAdapter.notifyDataSetChanged();
     }
 }

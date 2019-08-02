@@ -5,8 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,10 +22,12 @@ public class SelectedItemAdapter extends RecyclerView.Adapter<SelectedItemAdapte
 
     private Context context;
     private List<Ingredient> selectedFoodItems;
+    public onItemsChangedListener mListener;
 
-    public SelectedItemAdapter(Context context, List<Ingredient> selectedIngredients) {
+    public SelectedItemAdapter(Context context, List<Ingredient> selectedIngredients, onItemsChangedListener listener) {
         this.context = context;
         this.selectedFoodItems = selectedIngredients;
+        mListener = listener;
     }
 
 
@@ -56,8 +56,8 @@ public class SelectedItemAdapter extends RecyclerView.Adapter<SelectedItemAdapte
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tvName);
-            ivSavedItemImg = itemView.findViewById(R.id.ivSavedItemImg);
+            tvName = itemView.findViewById(R.id.tvSelectedItemName);
+            ivSavedItemImg = itemView.findViewById(R.id.ivSelectedItemImg);
         }
 
         // Binds data to the view
@@ -65,7 +65,19 @@ public class SelectedItemAdapter extends RecyclerView.Adapter<SelectedItemAdapte
            tvName.setText(ingredient.getName());
             RequestOptions options = new RequestOptions().fitCenter().circleCrop();
             Glide.with(context).load(ingredient.getImage().getUrl()).apply(options).into(ivSavedItemImg);
+            ivSavedItemImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectedFoodItems.remove(ingredient);
+                    notifyItemRemoved(position);
+                    mListener.onItemsChanged();
+                }
+            });
         }
+    }
+
+    public interface onItemsChangedListener {
+        void onItemsChanged();
     }
 
 
