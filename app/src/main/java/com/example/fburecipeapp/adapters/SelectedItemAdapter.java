@@ -5,8 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,8 +56,8 @@ public class SelectedItemAdapter extends RecyclerView.Adapter<SelectedItemAdapte
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tvName);
-            ivSavedItemImg = itemView.findViewById(R.id.ivSavedItemImg);
+            tvName = itemView.findViewById(R.id.tvSelectedItemName);
+            ivSavedItemImg = itemView.findViewById(R.id.ivSelectedItemImg);
         }
 
         // Binds data to the view
