@@ -13,8 +13,6 @@ import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
 
 public class ExpandableActivity extends AppCompatActivity {
-    private static final String FRAGMENT_TAG_DATA_PROVIDER = "data provider";
-    private static final String FRAGMENT_LIST_VIEW = "list view";
     private FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override

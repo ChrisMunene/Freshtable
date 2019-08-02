@@ -24,7 +24,7 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_group_item_normal_state"
+        android:background="@color/bg_item_swiping_state"
         android:clickable="true"
         android:foreground="?attr/selectableItemBackground"
         tools:ignore="UselessParent">
@@ -36,14 +36,14 @@
             android:layout_gravity="top|left"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:gravity="center"/>
+            android:gravity="center" />
 
         <com.example.fburecipeapp.helpers.ExpandableItemIndicator
             android:id="@+id/indicator"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="right|center_vertical"
-            android:layout_marginRight="16dp"/>
+            android:layout_marginRight="16dp" />
 
     </FrameLayout>
 
