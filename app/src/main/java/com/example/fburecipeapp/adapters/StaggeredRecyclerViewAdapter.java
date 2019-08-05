@@ -87,19 +87,6 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
              this.recipeName = itemView.findViewById(R.id.tvRecipe);
              this.searchBtn = v.findViewById(R.id.searchBtn);
              itemView.setOnClickListener(this);
-
-//             searchBtn.setOnClickListener(new View.OnClickListener() {
-//                 @Override
-//                 public void onClick(View v) {
-//                     Toast.makeText(mContext, "search clicked", Toast.LENGTH_SHORT).show();
-//                     FragmentManager fm = ((AppCompatActivity)mContext).getSupportFragmentManager();
-//                     if (fm != null) {
-//                         FilterRecipeDialogFragment frag = FilterRecipeDialogFragment.newInstance();
-//                         frag.setTargetFragment(recipeFragment, 0);
-//                         frag.show(fm, "receipt_dialog_fragment");
-//                     }
-//                 }
-//             });
          }
 
         @Override
