@@ -47,12 +47,10 @@ public class RecipeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("Kitchen fragment", "OnCreateView success");
         return inflater.inflate(R.layout.fragment_recipe, container, false);
-
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
         staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager());
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
@@ -64,13 +62,11 @@ public class RecipeFragment extends Fragment {
         myIngredients = new ArrayList<Ingredient>();
 
         loadUserIngredients();
-
-
     }
 
     private void loadRecipes() {
         Recipes.Query query = new Recipes.Query();
-        query.withOneIngredient(myIngredients);
+        query.withIngredients(myIngredients);
         query.findInBackground(new FindCallback<Recipes>() {
             @Override
             public void done(List<Recipes> objects, ParseException e) {
@@ -94,7 +90,6 @@ public class RecipeFragment extends Fragment {
             if(e == null){
                 for(User user: users){
                     myIngredients.addAll(user.getSavedIngredients());
-
                 }
 
                 loadRecipes();
