@@ -45,7 +45,6 @@ public class ReceiptDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Get field from view
 
         receiptImage = view.findViewById(R.id.receiptScan);
         titleReceipt = view.findViewById(R.id.titleReceipt);
@@ -69,19 +68,20 @@ public class ReceiptDialogFragment extends DialogFragment {
             if (image != null) {
                 Glide.with(getContext()).load(image.getUrl()).into(receiptImage); // setting ParseFile image to our layout
             }
+
+            getDialog().setCanceledOnTouchOutside(true);
         }
 
-        receiptImage.setOnClickListener(new View.OnClickListener() {
+       receiptImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getDialog().dismiss();
             }
         });
 
-
-
     }
 
+    // setting view size of the dialog fragment
     @Override
     public void onResume() {
         super.onResume();
