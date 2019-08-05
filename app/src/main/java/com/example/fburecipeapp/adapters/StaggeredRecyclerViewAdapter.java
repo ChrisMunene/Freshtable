@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,7 +18,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.DetailsFragment;
-import com.example.fburecipeapp.models.Recipe;
 import com.example.fburecipeapp.models.Recipes;
 import com.parse.ParseFile;
 
@@ -31,13 +31,16 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     private ArrayList<String> mImages = new ArrayList<>();
     private FragmentManager fragmentManager;
     private Context mContext;
+    private ImageButton searchBtn;
+    private Fragment recipeFragment;
 
     public StaggeredRecyclerViewAdapter(ArrayList<Recipes> mRecipes, ArrayList<String> mImages, Context mContext,
-                                        FragmentManager fragmentManager) {
+                                        FragmentManager fragmentManager, Fragment recipeFragment) {
         this.mRecipes = mRecipes;
         this.mImages = mImages;
         this.mContext = mContext;
         this.fragmentManager = fragmentManager;
+        this.recipeFragment = recipeFragment;
     }
 
     @NonNull
@@ -74,11 +77,15 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
          ImageView recipeImg;
          TextView recipeName;
+         ImageButton searchBtn;
+
+         View v = LayoutInflater.from(mContext).inflate(R.layout.fragment_recipe, null);
 
          public ViewHolder(View itemView) {
              super(itemView);
              this.recipeImg = itemView.findViewById(R.id.recipeImg);
              this.recipeName = itemView.findViewById(R.id.tvRecipe);
+             this.searchBtn = v.findViewById(R.id.searchBtn);
              itemView.setOnClickListener(this);
          }
 
