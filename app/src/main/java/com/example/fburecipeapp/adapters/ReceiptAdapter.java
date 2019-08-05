@@ -98,14 +98,13 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.ViewHold
         }
     }
 
-
+    // calls dialog fragment for receipt details
     private void showReceiptDialog(String objectId) {
         FragmentManager fm = ((AppCompatActivity)mContext).getSupportFragmentManager();
         if (fm != null) {
             ReceiptDialogFragment frag = ReceiptDialogFragment.newInstance(objectId);
             frag.setTargetFragment(receiptFragment, 0);
             frag.show(fm, "receipt_dialog_fragment");
-            //Log.d("receipt dialog", "receipt dialog shown");
         }
     }
 }

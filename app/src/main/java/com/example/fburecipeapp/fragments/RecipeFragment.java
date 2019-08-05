@@ -5,10 +5,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -34,6 +36,8 @@ public class RecipeFragment extends Fragment {
     private ArrayList<Recipes> mRecipes = new ArrayList<>();
     private StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter;
     private AsyncHttpClient client;
+    private ImageButton searchBtn;
+    private Fragment recipeFragment;
 
     private ArrayList<Ingredient> myIngredients;
 
@@ -53,8 +57,9 @@ public class RecipeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        searchBtn = view.findViewById(R.id.searchBtn);
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
-        staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager());
+        staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager(), this);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
@@ -64,6 +69,18 @@ public class RecipeFragment extends Fragment {
         myIngredients = new ArrayList<Ingredient>();
 
         loadUserIngredients();
+
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getFragmentManager();
+                if (fm != null) {
+                    FilterRecipeDialogFragment frag = FilterRecipeDialogFragment.newInstance();
+                    frag.setTargetFragment(recipeFragment, 0);
+                    frag.show(fm, "receipt_dialog_fragment");
+                }
+            }
+        });
 
 
     }
