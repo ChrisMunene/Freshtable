@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.fragments.IngredientListDialogFragment;
 import com.example.fburecipeapp.helpers.AbstractExpandableDataProvider;
 import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.helpers.ExpandableItemIndicator;
@@ -31,6 +32,11 @@ public class ExpandableAdapter
     private List<FoodType> mFoodTypes;
     private List<Ingredient> mIngredients;
     private List<Ingredient> selectedIngredients;
+    private onSelectedItemsChangedListener mListener;
+
+    public void setOnSelectedItemsChangedListener(onSelectedItemsChangedListener listener){
+        mListener = listener;
+    }
 
     static abstract class MyBaseViewHolder extends AbstractExpandableItemViewHolder {
         FrameLayout mContainer;
@@ -187,11 +193,14 @@ public class ExpandableAdapter
                             Log.d(TAG, String.format("Added %s", ingredient.getName()));
                             break;
                         }
+
+
                     }
                 }
 
                 // Set current state on UI
-               holder.mContainer.setBackgroundResource(bgResourceId);
+                holder.mContainer.setBackgroundResource(bgResourceId);
+                mListener.onSelectedItemsChanged();
 
             }
         });
@@ -217,4 +226,9 @@ public class ExpandableAdapter
     public List<Ingredient> getSelectedIngredients(){
         return selectedIngredients;
     }
+
+    public interface onSelectedItemsChangedListener {
+        void onSelectedItemsChanged();
+    }
+
 }
