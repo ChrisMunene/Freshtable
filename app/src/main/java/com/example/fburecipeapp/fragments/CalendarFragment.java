@@ -47,7 +47,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     private static final String TAG = "CalendarFragment";
 
     private final OneDayDecorator oneDayDecoratorIcon;
-    private Map<LocalDate, LinkedHashSet<String>> expiringItemsAndAssociatedDates;
+    private Map<LocalDate, LinkedHashSet<Ingredient>> expiringItemsAndAssociatedDates;
     protected ArrayList<Ingredient> allIngredients;
     private TextView expireText;
     private Unbinder unbinder;
@@ -63,7 +63,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
      * Initializes allIngredients as an ArrayList which contains all ingredients from the receipts
      */
     public CalendarFragment() {
-        this.expiringItemsAndAssociatedDates = new HashMap<LocalDate, LinkedHashSet<String>>();
+        this.expiringItemsAndAssociatedDates = new HashMap<LocalDate, LinkedHashSet<Ingredient>>();
         this.oneDayDecoratorIcon = new OneDayDecorator();
         this.allIngredients = new ArrayList<Ingredient>();
     }
@@ -100,10 +100,10 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
                                boolean selected) {
         oneDayDecoratorIcon.setDate(calendarDay.getDate());
 
-        LinkedHashSet<String> itemsExpiringOnSelectedDate = getItems(calendarDay.getDate());
+        LinkedHashSet<Ingredient> itemsExpiringOnSelectedDate = getItems(calendarDay.getDate());
 
         if (!itemsExpiringOnSelectedDate.isEmpty()) {
-            showCalendarDialog(itemsExpiringOnSelectedDate.toString());
+            showCalendarDialog(itemsExpiringOnSelectedDate, calendarDay);
         } else {
             expireText.setText("No Expiring Items Here");
         }
@@ -113,11 +113,11 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
      * Gets a set of strings of ingredients expiring on given date
      * If there are no items expiring on given date, returns an empty LinkedHashSet
      */
-    public LinkedHashSet<String> getItems(LocalDate calendarDay) {
-        LinkedHashSet<String> items = expiringItemsAndAssociatedDates.get(calendarDay);
+    public LinkedHashSet<Ingredient> getItems(LocalDate calendarDay) {
+        LinkedHashSet<Ingredient> items = expiringItemsAndAssociatedDates.get(calendarDay);
 
         if (items == null) {
-            LinkedHashSet<String> temp = new LinkedHashSet<String>();
+            LinkedHashSet<Ingredient> temp = new LinkedHashSet<Ingredient>();
             return temp;
         }
 
@@ -135,9 +135,9 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
             LocalDate localDate = convertToLocalDateViaMilisecond(date);
             localDate = localDate.plusDays(ingredient.getShelfLife());
 
-            String item = ingredient.getName();
+//            String item = ingredient.getName();
 
-            populateMap(localDate, item);
+            populateMap(localDate, ingredient);
 
         }
         allIngredients.clear();
@@ -147,22 +147,22 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     /**
      * Given a LocalDate and ingredient name, populates expiringItemsAndAssociatedDates
      */
-    private void populateMap(LocalDate day, String item) {
+    private void populateMap(LocalDate day, Ingredient ingredient) {
         if (expiringItemsAndAssociatedDates.containsKey(day)) {
-            expiringItemsAndAssociatedDates.get(day).add(item);
+            expiringItemsAndAssociatedDates.get(day).add(ingredient);
         } else {
             boolean isContained = false;
 
-            for (LinkedHashSet<String> currentItems: expiringItemsAndAssociatedDates.values()) {
-                if (currentItems.contains(item)) {
+            for (LinkedHashSet<Ingredient> currentItems: expiringItemsAndAssociatedDates.values()) {
+                if (currentItems.contains(ingredient)) {
                     isContained = true;
                     break;
                 }
             }
 
             if (isContained == false) {
-                LinkedHashSet<String> items = new LinkedHashSet<String>();
-                items.add(item);
+                LinkedHashSet<Ingredient> items = new LinkedHashSet<Ingredient>();
+                items.add(ingredient);
                 expiringItemsAndAssociatedDates.put(day, items);
             }
         }
@@ -225,10 +225,13 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     /**
      * Shows Calendar Dialog Fragment upon clicking a day which contains expiring items
      */
-    private void showCalendarDialog(String item) {
+    private void showCalendarDialog(LinkedHashSet<Ingredient> expiringItems, CalendarDay calendarDay) {
+
+        LocalDate expirationDate = calendarDay.getDate();
+
         FragmentManager fm = getFragmentManager();
         if (fm != null) {
-            CalendarItemCarouselDialogFragment frag = CalendarItemCarouselDialogFragment.newInstance(item);
+            CalendarItemCarouselDialogFragment frag = CalendarItemCarouselDialogFragment.newInstance(expiringItems, calendarDay.getDate());
             frag.setTargetFragment(this, 0);
             frag.show(fm, "dialog_fragment_calendar_items");
         }
