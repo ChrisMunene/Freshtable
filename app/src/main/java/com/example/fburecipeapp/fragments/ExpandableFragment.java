@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,8 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.activities.HomeActivity;
 import com.example.fburecipeapp.adapters.ExpandableAdapter;
+import com.example.fburecipeapp.adapters.SelectedItemAdapter;
 import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
@@ -31,6 +34,7 @@ import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -42,18 +46,24 @@ import java.util.List;
 
 public class ExpandableFragment
         extends Fragment
-        implements RecyclerViewExpandableItemManager.OnGroupCollapseListener,
+        implements ExpandableAdapter.onSelectedItemsChangedListener, SelectedItemAdapter.onItemsChangedListener, RecyclerViewExpandableItemManager.OnGroupCollapseListener,
         RecyclerViewExpandableItemManager.OnGroupExpandListener {
     private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
     private static final String TAG = ExpandableFragment.class.getSimpleName();
     private static final String KEY_SELECTED_INGREDIENTS = "selectedIngredientIds";
 
     private FloatingActionButton fabSave;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView rvExpandable;
+    private RecyclerView rvSelectedItems;
+    private View mLayout;
+    private RecyclerView.LayoutManager expandableLayoutManager;
+    private RecyclerView.LayoutManager selectedItemsLayoutManager;
+    private RecyclerView.Adapter selectedItemsAdapter;
+    private ExpandableAdapter myItemAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
     private ProgressDialog pd;
+    private List<Ingredient> selectedIngredients;
 
     public ExpandableFragment() {
         super();
@@ -85,11 +95,13 @@ public class ExpandableFragment
         pd.show();
 
         //noinspection ConstantConditions
-        View mLayout = getView().findViewById(R.id.main_content);
-        mRecyclerView = getView().findViewById(R.id.recycler_view);
+        mLayout = getView().findViewById(R.id.main_content);
+        rvExpandable = getView().findViewById(R.id.rvExpandable);
+        rvSelectedItems = getView().findViewById(R.id.rvSelectedItems);
         fabSave = getView().findViewById(R.id.fabSave);
 
-        mLayoutManager = new LinearLayoutManager(requireContext());
+        expandableLayoutManager = new LinearLayoutManager(requireContext());
+        selectedItemsLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
 
         final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable(SAVED_STATE_EXPANDABLE_ITEM_MANAGER) : null;
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
@@ -98,10 +110,12 @@ public class ExpandableFragment
 
         List<String> selectedIngredientsIds = Parcels.unwrap(getArguments().getParcelable(KEY_SELECTED_INGREDIENTS));
 
-        List<Ingredient> selectedIngredients = getSelectedIngredientFromIds(selectedIngredientsIds);
+        selectedIngredients = new ArrayList<Ingredient>();
 
-        //adapter
-        final ExpandableAdapter myItemAdapter = new ExpandableAdapter(new ExpandableDataProvider(), selectedIngredients);
+        //adapters
+        myItemAdapter = new ExpandableAdapter(new ExpandableDataProvider(), selectedIngredients);
+        selectedItemsAdapter = new SelectedItemAdapter(getContext(), selectedIngredients, this::onItemsChanged);
+        myItemAdapter.setOnSelectedItemsChangedListener(this::onSelectedItemsChanged);
 
         // wrap for expanding
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(myItemAdapter);
@@ -110,19 +124,8 @@ public class ExpandableFragment
         fabSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Ingredient> selectedIngredients = myItemAdapter.getSelectedIngredients();
-                if(selectedIngredients.size() > 0){
-                    Log.d(TAG, String.format("Selected Item Count: %s", selectedIngredients.size()));
-                    ParseUser.getCurrentUser().addAll("savedIngredients", selectedIngredients);
-                    ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            Log.d("Parse", "items added to Parse");
-                        }
-                    });
-
-                    Intent intent = new Intent(getActivity(), HomeActivity.class);
-                    startActivity(intent);
+                if(!selectedIngredients.isEmpty()){
+                    updateUser();
                 } else {
                     Snackbar.make(mLayout, "Please select some items", Snackbar.LENGTH_LONG)
                             .show(); // Don’t forget to show!
@@ -137,21 +140,28 @@ public class ExpandableFragment
         // Need to disable them when using animation indicator.
         animator.setSupportsChangeAnimations(false);
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mWrappedAdapter);  // requires *wrapped* adapter
-        mRecyclerView.setItemAnimator(animator);
-        mRecyclerView.setHasFixedSize(false);
+        // Setup expandable RecyclerView
+        rvExpandable.setLayoutManager(expandableLayoutManager);
+        rvExpandable.setAdapter(mWrappedAdapter);  // requires *wrapped* adapter
+        rvExpandable.setItemAnimator(animator);
+        rvExpandable.setHasFixedSize(false);
+
+        //Setup SelectedItems RecyclerView
+        rvSelectedItems.setLayoutManager(selectedItemsLayoutManager);
+        rvSelectedItems.setAdapter(selectedItemsAdapter);
 
         // additional decorations
         //noinspection StatementWithEmptyBody
         if (supportsViewElevation()) {
             // Lollipop or later has native drop shadow feature. ItemShadowDecorator is not required.
         } else {
-            mRecyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(requireContext(), R.drawable.material_shadow_z1)));
+            rvExpandable.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(requireContext(), R.drawable.material_shadow_z1)));
         }
-        mRecyclerView.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider_h), true));
+        rvExpandable.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider_h), true));
 
-        mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
+        mRecyclerViewExpandableItemManager.attachRecyclerView(rvExpandable);
+
+        getSelectedIngredientFromIds(selectedIngredientsIds);
 
         pd.dismiss();
     }
@@ -175,17 +185,17 @@ public class ExpandableFragment
             mRecyclerViewExpandableItemManager = null;
         }
 
-        if (mRecyclerView != null) {
-            mRecyclerView.setItemAnimator(null);
-            mRecyclerView.setAdapter(null);
-            mRecyclerView = null;
+        if (rvExpandable != null) {
+            rvExpandable.setItemAnimator(null);
+            rvExpandable.setAdapter(null);
+            rvExpandable = null;
         }
 
         if (mWrappedAdapter != null) {
             WrapperAdapterUtils.releaseAll(mWrappedAdapter);
             mWrappedAdapter = null;
         }
-        mLayoutManager = null;
+        expandableLayoutManager = null;
 
         super.onDestroyView();
     }
@@ -212,18 +222,85 @@ public class ExpandableFragment
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
     }
 
-    private List<Ingredient> getSelectedIngredientFromIds(List<String> objectIds){
+    private void getSelectedIngredientFromIds(List<String> objectIds){
         Ingredient.Query query =  new Ingredient.Query();
         query.whereObjectIds(objectIds);
-        List<Ingredient> ingredients = new ArrayList<Ingredient>();
         try {
-            ingredients.addAll(query.find());
+            selectedIngredients.addAll(query.find());
+            myItemAdapter.notifyDataSetChanged();
+            selectedItemsAdapter.notifyDataSetChanged();
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
 
-        return ingredients;
+    public void updateUser(){
+        pd.show();
+        User.Query userQuery = new User.Query();
+        userQuery.forCurrentUser().withSavedIngredients();
+        userQuery.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> users, ParseException e) {
+                if(e == null){
+                    User currentUser = users.get(0);
+                    List<Ingredient> userIngredients = currentUser.getSavedIngredients();
+                    List<Ingredient> listToSave = removeDuplicates(userIngredients);
+                    if(!listToSave.isEmpty()){
+                        saveUser(currentUser, listToSave);
+                    } else {
+                        if(pd.isShowing()) pd.dismiss();
+                        Snackbar.make(mLayout, "Selected items already saved.", Snackbar.LENGTH_LONG)
+                                .show(); // Don’t forget to show!
+                    }
+                } else {
+                    Log.e(TAG, "Error fetching user", e);
+                    pd.dismiss();
+                }
+
+            }
+        });
+
+    }
+
+    public List<Ingredient> removeDuplicates(List<Ingredient> userIngredients){
+        List<Ingredient> listToSave = new ArrayList<Ingredient>();
+        for(Ingredient selectedIngredient: selectedIngredients){
+            if(!userIngredients.contains(selectedIngredient)){
+                listToSave.add(selectedIngredient);
+            }
+        }
+
+        return listToSave;
+    }
+
+    public void saveUser(User currentUser, List<Ingredient> listToSave){
+        currentUser.addAll("savedIngredients", listToSave);
+        currentUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d("Parse", "items added to Parse");
+                    Intent intent = new Intent(getActivity(), HomeActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else {
+                    Log.e(TAG, "Error saving items", e);
+                    Toast.makeText(getContext(), "Error saving items", Toast.LENGTH_SHORT).show();
+                }
+
+                if(pd.isShowing()) pd.dismiss();
+            }
+        });
     }
 
 
+    @Override
+    public void onSelectedItemsChanged() {
+        selectedItemsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemsChanged() {
+        myItemAdapter.notifyDataSetChanged();
+    }
 }

@@ -2,7 +2,6 @@ package com.example.fburecipeapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -11,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.activities.EditReceiptActivity;
 import com.example.fburecipeapp.adapters.EditListAdapter;
+import com.example.fburecipeapp.adapters.SelectedItemAdapter;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -18,8 +18,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Parcel;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,22 +26,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.fburecipeapp.R;
-import com.example.fburecipeapp.adapters.EditListAdapter;
-import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.ReceiptItem;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
 import org.parceler.Parcels;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +53,6 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     private List<Ingredient> precheckedIngredients = new ArrayList<>();
     private EditListAdapter adapter;
     private Button submitBtn;
-    private Button editBtn;
     private static final String TAG = IngredientListDialogFragment.class.getSimpleName();
 
     public static IngredientListDialogFragment newInstance(List<ReceiptItem> receiptItems, Uri photoUri) {
@@ -88,17 +75,17 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         submitBtn = view.findViewById(R.id.submitBtn);
-        editBtn = view.findViewById(R.id.editBtn);
         rvIngredients = view.findViewById(R.id.rvIngredients);
         titleInput = view.findViewById(R.id.titleInput);
         descriptionInput = view.findViewById(R.id.descriptionInput);
         ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
-        adapter = new EditListAdapter(getContext(), ingredients, precheckedIngredients);
+        Uri photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
+        adapter = new EditListAdapter(getContext(), precheckedIngredients, photoUri);
         rvIngredients.setAdapter(adapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        rvIngredients.setLayoutManager(gridLayoutManager);
+        rvIngredients.setLayoutManager(linearLayoutManager);
 
         submitBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -106,14 +93,6 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
                 // Get selected items
                 List<Ingredient> selectedFoodItems = adapter.getSelectedFoodItems();
                 sendBackResult(selectedFoodItems);
-            }
-        });
-
-        editBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Ingredient> selectedFoodItems = adapter.getSelectedFoodItems();
-                showEditActivity(selectedFoodItems);
             }
         });
 
@@ -143,7 +122,6 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
                 if(e == null){
                     for (Ingredient ingredient: ingredientList) {
                         ingredients.add(ingredient);
-                        adapter.notifyItemInserted(ingredients.size() - 1);
                     }
                     getPrecheckedIngredients();
                 } else {
@@ -161,17 +139,6 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         dismiss();
     }
 
-    private void showEditActivity(List<Ingredient> selectedIngredients){
-        ArrayList selectedIngredientIds = new ArrayList<String>();
-        for(Ingredient ingredient: selectedIngredients){
-            selectedIngredientIds.add(ingredient.getObjectId());
-        }
-        final Intent intent = new Intent(getContext(), EditReceiptActivity.class);
-        intent.putParcelableArrayListExtra("selectedIngredientIds", selectedIngredientIds);
-        Uri photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
-        intent.putExtra("receiptImageUri", Parcels.wrap(photoUri));
-        startActivity(intent);
-    }
 
     // List the ingredient found in a receipt
     public void getPrecheckedIngredients(){
