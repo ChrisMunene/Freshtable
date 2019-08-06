@@ -2,10 +2,14 @@ package com.example.fburecipeapp.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.NinePatchDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +29,7 @@ import com.example.fburecipeapp.adapters.ExpandableAdapter;
 import com.example.fburecipeapp.adapters.SelectedItemAdapter;
 import com.example.fburecipeapp.helpers.ExpandableDataProvider;
 import com.example.fburecipeapp.models.Ingredient;
+import com.example.fburecipeapp.models.Receipt;
 import com.example.fburecipeapp.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,12 +41,17 @@ import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandab
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ExpandableFragment
@@ -51,6 +61,11 @@ public class ExpandableFragment
     private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
     private static final String TAG = ExpandableFragment.class.getSimpleName();
     private static final String KEY_SELECTED_INGREDIENTS = "selectedIngredientIds";
+
+    private String title;
+    private String description;
+    private Uri photoUri;
+    private Boolean isEditingReceipt;
 
     private FloatingActionButton fabSave;
     private RecyclerView rvExpandable;
@@ -69,10 +84,14 @@ public class ExpandableFragment
         super();
     }
 
-    public static ExpandableFragment newInstance(List<String> selectedIngredientIds) {
+    public static ExpandableFragment newInstance(List<String> selectedIngredientIds, String title, String description, Uri photoUri, Boolean isEditingReceipt) {
         ExpandableFragment fragment = new ExpandableFragment();
         Bundle args = new Bundle();
         args.putParcelable(KEY_SELECTED_INGREDIENTS, Parcels.wrap(selectedIngredientIds));
+        args.putParcelable("photoUri", Parcels.wrap(photoUri));
+        args.putString("title", title);
+        args.putString("description", description);
+        args.putBoolean("isEditingReceipt", isEditingReceipt);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,6 +128,10 @@ public class ExpandableFragment
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
         List<String> selectedIngredientsIds = Parcels.unwrap(getArguments().getParcelable(KEY_SELECTED_INGREDIENTS));
+        photoUri = Parcels.unwrap(getArguments().getParcelable("photoUri"));
+        title = getArguments().getString("title");
+        description = getArguments().getString("description");
+        isEditingReceipt =getArguments().getBoolean("isEditingReceipt");
 
         selectedIngredients = new ArrayList<Ingredient>();
 
@@ -125,7 +148,14 @@ public class ExpandableFragment
             @Override
             public void onClick(View view) {
                 if(!selectedIngredients.isEmpty()){
+
+                    pd.show();
+
                     updateUser();
+
+                    //Post receipt if from editing
+                    if(isEditingReceipt) postReceipt();
+
                 } else {
                     Snackbar.make(mLayout, "Please select some items", Snackbar.LENGTH_LONG)
                             .show(); // Don’t forget to show!
@@ -235,32 +265,32 @@ public class ExpandableFragment
     }
 
     public void updateUser(){
-        pd.show();
         User.Query userQuery = new User.Query();
         userQuery.forCurrentUser().withSavedIngredients();
         userQuery.findInBackground(new FindCallback<User>() {
             @Override
             public void done(List<User> users, ParseException e) {
                 if(e == null){
+                    // Check if user already has selected Ingredients
                     User currentUser = users.get(0);
                     List<Ingredient> userIngredients = currentUser.getSavedIngredients();
                     List<Ingredient> listToSave = removeDuplicates(userIngredients);
                     if(!listToSave.isEmpty()){
                         saveUser(currentUser, listToSave);
                     } else {
-                        if(pd.isShowing()) pd.dismiss();
-                        Snackbar.make(mLayout, "Selected items already saved.", Snackbar.LENGTH_LONG)
-                                .show(); // Don’t forget to show!
+                        if(!isEditingReceipt){
+                            if(pd.isShowing()) pd.dismiss();
+                            Snackbar.make(mLayout, "Selected items already saved.", Snackbar.LENGTH_LONG)
+                                    .show(); // Don’t forget to show!
+                        }
                     }
                 } else {
                     Log.e(TAG, "Error fetching user", e);
-                    pd.dismiss();
+                    if(pd.isShowing()) pd.dismiss();
                 }
 
             }
-        });
-
-    }
+        }); }
 
     public List<Ingredient> removeDuplicates(List<Ingredient> userIngredients){
         List<Ingredient> listToSave = new ArrayList<Ingredient>();
@@ -280,17 +310,61 @@ public class ExpandableFragment
             public void done(ParseException e) {
                 if(e == null){
                     Log.d("Parse", "items added to Parse");
+                    if(pd.isShowing()) pd.dismiss();
                     Intent intent = new Intent(getActivity(), HomeActivity.class);
                     startActivity(intent);
                     getActivity().finish();
                 } else {
+                    if(pd.isShowing()) pd.dismiss();
                     Log.e(TAG, "Error saving items", e);
                     Toast.makeText(getContext(), "Error saving items", Toast.LENGTH_SHORT).show();
                 }
 
-                if(pd.isShowing()) pd.dismiss();
             }
         });
+    }
+
+    // Creates a new post in Parse
+    private void postReceipt(){
+
+        try {
+
+            // Get bitmap from Uri
+            Bitmap receiptImageBmp = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+
+            // Convert Bitmap to ByteArray -- To be used when creating a parsefile
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            receiptImageBmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            receiptImageBmp.recycle();
+
+            // Covert ByteArray to ParseFile
+            ParseFile receiptImage = new ParseFile(generateUniqueFileName(), byteArray);
+
+            Receipt newReceipt = new Receipt();
+            newReceipt.setTitle(title);
+            newReceipt.setDescription(description);
+            newReceipt.setImage(receiptImage);
+            newReceipt.setUser(ParseUser.getCurrentUser());
+            newReceipt.setReceiptItems(selectedIngredients);
+
+            newReceipt.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "Receipt Saved Successfully");
+                    } else {
+                        Log.e(TAG, "Failed to post receipt", e);
+                    }
+
+                }
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 
@@ -302,5 +376,12 @@ public class ExpandableFragment
     @Override
     public void onItemsChanged() {
         myItemAdapter.notifyDataSetChanged();
+    }
+
+    // Returns a unique file name using current timestamp.
+    public String generateUniqueFileName(){
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_" + ".jpg";
+        return imageFileName;
     }
 }
