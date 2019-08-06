@@ -5,10 +5,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -34,15 +36,13 @@ public class RecipeFragment extends Fragment {
     private ArrayList<Recipes> mRecipes = new ArrayList<>();
     private StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter;
     private AsyncHttpClient client;
+    private ImageButton searchBtn;
+    private Fragment recipeFragment;
 
     private ArrayList<Ingredient> myIngredients;
 
     public RecipeFragment() {
 
-//        myIngredients.add("Honey");
-//        myIngredients.add("Sugar");
-//        myIngredients.add("Oil");
-//        myIngredients.add("Chicken");
     }
 
 
@@ -51,14 +51,13 @@ public class RecipeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("Kitchen fragment", "OnCreateView success");
         return inflater.inflate(R.layout.fragment_recipe, container, false);
-
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
+        searchBtn = view.findViewById(R.id.searchBtn);
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
-        staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager());
+        staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager(), this);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
@@ -69,13 +68,22 @@ public class RecipeFragment extends Fragment {
 
         loadUserIngredients();
 
-
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getFragmentManager();
+                if (fm != null) {
+                    FilterRecipeDialogFragment frag = FilterRecipeDialogFragment.newInstance();
+                    frag.setTargetFragment(recipeFragment, 0);
+                    frag.show(fm, "receipt_dialog_fragment");
+                }
+            }
+        });
     }
-
 
     private void loadRecipes() {
         Recipes.Query query = new Recipes.Query();
-        query.withOneIngredient(myIngredients);
+        query.withIngredients(myIngredients);
         query.findInBackground(new FindCallback<Recipes>() {
             @Override
             public void done(List<Recipes> objects, ParseException e) {
@@ -99,7 +107,6 @@ public class RecipeFragment extends Fragment {
             if(e == null){
                 for(User user: users){
                     myIngredients.addAll(user.getSavedIngredients());
-
                 }
 
                 loadRecipes();
