@@ -29,12 +29,18 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private final Context mContext;
     private final List<String> mSelectedIngredientIds;
     private Uri mPhotoUri;
+    private String mTitle;
+    private String mDescription;
+    private String mPhotoFilePath;
 
-    public SectionsPagerAdapter(Context context, FragmentManager fm, List<String> selectedIngredientIds, Uri photoUri) {
+    public SectionsPagerAdapter(Context context, FragmentManager fm, List<String> selectedIngredientIds, Uri photoUri, String title, String description, String photoFilePath) {
         super(fm);
         mContext = context;
         mSelectedIngredientIds = selectedIngredientIds;
         mPhotoUri = photoUri;
+        mTitle =  title;
+        mDescription = description;
+        mPhotoFilePath = photoFilePath;
     }
 
     @Override
@@ -43,10 +49,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         Fragment fragment = PlaceholderFragment.newInstance(position + 1);
         switch (position){
             case 0:
-               fragment = ExpandableFragment.newInstance(mSelectedIngredientIds);
+               fragment = ExpandableFragment.newInstance(mSelectedIngredientIds, mTitle, mDescription, mPhotoUri, true);
                break;
             case 1:
-                fragment = ViewReceiptFragment.newInstance(mPhotoUri);
+                fragment = ViewReceiptFragment.newInstance(mPhotoUri, mPhotoFilePath);
                 break;
             default:
                 break;

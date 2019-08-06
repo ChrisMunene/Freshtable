@@ -10,9 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.activities.EditReceiptActivity;
 import com.example.fburecipeapp.adapters.EditListAdapter;
-import com.example.fburecipeapp.adapters.SelectedItemAdapter;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -27,7 +25,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.fburecipeapp.R;
-import com.google.android.material.snackbar.Snackbar;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -50,18 +47,20 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
     private EditText titleInput;
     private EditText descriptionInput;
     private List<Ingredient> ingredients;
-    private List<ReceiptItem> receiptItems;
+    private List<String> receiptItems;
     private List<Ingredient> precheckedIngredients = new ArrayList<>();
     private EditListAdapter adapter;
     private Button submitBtn;
     private Uri photoUri;
+    private String photoFilePath;
     private static final String TAG = IngredientListDialogFragment.class.getSimpleName();
 
-    public static IngredientListDialogFragment newInstance(List<ReceiptItem> receiptItems, Uri photoUri) {
+    public static IngredientListDialogFragment newInstance(List<String> receiptItems, Uri photoUri, String photoFilePath) {
         final IngredientListDialogFragment fragment = new IngredientListDialogFragment();
         final Bundle args = new Bundle();
         args.putParcelable("ReceiptItems", Parcels.wrap(receiptItems));
         args.putParcelable("receiptImageUri", Parcels.wrap(photoUri));
+        args.putString("photoFilePath", photoFilePath);
         fragment.setArguments(args);
         return fragment;
     }
@@ -83,6 +82,7 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
         ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
         photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
+        photoFilePath = getArguments().getString("photoFilePath");
         adapter = new EditListAdapter(getContext(), precheckedIngredients);
         adapter.setOnAddBtnClickedListener(this::onAddButtonClicked);
         rvIngredients.setAdapter(adapter);
@@ -139,6 +139,9 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
             }
             final Intent intent = new Intent(getContext(), EditReceiptActivity.class);
             intent.putParcelableArrayListExtra("selectedIngredientIds", selectedIngredientIds);
+            intent.putExtra("title", title);
+            intent.putExtra("description", description);
+            intent.putExtra("photoFilePath", photoFilePath);
             intent.putExtra("receiptImageUri", Parcels.wrap(photoUri));
             startActivity(intent);
         }
@@ -158,7 +161,7 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
                     for (Ingredient ingredient: ingredientList) {
                         ingredients.add(ingredient);
                     }
-                    getPrecheckedIngredients();
+                    if(receiptItems != null) getPrecheckedIngredients();
                 } else {
                     Log.e(TAG, "Error fetching ingredients", e);
                 }
@@ -177,10 +180,10 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
 
     // List the ingredient found in a receipt
     public void getPrecheckedIngredients(){
-        for (ReceiptItem receiptItem: receiptItems){
+        for (String receiptItem: receiptItems){
             for(Ingredient ingredient: ingredients){
                 // toLowercase used because .contains is case sensitive -- Java SMH :(
-                if(receiptItem.getDescription().toLowerCase().contains(ingredient.getName().toLowerCase()) && !precheckedIngredients.contains(ingredient)){
+                if(receiptItem.toLowerCase().contains(ingredient.getName().toLowerCase()) && !precheckedIngredients.contains(ingredient)){
                     precheckedIngredients.add(ingredient);
                     adapter.notifyDataSetChanged();
                 }
