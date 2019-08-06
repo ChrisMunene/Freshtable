@@ -77,8 +77,7 @@ public class FilterRecipeDialogFragment extends DialogFragment {
              public void onClick(View v) {
                  Toast.makeText(getContext(), "filter clicked", Toast.LENGTH_SHORT).show();
                  Log.d("filter", selectedChipGroup.toString());
-
-                 getDialog().dismiss();
+                 sendBackResult(selectedChipGroup);
             }
         });
     }
@@ -141,5 +140,15 @@ public class FilterRecipeDialogFragment extends DialogFragment {
                 }
             }
         });
+    }
+
+    public interface Listener {
+        void onFinishEditingList(ArrayList<String> selectedChipGroup);
+    }
+
+    public void sendBackResult(ArrayList<String> selectedChipGroup) {
+        FilterRecipeDialogFragment.Listener listener = (FilterRecipeDialogFragment.Listener) getTargetFragment();
+        listener.onFinishEditingList(selectedChipGroup);
+        dismiss();
     }
 }
