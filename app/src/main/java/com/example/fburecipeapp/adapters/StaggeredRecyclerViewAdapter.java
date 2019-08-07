@@ -33,6 +33,8 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     private Context mContext;
     private ImageButton searchBtn;
     private Fragment recipeFragment;
+    private ArrayList<Recipes> newRecipes;
+    private ArrayList<String> selectedChipGroup = new ArrayList<>();
 
     public StaggeredRecyclerViewAdapter(ArrayList<Recipes> mRecipes, ArrayList<String> mImages, Context mContext,
                                         FragmentManager fragmentManager, Fragment recipeFragment) {
@@ -57,6 +59,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
                 .placeholder(R.drawable.ic_launcher_background);
 
         Recipes recipe = mRecipes.get(position);
+
         ParseFile image = recipe.getImage();
 
 
@@ -96,7 +99,6 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             Recipes recipe = mRecipes.get(position);
             // make sure the position is valid, i.e. actually exists in the view
             if (position != RecyclerView.NO_POSITION) {
-                // Fragment fragment = new DetailsFragment(recipe.getName(), recipe.getImage(), recipe.getAllIngredients(), recipe.getInstructions());
                 Fragment fragment = new DetailsFragment(recipe.getObjectId());
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.flContainer, fragment);

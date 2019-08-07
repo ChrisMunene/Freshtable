@@ -1,5 +1,6 @@
 package com.example.fburecipeapp.fragments;
 
+import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,55 +26,57 @@ import com.parse.ParseFile;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ViewListener;
 
+import org.threeten.bp.Instant;
+import org.threeten.bp.ZoneId;
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class CalendarItemCarouselDialogFragment extends DialogFragment {
+public class ItemDialogFragment extends DialogFragment {
 
     CarouselView carouselView;
-    TextView carouselLabel;
-    ParseFile[] recipeImages;
+    TextView carouselIngredientNameLabel;
 
+    private ArrayList<Ingredient> ingredients;
     private ArrayList<String> ingredientNames;
     private ArrayList<ParseFile> ingredientImages;
     private ArrayList<LocalDate> ingredientBoughtDates;
-    private ArrayList<Ingredient> ingredients;
+    private ArrayList<LocalDate> ingredientExpirationDates;
 
-    private LocalDate expirationDate;
-
-
-    public CalendarItemCarouselDialogFragment(LinkedHashSet<Ingredient> expiringIngredients, LocalDate expirationDate) {
+    /**
+     * Constructs ItemDialogFragment
+     * Initializes all relevant data fields
+     * @param allIngredients: contains a set of all ingredients to be displayed
+     */
+    public ItemDialogFragment(LinkedHashSet<Ingredient> allIngredients) {
+        ingredients = new ArrayList<Ingredient>();
         ingredientNames = new ArrayList<String>();
         ingredientImages = new ArrayList<ParseFile>();
         ingredientBoughtDates = new ArrayList<LocalDate>();
-        ingredients = new ArrayList<Ingredient>();
-        recipeImages = new ParseFile[3];
-        this.expirationDate = expirationDate;
+        ingredientExpirationDates = new ArrayList<LocalDate>();
 
-        for (Ingredient ingredient : expiringIngredients) {
+        for (Ingredient ingredient : allIngredients) {
+            ingredients.add(ingredient);
             ingredientNames.add(ingredient.getName());
             ingredientImages.add(ingredient.getImage());
-            ingredientBoughtDates.add(expirationDate.minusDays(ingredient.getShelfLife()));
-            ingredients.add(ingredient);
+            LocalDate ingredientBoughtDate = convertToLocalDateViaMilisecond(ingredient.getCreatedAt());
+            ingredientBoughtDates.add(ingredientBoughtDate);
+            ingredientExpirationDates.add(ingredientBoughtDate.plusDays(ingredient.getShelfLife()));
         }
     }
 
-    public static CalendarItemCarouselDialogFragment newInstance(LinkedHashSet<Ingredient> expiringIngredients, LocalDate expirationDate) {
-        CalendarItemCarouselDialogFragment fragment = new CalendarItemCarouselDialogFragment(expiringIngredients, expirationDate);
-
-        Bundle args = new Bundle();
-        args.putString("item", expiringIngredients.toString());
-        fragment.setArguments(args);
+    public static ItemDialogFragment newInstance(LinkedHashSet<Ingredient> allIngredients) {
+        ItemDialogFragment fragment = new ItemDialogFragment(allIngredients);
         return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.carousel_dialog_fragment_calendar_item, container, false);
+        return inflater.inflate(R.layout.carousel_dialog_fragment, container, false);
     }
 
     @Override
@@ -81,12 +84,11 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         carouselView = view.findViewById(R.id.carouselView);
-        carouselLabel = view.findViewById(R.id.ingredientName);
+        carouselIngredientNameLabel = view.findViewById(R.id.ingredientName);
 
-        carouselView.setPageCount(ingredientNames.size()); // change this
+        carouselView.setPageCount(ingredientNames.size());
         carouselView.setSlideInterval(3000);
         carouselView.setViewListener(viewListener);
-
     }
 
     @Override
@@ -98,20 +100,23 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
     }
 
-    private static String[] convertStringToArray(String item) {
-        String temp = item.substring(1, item.length() - 1);
-        return temp.split(",");
+    /**
+     * Given a Date, converts it to a LocalDate
+     */
+    @TargetApi(26)
+    public org.threeten.bp.LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
+        return Instant.ofEpochMilli(dateToConvert.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
     }
-
 
     ViewListener viewListener = new ViewListener() {
         @Override
         public View setViewForPosition(int position) {
-
-            View customView = getLayoutInflater().inflate(R.layout.carousel_dialog_details, null);
+            View customView = getLayoutInflater().inflate(R.layout.item_dialog_details, null);
 
             TextView labelTextView = (TextView) customView.findViewById(R.id.ingredientName);
-            ImageView fruitImageView = (ImageView) customView.findViewById(R.id.ingredientImage);
+            ImageView ingredientImageView = (ImageView) customView.findViewById(R.id.ingredientImage);
             TextView boughtDateTextView = (TextView) customView.findViewById(R.id.ingredientBoughtDate);
             TextView expirationDateTextView = (TextView) customView.findViewById(R.id.ingredientExpireDate);
 
@@ -180,18 +185,16 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
                                 dismiss();
                             }
                         });
-
                     }
                 }
             });
 
-            Glide.with(getContext()).load(ingredientImages.get(position).getUrl()).into(fruitImageView);
+            Glide.with(getContext()).load(ingredientImages.get(position).getUrl()).into(ingredientImageView);
             labelTextView.setText(ingredientNames.get(position));
             boughtDateTextView.setText(ingredientBoughtDates.get(position).toString());
-            expirationDateTextView.setText(expirationDate.toString());
+            expirationDateTextView.setText(ingredientExpirationDates.get(position).toString());
 
             return customView;
         }
     };
-
 }
