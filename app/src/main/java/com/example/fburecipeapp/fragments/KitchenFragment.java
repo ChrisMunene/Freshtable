@@ -78,7 +78,7 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
         currentUser = (User) ParseUser.getCurrentUser();
 
         // Initialize Progress Dialog
-        pd = new ProgressDialog(getContext());
+        pd = new ProgressDialog(getContext(), ProgressDialog.THEME_DEVICE_DEFAULT_LIGHT);
         pd.setTitle("Loading...");
         pd.setMessage("Please wait.");
         pd.setCancelable(false);

@@ -21,11 +21,9 @@
             android:label="@string/title_activity_edit_receipt"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".activities.KitchenMenuActivity" />
         <activity
             android:name=".activities.HomeActivity"
             android:label="@string/title_activity_home" />
-        <activity android:name=".activities.TypeSelectionActivity" />
         <activity android:name=".activities.ExpandableActivity">
 
         </activity>

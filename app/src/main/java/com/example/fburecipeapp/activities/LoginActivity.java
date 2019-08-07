@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
             setContentView(R.layout.activity_login);
 
             // Initialize Progress Dialog
-            pd = new ProgressDialog(this);
+            pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_LIGHT);
             pd.setTitle("Loading...");
             pd.setMessage("Please wait.");
             pd.setCancelable(false);
