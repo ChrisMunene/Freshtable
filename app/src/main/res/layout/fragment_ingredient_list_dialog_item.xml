@@ -10,4 +10,5 @@
     android:paddingRight="@dimen/list_item_spacing"
     android:paddingBottom="@dimen/list_item_spacing_half"
     android:textAppearance="@style/TextAppearance.AppCompat.Large"
+    android:fontFamily="@font/telex"
     tools:text="Hello" />
