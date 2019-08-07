@@ -134,57 +134,67 @@ public class ItemDialogFragment extends DialogFragment {
                 public void done(List<Recipes> recipes, ParseException e) {
                     if (e == null) {
 
-                        Glide.with(getContext())
-                                .load(recipes.get(0).getImage().getUrl())
-                                .apply(RequestOptions.circleCropTransform())
-                                .into(recipeOneImageView);
+                        if (recipes.size() == 0) {
+                            return;
+                        }
 
-                        Glide.with(getContext())
-                                .load(recipes.get(1).getImage().getUrl())
-                                .apply(RequestOptions.circleCropTransform())
-                                .into(recipeTwoImageView);
+                        if (recipes.size() == 1 || recipes.size() == 2 || recipes.size() >= 3) {
+                            Glide.with(getContext())
+                                    .load(recipes.get(0).getImage().getUrl())
+                                    .apply(RequestOptions.circleCropTransform())
+                                    .into(recipeOneImageView);
 
-                        Glide.with(getContext())
-                                .load(recipes.get(2).getImage().getUrl())
-                                .apply(RequestOptions.circleCropTransform())
-                                .into(recipeThreeImageView);
+                            recipeOneImageView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Fragment fragment = new DetailsFragment(recipes.get(0).getObjectId()); // CHANGE THIS HERE
+                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                    fragmentTransaction.replace(R.id.flContainer, fragment);
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.commit();
+                                    dismiss();
+                                }
+                            });
+                        }
+
+                        if (recipes.size() == 2 || recipes.size() >= 3) {
+                            Glide.with(getContext())
+                                    .load(recipes.get(1).getImage().getUrl())
+                                    .apply(RequestOptions.circleCropTransform())
+                                    .into(recipeTwoImageView);
+
+                            recipeTwoImageView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Fragment fragment = new DetailsFragment(recipes.get(1).getObjectId());
+                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                    fragmentTransaction.replace(R.id.flContainer, fragment);
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.commit();
+                                    dismiss();
+                                }
+                            });
+                        }
+
+                        if (recipes.size() >= 3) {
+                            Glide.with(getContext())
+                                    .load(recipes.get(2).getImage().getUrl())
+                                    .apply(RequestOptions.circleCropTransform())
+                                    .into(recipeThreeImageView);
 
 
-                        recipeOneImageView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Fragment fragment = new DetailsFragment(recipes.get(0).getObjectId()); // CHANGE THIS HERE
-                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                                fragmentTransaction.replace(R.id.flContainer, fragment);
-                                fragmentTransaction.addToBackStack(null);
-                                fragmentTransaction.commit();
-                                dismiss();
-                            }
-                        });
-
-                        recipeTwoImageView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Fragment fragment = new DetailsFragment(recipes.get(1).getObjectId());
-                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                                fragmentTransaction.replace(R.id.flContainer, fragment);
-                                fragmentTransaction.addToBackStack(null);
-                                fragmentTransaction.commit();
-                                dismiss();
-                            }
-                        });
-
-                        recipeThreeImageView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Fragment fragment = new DetailsFragment(recipes.get(2).getObjectId());
-                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                                fragmentTransaction.replace(R.id.flContainer, fragment);
-                                fragmentTransaction.addToBackStack(null);
-                                fragmentTransaction.commit();
-                                dismiss();
-                            }
-                        });
+                            recipeThreeImageView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Fragment fragment = new DetailsFragment(recipes.get(2).getObjectId());
+                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                    fragmentTransaction.replace(R.id.flContainer, fragment);
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.commit();
+                                    dismiss();
+                                }
+                            });
+                        }
                     }
                 }
             });
