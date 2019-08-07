@@ -127,15 +127,15 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
     /**
      * Sets up data given a date
-     * Calculates expiring date and gets ingredient name to send to populateMap
+     * Calculates expiring date and gets ingredient name to send to setUpExpiringItemsAndAssociatedDates
      */
-    private void setUpData(Date date) {
+    private void setUpInitialDataFromServer(Date date) {
 
         for(Ingredient ingredient : allIngredients) {
             LocalDate localDate = convertToLocalDateViaMilisecond(date);
             localDate = localDate.plusDays(ingredient.getShelfLife());
 
-            populateMap(localDate, ingredient);
+            setUpExpiringItemsAndAssociatedDates(localDate, ingredient);
 
         }
         allIngredients.clear();
@@ -145,11 +145,12 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
     /**
      * Given a LocalDate and ingredient name, populates expiringItemsAndAssociatedDates
      */
-    private void populateMap(LocalDate day, Ingredient ingredient) {
+    private void setUpExpiringItemsAndAssociatedDates(LocalDate day, Ingredient ingredient) {
         if (expiringItemsAndAssociatedDates.containsKey(day)) {
 
             boolean isContained = false;
 
+            // checks if given ingredient is already set to expire on the same day via another receipt
             for(Ingredient existingIngredient: expiringItemsAndAssociatedDates.get(day)) {
                 if (existingIngredient.getName().equals(ingredient.getName())) {
                     isContained = true;
@@ -164,6 +165,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         } else {
             boolean isContained = false;
 
+            // checks if given ingredient is already set to expire on another date
             for (LinkedHashSet<Ingredient> currentItems: expiringItemsAndAssociatedDates.values()) {
                 LinkedHashSet<String> temp = new LinkedHashSet<>();
                 for (Ingredient i : currentItems) {
@@ -220,7 +222,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
                     if (ingredients != null) {
                         allIngredients.addAll(ingredients);
                         date = receipt.getCreatedAt();
-                        setUpData(date);
+                        setUpInitialDataFromServer(date);
                     }
                 }
 

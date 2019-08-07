@@ -34,6 +34,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="top|left"
             android:gravity="center"
+            android:fontFamily="@font/telex"
             tools:ignore="RtlHardcoded"/>
 
     </FrameLayout>
