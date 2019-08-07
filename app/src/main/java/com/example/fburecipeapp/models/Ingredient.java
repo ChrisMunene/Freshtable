@@ -16,6 +16,7 @@ public class Ingredient extends ParseObject {
     private static final String KEY_IMAGE = "image";
     private static final String KEY_FOODTYPE = "foodType";
     private static final String KEY_OBJECT_ID = "objectId";
+    private static final String KEY_RECEIPT_KEYWORDS = "receiptKeywords";
 
     private static final String KEY_SHELF_LIFE = "shelfLife";
 
@@ -46,6 +47,14 @@ public class Ingredient extends ParseObject {
             whereContainedIn(KEY_OBJECT_ID, objectIds);
             return this;
         }
+    }
+
+    public List<String> getKeywords(){
+        return getList(KEY_RECEIPT_KEYWORDS);
+    }
+
+    public void setKeywords(List<String> keywords){
+        put(KEY_RECEIPT_KEYWORDS, keywords);
     }
 
     @Override
