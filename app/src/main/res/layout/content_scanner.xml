@@ -5,46 +5,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".HomeActivity"
+    tools:context=".activities.HomeActivity"
     tools:showIn="@layout/fragment_scanner">
 
-    <EditText
-        android:id="@+id/descriptionInput"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/edittext_rounded"
-        android:ems="10"
-        android:gravity="start|top"
-        android:hint="Add a Caption..."
-        android:inputType="textMultiLine"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivPreview" />
-
-    <Button
-        android:id="@+id/createBtn"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/uploadFileBtn"
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginStart="55dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="56dp"
-        android:text="Create"
+        android:text="Upload from Gallery"
+        android:textColor="#F8F2F2"
+        android:textSize="17sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionInput" />
+        app:layout_constraintTop_toBottomOf="@+id/ivPreview"
+        style="@style/AppTheme.RoundedCornerMaterialButton"/>
 
     <ImageView
         android:id="@+id/ivPreview"
-        android:layout_width="408dp"
-        android:layout_height="382dp"
+        android:layout_width="373dp"
+        android:layout_height="327dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="172dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.444"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+        app:layout_constraintVertical_bias="0.0"
+        android:background="@color/bg_swipe_group_item_dismiss"/>
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="281dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:color/holo_blue_dark" />
+        app:srcCompat="@drawable/ic_my_logo_2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "809186813052",
+    "firebase_url": "https://mlkit-demo-d4f52.firebaseio.com",
+    "project_id": "mlkit-demo-d4f52",
+    "storage_bucket": "mlkit-demo-d4f52.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809186813052:android:73460fc7e23f802c",
+        "android_client_info": {
+          "package_name": "com.example.fburecipeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq4OEYydtMH3ozg1P5VECbpQPLwvPfPEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809186813052:android:09546560b4505797",
+        "android_client_info": {
+          "package_name": "com.google.firebase.samples.apps.mlkit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq4OEYydtMH3ozg1P5VECbpQPLwvPfPEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

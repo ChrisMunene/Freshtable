@@ -5,12 +5,13 @@
     android:id="@+id/composeFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    android:background="@drawable/my_kitchen_gradient"
+    tools:context=".activities.HomeActivity">
 
     <include
         android:id="@+id/include2"
-        android:layout_width="wrap_content"
         layout="@layout/content_scanner"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,11 +21,16 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="36dp"
-        android:layout_marginBottom="45dp"
-        app:backgroundTint="@color/colorWhite"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="center"
+        app:backgroundTint="#FFFBFB"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_camera" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:rippleColor="#00FFFFFF"
+        app:srcCompat="@drawable/camera_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/ingredientImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/ingredientName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ingredientImage" />
+
+    <TextView
+        android:id="@+id/ingredientBoughtDateSetUpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:text="Bought Date: "
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ingredientName" />
+
+    <TextView
+        android:id="@+id/ingredientBoughtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toEndOf="@id/ingredientBoughtDateSetUpText"
+        app:layout_constraintTop_toBottomOf="@id/ingredientName" />
+
+    <TextView
+        android:id="@+id/ingredientExpireDateSetUpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:text="Expiration Date: "
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ingredientBoughtDate" />
+
+    <TextView
+        android:id="@+id/ingredientExpireDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toEndOf="@id/ingredientExpireDateSetUpText"
+        app:layout_constraintTop_toBottomOf="@id/ingredientBoughtDate" />
+
+    <TextView
+        android:id="@+id/recommendedRecipesSetUpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:text="Recommended Recipes: "
+        android:layout_marginBottom="24dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ingredientExpireDate" />
+
+    <ImageView
+        android:id="@+id/iv_recipeOne"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginLeft="37dp"
+        android:layout_marginRight="25dp"
+        app:srcCompat="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recommendedRecipesSetUpText" />
+
+
+    <ImageView
+        android:id="@+id/iv_recipeTwo"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        app:layout_constraintStart_toEndOf="@id/iv_recipeOne"
+        app:layout_constraintTop_toBottomOf="@id/recommendedRecipesSetUpText"
+        app:srcCompat="@android:color/black" />
+
+    <ImageView
+        android:id="@+id/iv_recipeThree"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        app:layout_constraintStart_toEndOf="@id/iv_recipeTwo"
+        app:layout_constraintTop_toBottomOf="@id/recommendedRecipesSetUpText"
+        app:srcCompat="@android:color/black" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
