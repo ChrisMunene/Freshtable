@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,9 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
-
 import com.example.fburecipeapp.activities.ExpandableActivity;
-
 import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
 import com.example.fburecipeapp.models.FoodType;
@@ -30,7 +27,6 @@ import com.example.fburecipeapp.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -49,7 +45,6 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
     private ImageButton addFoodBtn;
     private List<Ingredient> savedIngredients;
     private List<Ingredient> removedItems;
-    private ImageView savedItemImg;
     private final static String TAG = KitchenFragment.class.getSimpleName();
 
 
@@ -75,7 +70,6 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
         kitchenAdapter = new KitchenAdapter(savedIngredients);
         kitchenAdapter.setOnItemsChangedListener(this::onItemsChanged);
 
-        //savedItemImg = view.findViewById(R.id.savedItemImg);
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new GridLayoutManager(getContext(), 3);
