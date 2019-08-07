@@ -28,6 +28,8 @@
         android:layout_margin="16dp"
         android:layout_marginTop="5dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/light_black"
+        android:fontFamily="@font/telex"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/calendarView" />
 

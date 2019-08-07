@@ -31,5 +31,7 @@
 
     <color name="filter_color">#b7d6ec</color>
 
+    <color name="light_black">#383838</color>
+    <color name="dark_white">#F5F5F5</color>
 
 </resources>

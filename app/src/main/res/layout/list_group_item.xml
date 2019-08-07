@@ -36,6 +36,7 @@
             android:layout_gravity="top|left"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
+            android:fontFamily="@font/telex"
             android:gravity="center" />
 
         <com.example.fburecipeapp.helpers.ExpandableItemIndicator
