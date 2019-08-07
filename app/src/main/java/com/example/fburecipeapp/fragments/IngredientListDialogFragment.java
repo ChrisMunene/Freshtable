@@ -10,9 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.activities.EditReceiptActivity;
 import com.example.fburecipeapp.adapters.EditListAdapter;
-import com.example.fburecipeapp.adapters.SelectedItemAdapter;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.ReceiptItem;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -33,6 +31,7 @@ import com.parse.ParseException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,23 +42,26 @@ import java.util.List;
  * </pre>
  * <p>You activity (or fragment) needs to implement {@link IngredientListDialogFragment.Listener}.</p>
  */
-public class IngredientListDialogFragment extends BottomSheetDialogFragment {
+public class IngredientListDialogFragment extends BottomSheetDialogFragment implements EditListAdapter.AddButtonClickListener {
 
     private RecyclerView rvIngredients;
     private EditText titleInput;
     private EditText descriptionInput;
-    private List<Ingredient> ingredients;
-    private List<ReceiptItem> receiptItems;
+    private List<String> receiptItems;
     private List<Ingredient> precheckedIngredients = new ArrayList<>();
+    private HashMap<String, Ingredient> ingredientHashMap = new HashMap<String, Ingredient>();
     private EditListAdapter adapter;
     private Button submitBtn;
+    private Uri photoUri;
+    private String photoFilePath;
     private static final String TAG = IngredientListDialogFragment.class.getSimpleName();
 
-    public static IngredientListDialogFragment newInstance(List<ReceiptItem> receiptItems, Uri photoUri) {
+    public static IngredientListDialogFragment newInstance(List<String> receiptItems, Uri photoUri, String photoFilePath) {
         final IngredientListDialogFragment fragment = new IngredientListDialogFragment();
         final Bundle args = new Bundle();
         args.putParcelable("ReceiptItems", Parcels.wrap(receiptItems));
         args.putParcelable("receiptImageUri", Parcels.wrap(photoUri));
+        args.putString("photoFilePath", photoFilePath);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,10 +80,11 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         rvIngredients = view.findViewById(R.id.rvIngredients);
         titleInput = view.findViewById(R.id.titleInput);
         descriptionInput = view.findViewById(R.id.descriptionInput);
-        ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
-        Uri photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
-        adapter = new EditListAdapter(getContext(), precheckedIngredients, photoUri);
+        photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
+        photoFilePath = getArguments().getString("photoFilePath");
+        adapter = new EditListAdapter(getContext(), precheckedIngredients);
+        adapter.setOnAddBtnClickedListener(this::onAddButtonClicked);
         rvIngredients.setAdapter(adapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -91,8 +94,18 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View view) {
                 // Get selected items
-                List<Ingredient> selectedFoodItems = adapter.getSelectedFoodItems();
-                sendBackResult(selectedFoodItems);
+                String title = titleInput.getText().toString();
+                String description = descriptionInput.getText().toString();
+
+                if(title.isEmpty()){
+                   titleInput.setError("Please enter a title");
+                } else if(description.isEmpty()) {
+                    descriptionInput.setError("Please enter a description");
+                } else {
+                    List<Ingredient> selectedIngredients = adapter.getSelectedFoodItems();
+                    sendBackResult(selectedIngredients);
+                }
+
             }
         });
 
@@ -109,6 +122,31 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
         super.onDetach();
     }
 
+    @Override
+    public void onAddButtonClicked() {
+        String title = titleInput.getText().toString();
+        String description = descriptionInput.getText().toString();
+
+        if(title.isEmpty()){
+            titleInput.setError("Please enter a title");
+        } else if(description.isEmpty()) {
+            descriptionInput.setError("Please enter a description");
+        } else {
+            List<Ingredient> selectedIngredients = adapter.getSelectedFoodItems();
+            ArrayList selectedIngredientIds = new ArrayList<String>();
+            for(Ingredient ingredient: selectedIngredients){
+                selectedIngredientIds.add(ingredient.getObjectId());
+            }
+            final Intent intent = new Intent(getContext(), EditReceiptActivity.class);
+            intent.putParcelableArrayListExtra("selectedIngredientIds", selectedIngredientIds);
+            intent.putExtra("title", title);
+            intent.putExtra("description", description);
+            intent.putExtra("photoFilePath", photoFilePath);
+            intent.putExtra("receiptImageUri", Parcels.wrap(photoUri));
+            startActivity(intent);
+        }
+    }
+
     public interface Listener {
         void onFinishEditingList(String title, String description, List<Ingredient> foodItems);
     }
@@ -121,9 +159,12 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
             public void done(List<Ingredient> ingredientList, ParseException e) {
                 if(e == null){
                     for (Ingredient ingredient: ingredientList) {
-                        ingredients.add(ingredient);
+                        List<String> keywords = ingredient.getKeywords();
+                        for(String keyword: keywords){
+                            ingredientHashMap.put(keyword, ingredient);
+                        }
                     }
-                    getPrecheckedIngredients();
+                    if(receiptItems != null) getPrecheckedIngredients();
                 } else {
                     Log.e(TAG, "Error fetching ingredients", e);
                 }
@@ -142,13 +183,10 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment {
 
     // List the ingredient found in a receipt
     public void getPrecheckedIngredients(){
-        for (ReceiptItem receiptItem: receiptItems){
-            for(Ingredient ingredient: ingredients){
-                // toLowercase used because .contains is case sensitive -- Java SMH :(
-                if(receiptItem.getDescription().toLowerCase().contains(ingredient.getName().toLowerCase()) && !precheckedIngredients.contains(ingredient)){
-                    precheckedIngredients.add(ingredient);
-                    adapter.notifyDataSetChanged();
-                }
+        for (String receiptItem: receiptItems){
+            if(ingredientHashMap.containsKey(receiptItem)){
+                precheckedIngredients.add(ingredientHashMap.get(receiptItem));
+                adapter.notifyDataSetChanged();
             }
         }
 

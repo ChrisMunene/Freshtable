@@ -27,7 +27,7 @@ import com.parse.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecipeFragment extends Fragment {
+public class RecipeFragment extends Fragment implements FilterRecipeDialogFragment.Listener {
 
     private static final int NUM_COLUMNS = 2;
     private static final String TAG = "RecipeFragment";
@@ -37,7 +37,9 @@ public class RecipeFragment extends Fragment {
     private StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter;
     private AsyncHttpClient client;
     private ImageButton searchBtn;
+    private ArrayList<String> selectedChipGroup;
     private Fragment recipeFragment;
+    private List<Ingredient> savedIngredients;
 
     private ArrayList<Ingredient> myIngredients;
 
@@ -49,7 +51,7 @@ public class RecipeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("Kitchen fragment", "OnCreateView success");
+        Log.d(TAG, "OnCreateView success");
         return inflater.inflate(R.layout.fragment_recipe, container, false);
     }
 
@@ -57,6 +59,9 @@ public class RecipeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         searchBtn = view.findViewById(R.id.searchBtn);
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
+        selectedChipGroup = new ArrayList<>();
+        savedIngredients = new ArrayList<>();
+
         staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager(), this);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
@@ -71,12 +76,7 @@ public class RecipeFragment extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm = getFragmentManager();
-                if (fm != null) {
-                    FilterRecipeDialogFragment frag = FilterRecipeDialogFragment.newInstance();
-                    frag.setTargetFragment(recipeFragment, 0);
-                    frag.show(fm, "receipt_dialog_fragment");
-                }
+                showEditDialog();
             }
         });
     }
@@ -89,6 +89,7 @@ public class RecipeFragment extends Fragment {
             public void done(List<Recipes> objects, ParseException e) {
                 if (e == null) {
                     Log.d("item count", String.format("%s", objects.size()));
+                    mRecipes.removeAll(mRecipes);
                     mRecipes.addAll(objects);
                     staggeredRecyclerViewAdapter.notifyDataSetChanged();
                 } else {
@@ -99,20 +100,50 @@ public class RecipeFragment extends Fragment {
     }
 
     private void loadUserIngredients() {
-    User.Query query =  new User.Query();
-    query.forCurrentUser().withSavedIngredients();
-    query.findInBackground(new FindCallback<User>() {
-        @Override
-        public void done(List<User> users, ParseException e) {
-            if(e == null){
-                for(User user: users){
-                    myIngredients.addAll(user.getSavedIngredients());
+        User.Query query = new User.Query();
+        query.forCurrentUser().withSavedIngredients();
+        query.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> users, ParseException e) {
+                if (e == null) {
+                    for (User user : users) {
+                        savedIngredients = user.getSavedIngredients();
+                        myIngredients.removeAll(myIngredients);
+
+                        if (selectedChipGroup.size() != 0) {
+                            for (int i = 0; i < savedIngredients.size(); i++) {
+                                if (selectedChipGroup.contains(savedIngredients.get(i).getName())) {
+                                    myIngredients.add(savedIngredients.get(i));
+                                }
+                            }
+                        } else {
+                                myIngredients.addAll(savedIngredients);
+                            }
+                        }
+                    }
+
+                    loadRecipes();
                 }
+        });
+    }
 
-                loadRecipes();
-            }
+    private void loadCurrentIngredients() {
+        loadRecipes();
+    }
+
+    private void showEditDialog(){
+        FragmentManager fm = getFragmentManager();
+        if(fm != null){
+            FilterRecipeDialogFragment frag = FilterRecipeDialogFragment.newInstance();
+            frag.setTargetFragment(this, 0);
+            frag.show(fm, "fragment_filter");
         }
-    });
+    }
 
+    @Override
+    public void onFinishEditingList(ArrayList<String> chipGroup) {
+        Log.d("filter transfer", "finished editing list");
+        selectedChipGroup = chipGroup;
+        loadUserIngredients();
     }
 }

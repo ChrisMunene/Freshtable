@@ -21,7 +21,7 @@ public class ExpandableActivity extends AppCompatActivity {
         setContentView(R.layout.activity_example);
 
         if (savedInstanceState == null) {
-            Fragment fragment = ExpandableFragment.newInstance(new ArrayList<>());
+            Fragment fragment = ExpandableFragment.newInstance(new ArrayList<>(), null, null, null, false);
             fragmentManager.beginTransaction().replace(R.id.mContainer, fragment).commitNow();
         }
     }
