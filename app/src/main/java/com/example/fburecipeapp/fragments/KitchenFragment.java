@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,9 +33,10 @@ import com.parse.ParseUser;
 
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
-public class KitchenFragment extends Fragment {
+public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsChangedListener{
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -56,7 +58,6 @@ public class KitchenFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("Kitchen fragment", "OnCreateView success");
         return inflater.inflate(R.layout.fragment_kitchen, container, false);
-
     }
 
     @Override
@@ -68,10 +69,13 @@ public class KitchenFragment extends Fragment {
         addFoodBtn = view.findViewById(R.id.addFoodBtn);
         savedIngredients = new ArrayList<Ingredient>();
         removedItems = new ArrayList<Ingredient>();
-        kitchenAdapter = new KitchenAdapter(savedIngredients);
         recyclerView = view.findViewById(R.id.rvSaved);
 
-        savedItemImg = view.findViewById(R.id.savedItemImg);
+        // Adapter
+        kitchenAdapter = new KitchenAdapter(savedIngredients);
+        kitchenAdapter.setOnItemsChangedListener(this::onItemsChanged);
+
+        //savedItemImg = view.findViewById(R.id.savedItemImg);
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new GridLayoutManager(getContext(), 3);
@@ -132,4 +136,17 @@ public class KitchenFragment extends Fragment {
 
     }
 
+    @Override
+    public void onItemsChanged(Ingredient ingredient) {
+
+        LinkedHashSet<Ingredient> ingredients = new LinkedHashSet<Ingredient>();
+        ingredients.add(ingredient);
+
+        FragmentManager fm = getFragmentManager();
+        if (fm != null) {
+            ItemDialogFragment frag = ItemDialogFragment.newInstance(ingredients);
+            frag.setTargetFragment(this, 0);
+            frag.show(fm, "item_dialog_details");
+        }
+    }
 }
