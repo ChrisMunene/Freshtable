@@ -68,10 +68,11 @@ public class Ingredient extends ParseObject {
             return false;
         }
         final Ingredient other = (Ingredient) obj;
-        if (this.getObjectId() == null ? other.getObjectId() != null : !this.getObjectId().equals(other.getObjectId()))
+        if (this.getObjectId() == null)
         {
-            return false;
+            return other.getObjectId() == null;
         }
-        return true;
+
+        return this.getObjectId().equals(other.getObjectId());
     }
 }
