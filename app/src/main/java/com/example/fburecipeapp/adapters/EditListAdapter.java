@@ -30,14 +30,17 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
 
     private Context context;
     private List<Ingredient> selectedFoodItems;
-    private Uri receiptUri;
     private final int VIEW_TYPE_BTN = 0;
     private final int VIEW_TYPE_CELL = 1;
+    public AddButtonClickListener mListener;
 
-    public EditListAdapter(Context context, List<Ingredient> precheckedIngredients, Uri photoUri) {
+    public EditListAdapter(Context context, List<Ingredient> precheckedIngredients) {
         this.context = context;
         this.selectedFoodItems = precheckedIngredients;
-        this.receiptUri = photoUri;
+    }
+
+    public void setOnAddBtnClickedListener(AddButtonClickListener listener){
+        mListener = listener;
     }
 
     @NonNull
@@ -101,15 +104,7 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
             ivAddBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("Btn", "Clicked");
-                    ArrayList selectedIngredientIds = new ArrayList<String>();
-                    for(Ingredient ingredient: selectedFoodItems){
-                        selectedIngredientIds.add(ingredient.getObjectId());
-                    }
-                    final Intent intent = new Intent(context, EditReceiptActivity.class);
-                    intent.putParcelableArrayListExtra("selectedIngredientIds", selectedIngredientIds);
-                    intent.putExtra("receiptImageUri", Parcels.wrap(receiptUri));
-                    context.startActivity(intent);
+                    mListener.onAddButtonClicked();
                 }
             });
         }
@@ -134,6 +129,10 @@ public class EditListAdapter extends RecyclerView.Adapter<EditListAdapter.ViewHo
 
     public List<Ingredient> getSelectedFoodItems(){
         return selectedFoodItems;
+    }
+
+    public interface AddButtonClickListener{
+        void onAddButtonClicked();
     }
 
 }
