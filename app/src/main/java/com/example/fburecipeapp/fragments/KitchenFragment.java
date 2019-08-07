@@ -70,6 +70,7 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
         kitchenAdapter = new KitchenAdapter(savedIngredients);
         kitchenAdapter.setOnItemsChangedListener(this::onItemsChanged);
 
+
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new GridLayoutManager(getContext(), 3);
