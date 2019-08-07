@@ -185,8 +185,11 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
     public void getPrecheckedIngredients(){
         for (String receiptItem: receiptItems){
             if(ingredientHashMap.containsKey(receiptItem)){
-                precheckedIngredients.add(ingredientHashMap.get(receiptItem));
-                adapter.notifyDataSetChanged();
+                Ingredient ingredient = ingredientHashMap.get(receiptItem);
+                if(!precheckedIngredients.contains(ingredient)) {
+                    precheckedIngredients.add(ingredient);
+                    adapter.notifyDataSetChanged();
+                }
             }
         }
 
