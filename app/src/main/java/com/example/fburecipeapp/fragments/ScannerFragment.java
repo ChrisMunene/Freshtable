@@ -382,6 +382,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         FragmentManager fm = getFragmentManager();
         if(fm != null){
             IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance(receiptItems, photoUri, photoFilePath);
+            frag.setCancelable(false);
             frag.setTargetFragment(this, 0);
             frag.show(fm, "fragment_edit_items");
         }

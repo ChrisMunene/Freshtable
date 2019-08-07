@@ -6,11 +6,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/bg_blue_main</item>
 
     </style>
 
     <style name="AppTheme.RoundedCornerMaterialButton" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">#2196F3</item>
+        <item name="backgroundTint">@color/bg_blue_main</item>
         <item name="cornerRadius">@dimen/corner_radius</item>
     </style>
 

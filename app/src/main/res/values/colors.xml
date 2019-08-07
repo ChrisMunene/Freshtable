@@ -10,6 +10,7 @@
     <color name="bg_item_dragging_active_state">#ffff9999</color>
     <color name="bg_item_swiping_state">#DDDDFF</color>
     <color name="bg_item_swiping_active_state">#ff9999ff</color>
+    <color name="bg_blue_main">#2196F3</color>
 
     <color name="bg_group_item_normal_pressed_state">#ff99cc99</color>
     <color name="bg_group_item_normal_state">#ffddffdd</color>
