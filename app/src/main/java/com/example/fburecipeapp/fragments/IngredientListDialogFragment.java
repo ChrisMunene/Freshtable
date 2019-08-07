@@ -31,6 +31,7 @@ import com.parse.ParseException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,9 +47,9 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
     private RecyclerView rvIngredients;
     private EditText titleInput;
     private EditText descriptionInput;
-    private List<Ingredient> ingredients;
     private List<String> receiptItems;
     private List<Ingredient> precheckedIngredients = new ArrayList<>();
+    private HashMap<String, Ingredient> ingredientHashMap = new HashMap<String, Ingredient>();
     private EditListAdapter adapter;
     private Button submitBtn;
     private Uri photoUri;
@@ -79,7 +80,6 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
         rvIngredients = view.findViewById(R.id.rvIngredients);
         titleInput = view.findViewById(R.id.titleInput);
         descriptionInput = view.findViewById(R.id.descriptionInput);
-        ingredients = new ArrayList<>();
         receiptItems = Parcels.unwrap(getArguments().getParcelable("ReceiptItems"));
         photoUri = Parcels.unwrap(getArguments().getParcelable("receiptImageUri"));
         photoFilePath = getArguments().getString("photoFilePath");
@@ -159,7 +159,10 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
             public void done(List<Ingredient> ingredientList, ParseException e) {
                 if(e == null){
                     for (Ingredient ingredient: ingredientList) {
-                        ingredients.add(ingredient);
+                        List<String> keywords = ingredient.getKeywords();
+                        for(String keyword: keywords){
+                            ingredientHashMap.put(keyword, ingredient);
+                        }
                     }
                     if(receiptItems != null) getPrecheckedIngredients();
                 } else {
@@ -181,12 +184,9 @@ public class IngredientListDialogFragment extends BottomSheetDialogFragment impl
     // List the ingredient found in a receipt
     public void getPrecheckedIngredients(){
         for (String receiptItem: receiptItems){
-            for(Ingredient ingredient: ingredients){
-                // toLowercase used because .contains is case sensitive -- Java SMH :(
-                if(receiptItem.toLowerCase().contains(ingredient.getName().toLowerCase()) && !precheckedIngredients.contains(ingredient)){
-                    precheckedIngredients.add(ingredient);
-                    adapter.notifyDataSetChanged();
-                }
+            if(ingredientHashMap.containsKey(receiptItem)){
+                precheckedIngredients.add(ingredientHashMap.get(receiptItem));
+                adapter.notifyDataSetChanged();
             }
         }
 
