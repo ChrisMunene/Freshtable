@@ -47,7 +47,6 @@ public class KitchenFragment extends Fragment {
     private ImageButton addFoodBtn;
     private List<Ingredient> savedIngredients;
     private List<Ingredient> removedItems;
-    private ImageView savedItemImg;
     private final static String TAG = KitchenFragment.class.getSimpleName();
 
 
@@ -71,7 +70,6 @@ public class KitchenFragment extends Fragment {
         kitchenAdapter = new KitchenAdapter(savedIngredients);
         recyclerView = view.findViewById(R.id.rvSaved);
 
-        savedItemImg = view.findViewById(R.id.savedItemImg);
         recyclerView.setAdapter(kitchenAdapter);
 
         layoutManager = new GridLayoutManager(getContext(), 3);
