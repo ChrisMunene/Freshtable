@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/my_kitchen_gradient"
-    tools:context=".MainActivity">
+    tools:context=".activities.LoginActivity">
 
     <EditText
         android:id="@+id/username_et"
@@ -25,9 +25,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.32999998" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/loginBtn"
-        style="@style/Widget.AppCompat.Button"
         android:layout_width="285dp"
         android:layout_height="50dp"
         android:layout_marginTop="56dp"
@@ -40,7 +39,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.523"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_et" />
+        app:layout_constraintTop_toBottomOf="@+id/password_et"
+        style="@style/AppTheme.RoundedCornerMaterialButton"/>
 
 
     <EditText

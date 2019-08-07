@@ -9,6 +9,11 @@
 
     </style>
 
+    <style name="AppTheme.RoundedCornerMaterialButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">#2196F3</item>
+        <item name="cornerRadius">@dimen/corner_radius</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
