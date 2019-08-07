@@ -1,10 +1,6 @@
 package com.example.fburecipeapp.fragments;
 
-import android.media.Image;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +25,6 @@ import com.parse.ParseFile;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ViewListener;
 
-import org.w3c.dom.Text;
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
@@ -40,12 +35,13 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
 
     CarouselView carouselView;
     TextView carouselLabel;
-
-    int[] sampleImages = {R.drawable.temp_image_1, R.drawable.temp_image_2, R.drawable.temp_image_3};
+    ParseFile[] recipeImages;
 
     private ArrayList<String> ingredientNames;
     private ArrayList<ParseFile> ingredientImages;
     private ArrayList<LocalDate> ingredientBoughtDates;
+    private ArrayList<Ingredient> ingredients;
+
     private LocalDate expirationDate;
 
 
@@ -53,12 +49,15 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
         ingredientNames = new ArrayList<String>();
         ingredientImages = new ArrayList<ParseFile>();
         ingredientBoughtDates = new ArrayList<LocalDate>();
+        ingredients = new ArrayList<Ingredient>();
+        recipeImages = new ParseFile[3];
         this.expirationDate = expirationDate;
 
         for (Ingredient ingredient : expiringIngredients) {
             ingredientNames.add(ingredient.getName());
             ingredientImages.add(ingredient.getImage());
             ingredientBoughtDates.add(expirationDate.minusDays(ingredient.getShelfLife()));
+            ingredients.add(ingredient);
         }
     }
 
@@ -119,38 +118,70 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
             FragmentManager fragmentManager = getFragmentManager();
 
             ImageView recipeOneImageView = (ImageView) customView.findViewById(R.id.iv_recipeOne);
-            recipeOneImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Fragment fragment = new RecipeFragment(); // CHANGE THIS HERE
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.flContainer, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                }
-            });
-
             ImageView recipeTwoImageView = (ImageView) customView.findViewById(R.id.iv_recipeTwo);
-            recipeTwoImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Fragment fragment = new RecipeFragment();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.flContainer, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                }
-            });
-
             ImageView recipeThreeImageView = (ImageView) customView.findViewById(R.id.iv_recipeThree);
-            recipeThreeImageView.setOnClickListener(new View.OnClickListener() {
+
+
+            Recipes.Query query = new Recipes.Query();
+            query.withOneIngredient(ingredients.get(position));
+            query.findInBackground(new FindCallback<Recipes>() {
                 @Override
-                public void onClick(View v) {
-                    Fragment fragment = new RecipeFragment();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.flContainer, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+                public void done(List<Recipes> recipes, ParseException e) {
+                    if (e == null) {
+
+                        Glide.with(getContext())
+                                .load(recipes.get(0).getImage().getUrl())
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(recipeOneImageView);
+
+                        Glide.with(getContext())
+                                .load(recipes.get(1).getImage().getUrl())
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(recipeTwoImageView);
+
+                        Glide.with(getContext())
+                                .load(recipes.get(2).getImage().getUrl())
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(recipeThreeImageView);
+
+
+                        recipeOneImageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Fragment fragment = new DetailsFragment(recipes.get(0).getObjectId()); // CHANGE THIS HERE
+                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                fragmentTransaction.replace(R.id.flContainer, fragment);
+                                fragmentTransaction.addToBackStack(null);
+                                fragmentTransaction.commit();
+                                dismiss();
+                            }
+                        });
+
+                        recipeTwoImageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Fragment fragment = new DetailsFragment(recipes.get(1).getObjectId());
+                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                fragmentTransaction.replace(R.id.flContainer, fragment);
+                                fragmentTransaction.addToBackStack(null);
+                                fragmentTransaction.commit();
+                                dismiss();
+                            }
+                        });
+
+                        recipeThreeImageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Fragment fragment = new DetailsFragment(recipes.get(2).getObjectId());
+                                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                fragmentTransaction.replace(R.id.flContainer, fragment);
+                                fragmentTransaction.addToBackStack(null);
+                                fragmentTransaction.commit();
+                                dismiss();
+                            }
+                        });
+
+                    }
                 }
             });
 
@@ -159,13 +190,8 @@ public class CalendarItemCarouselDialogFragment extends DialogFragment {
             boughtDateTextView.setText(ingredientBoughtDates.get(position).toString());
             expirationDateTextView.setText(expirationDate.toString());
 
-            Glide.with(getContext()).load(sampleImages[0]).apply(RequestOptions.circleCropTransform()).into(recipeOneImageView);
-            Glide.with(getContext()).load(sampleImages[1]).apply(RequestOptions.circleCropTransform()).into(recipeTwoImageView);
-            Glide.with(getContext()).load(sampleImages[2]).apply(RequestOptions.circleCropTransform()).into(recipeThreeImageView);
-
             return customView;
         }
     };
-
 
 }

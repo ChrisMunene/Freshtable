@@ -32,7 +32,10 @@ public class EditReceiptActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_receipt);
         List<String> selectedIngredientIds = getIntent().getStringArrayListExtra("selectedIngredientIds");
         Uri photoUri = Parcels.unwrap(getIntent().getParcelableExtra("receiptImageUri"));
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedIngredientIds, photoUri);
+        String title = getIntent().getStringExtra("title");
+        String description = getIntent().getStringExtra("description");
+        String photoFilePath = getIntent().getStringExtra("photoFilePath");
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedIngredientIds, photoUri, title, description, photoFilePath);
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);

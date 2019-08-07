@@ -53,12 +53,10 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "OnCreateView success");
         return inflater.inflate(R.layout.fragment_recipe, container, false);
-
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         searchBtn = view.findViewById(R.id.searchBtn);
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
         selectedChipGroup = new ArrayList<>();
@@ -85,7 +83,7 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
 
     private void loadRecipes() {
         Recipes.Query query = new Recipes.Query();
-        query.withOneIngredient(myIngredients);
+        query.withIngredients(myIngredients);
         query.findInBackground(new FindCallback<Recipes>() {
             @Override
             public void done(List<Recipes> objects, ParseException e) {

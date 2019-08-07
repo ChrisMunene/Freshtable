@@ -1,6 +1,7 @@
 package com.example.fburecipeapp.fragments;
 
 import android.os.Bundle;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,27 +19,37 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.models.Recipe;
+import com.example.fburecipeapp.models.Recipes;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import org.parceler.Parcel;
+import org.w3c.dom.Text;
+
+import java.util.List;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class DetailsFragment extends Fragment {
 
     Recipe recipe;
+    private String recipeID;
     private String name;
     private ParseFile image;
     private String ingredients;
     private String instructions;
 
 
-    public DetailsFragment(String name, ParseFile image, String ingredients, String instructions) {
-        this.name = name;
-        this.image = image;
-        // this.includes = includes;
-        this.ingredients = ingredients;
-        this.instructions = instructions;
+//    public DetailsFragment(String name, ParseFile image, String ingredients, String instructions) {
+//        this.name = name;
+//        this.image = image;
+//        this.ingredients = ingredients;
+//        this.instructions = instructions;
+//    }
+
+    public DetailsFragment(String recipeID) {
+        this.recipeID = recipeID;
     }
 
     @Nullable
@@ -57,13 +68,33 @@ public class DetailsFragment extends Fragment {
         TextView tvRecipeIngredients = view.findViewById(R.id.tv_recipeAllIngredients);
         TextView tvRecipeInstructions = view.findViewById(R.id.tv_recipeInstructions);
 
-        tvRecipeName.setText(name);
-        Glide.with(getContext())
-                .load(image.getUrl())
-                .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(15)))
-                .into(ivRecipeImage);
-        tvRecipeIngredients.setText(ingredients);
-        tvRecipeInstructions.setText(instructions);
+        getRecipeDetails(tvRecipeName, ivRecipeImage, tvRecipeIngredients, tvRecipeInstructions);
     }
 
+    private void getRecipeDetails(TextView tvRecipeName, ImageView ivRecipeImage, TextView tvRecipeIngredients, TextView tvRecipeInstructions) {
+        Recipes.Query query = new Recipes.Query();
+        query.withRecipeID(recipeID);
+        query.findInBackground(new FindCallback<Recipes>() {
+            @Override
+            public void done(List<Recipes> recipes, ParseException e) {
+                if (e == null) {
+                    Recipes recipe = recipes.get(0);
+                    name = recipe.getName();
+                    image = recipe.getImage();
+                    ingredients = recipe.getAllIngredients();
+                    instructions = recipe.getInstructions();
+                    
+                    tvRecipeName.setText(name);
+                    Glide.with(getContext())
+                            .load(image.getUrl())
+                            .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(15)))
+                            .into(ivRecipeImage);
+                    tvRecipeIngredients.setText(ingredients);
+                    tvRecipeInstructions.setText(instructions);
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }
