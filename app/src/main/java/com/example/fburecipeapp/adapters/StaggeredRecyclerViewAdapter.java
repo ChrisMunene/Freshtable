@@ -99,7 +99,6 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             Recipes recipe = mRecipes.get(position);
             // make sure the position is valid, i.e. actually exists in the view
             if (position != RecyclerView.NO_POSITION) {
-                // Fragment fragment = new DetailsFragment(recipe.getName(), recipe.getImage(), recipe.getAllIngredients(), recipe.getInstructions());
                 Fragment fragment = new DetailsFragment(recipe.getObjectId());
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.flContainer, fragment);

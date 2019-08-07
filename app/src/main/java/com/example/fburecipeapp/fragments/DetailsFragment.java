@@ -83,7 +83,7 @@ public class DetailsFragment extends Fragment {
                     image = recipe.getImage();
                     ingredients = recipe.getAllIngredients();
                     instructions = recipe.getInstructions();
-                    
+
                     tvRecipeName.setText(name);
                     Glide.with(getContext())
                             .load(image.getUrl())

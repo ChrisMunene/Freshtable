@@ -229,11 +229,19 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
         LocalDate expirationDate = calendarDay.getDate();
 
+//        FragmentManager fm = getFragmentManager();
+//        if (fm != null) {
+//            CalendarItemCarouselDialogFragment frag = CalendarItemCarouselDialogFragment.newInstance(expiringItems, calendarDay.getDate());
+//            frag.setTargetFragment(this, 0);
+//            frag.show(fm, "carousel_dialog_details");
+//        }
+
+
         FragmentManager fm = getFragmentManager();
         if (fm != null) {
-            CalendarItemCarouselDialogFragment frag = CalendarItemCarouselDialogFragment.newInstance(expiringItems, calendarDay.getDate());
+            ItemDialogFragment frag = ItemDialogFragment.newInstance(expiringItems);
             frag.setTargetFragment(this, 0);
-            frag.show(fm, "dialog_fragment_calendar_items");
+            frag.show(fm, "item_dialog_details");
         }
     }
 
