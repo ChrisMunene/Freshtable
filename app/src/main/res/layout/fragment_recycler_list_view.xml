@@ -28,7 +28,7 @@
             android:id="@+id/rvExpandable"
             style="@style/myRecyclerViewStyle"
             android:layout_width="match_parent"
-            android:layout_height="670dp"
+            android:layout_height="650dp"
             android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
