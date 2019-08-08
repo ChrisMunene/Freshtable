@@ -37,8 +37,8 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    protected ArrayList<FoodType> types;
-    protected KitchenAdapter kitchenAdapter;
+    private ArrayList<FoodType> types;
+    private KitchenAdapter kitchenAdapter;
     private ImageButton logoutBtn;
     private ProgressDialog pd;
     private User currentUser;
@@ -46,7 +46,7 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
     private List<Ingredient> savedIngredients;
     private List<Ingredient> removedItems;
     private final static String TAG = KitchenFragment.class.getSimpleName();
-
+    private static boolean toasted = false;
 
     @Nullable
     @Override
@@ -57,8 +57,6 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        Toast.makeText(getContext(), "Press and hold an item to delete", Toast.LENGTH_LONG).show();
 
         logoutBtn = view.findViewById(R.id.logoutBtn);
         addFoodBtn = view.findViewById(R.id.addFoodBtn);
@@ -83,9 +81,7 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
 
-
         loadSavedItems();
-
 
         // brings user to login activity when logout button is pressed
         logoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -103,9 +99,13 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
             public void onClick(View v) {
                 final Intent intent = new Intent(getContext(), ExpandableActivity.class);
                 startActivity(intent);
-
             }
         });
+
+        if (toasted == false) {
+            Toast.makeText(getContext(), "Press and hold an item to delete.", Toast.LENGTH_LONG).show();
+            toasted = true;
+        }
     }
 
     // loads the specific fooditems for the food category
@@ -128,7 +128,6 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
                 pd.dismiss();
             }
         });
-
     }
 
     @Override

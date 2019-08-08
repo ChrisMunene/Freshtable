@@ -13,9 +13,9 @@
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
-        <color android:color="@color/bg_group_item_normal_pressed_state"/>
+        <color android:color="@color/ripple_color"/>
     </item>
     <item>
-        <color android:color="@color/bg_group_item_normal_state"/>
+        <color android:color="@color/filter_color"/>
     </item>
 </selector>

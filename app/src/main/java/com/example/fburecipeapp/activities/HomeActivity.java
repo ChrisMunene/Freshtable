@@ -19,7 +19,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class HomeActivity extends AppCompatActivity {
 
     private Fragment fragment;
-
     private FragmentManager fragmentManager = getSupportFragmentManager();
     
     // sets up bottom navigation bar - used to hold and call each fragment/screen
@@ -48,7 +47,6 @@ public class HomeActivity extends AppCompatActivity {
 
             // replaces empty container with whichever fragment is called
             fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commitNow();
-
             return true;
         }
     };
@@ -60,7 +58,5 @@ public class HomeActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navView.setSelectedItemId(R.id.action_kitchen);
-
     }
-
 }

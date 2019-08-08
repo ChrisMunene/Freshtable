@@ -34,6 +34,9 @@
             android:layout_height="match_parent"
             android:layout_gravity="top|left"
             android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:fontFamily="@font/telex"
             tools:ignore="RtlHardcoded"/>
 

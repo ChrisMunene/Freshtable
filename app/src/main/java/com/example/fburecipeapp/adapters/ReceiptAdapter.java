@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.ReceiptDialogFragment;
 import com.example.fburecipeapp.models.Receipt;
@@ -49,11 +50,14 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.ViewHold
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String strDate = dateFormat.format(date);
 
+        RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.placeholder_foreground);
 
         holder.dateUploaded.setText(strDate);
 
         Glide.with(mContext)
                 .load(receiptImg.getUrl())
+                .apply(requestOptions)
                 .into(holder.receiptImg);
 
     }
