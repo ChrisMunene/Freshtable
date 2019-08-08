@@ -18,7 +18,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.fragments.DetailsFragment;
-import com.example.fburecipeapp.models.Recipes;
+import com.example.fburecipeapp.models.Recipe;
 import com.parse.ParseFile;
 
 import java.util.ArrayList;
@@ -27,16 +27,16 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
     private static final String TAG = "StaggeredRecyclerViewAdapter";
 
-    private ArrayList<Recipes> mRecipes = new ArrayList<>();
+    private ArrayList<Recipe> mRecipes = new ArrayList<>();
     private ArrayList<String> mImages = new ArrayList<>();
     private FragmentManager fragmentManager;
     private Context mContext;
     private ImageButton searchBtn;
     private Fragment recipeFragment;
-    private ArrayList<Recipes> newRecipes;
+    private ArrayList<Recipe> newRecipes;
     private ArrayList<String> selectedChipGroup = new ArrayList<>();
 
-    public StaggeredRecyclerViewAdapter(ArrayList<Recipes> mRecipes, ArrayList<String> mImages, Context mContext,
+    public StaggeredRecyclerViewAdapter(ArrayList<Recipe> mRecipes, ArrayList<String> mImages, Context mContext,
                                         FragmentManager fragmentManager, Fragment recipeFragment) {
         this.mRecipes = mRecipes;
         this.mImages = mImages;
@@ -58,7 +58,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
 
-        Recipes recipe = mRecipes.get(position);
+        Recipe recipe = mRecipes.get(position);
 
         ParseFile image = recipe.getImage();
 
@@ -96,7 +96,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         public void onClick(View v) {
             // gets item position
             int position = getAdapterPosition();
-            Recipes recipe = mRecipes.get(position);
+            Recipe recipe = mRecipes.get(position);
             // make sure the position is valid, i.e. actually exists in the view
             if (position != RecyclerView.NO_POSITION) {
                 Fragment fragment = new DetailsFragment(recipe.getObjectId());
