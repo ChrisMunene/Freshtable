@@ -43,11 +43,37 @@
             app:srcCompat="@android:color/black" />
 
         <TextView
+            android:id="@+id/containsIngredientsSetUpText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contains:"
+            android:textColor="@color/dark_white"
+            android:textStyle="italic"
+            android:fontFamily="@font/telex"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_recipeImage"/>
+
+        <TextView
+            android:id="@+id/containsIngredientsDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/dark_white"
+            android:textStyle="italic"
+            android:fontFamily="@font/telex"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toEndOf="@id/containsIngredientsSetUpText"
+            app:layout_constraintTop_toBottomOf="@id/iv_recipeImage"/>
+
+        <TextView
             android:id="@+id/tv_ingredientsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:fontFamily="@font/telex"
             android:text="Recipe Ingredients:"
@@ -55,7 +81,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_recipeImage" />
+            app:layout_constraintTop_toBottomOf="@id/containsIngredientsSetUpText" />
 
         <TextView
             android:id="@+id/tv_recipeAllIngredients"

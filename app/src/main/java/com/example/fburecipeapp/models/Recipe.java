@@ -5,35 +5,79 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import org.parceler.Parcel;
+import java.util.ArrayList;
+import java.util.List;
 
-@ParseClassName("Recipe")
+@ParseClassName("Recipes")
 public class Recipe extends ParseObject {
 
-    String recipeName = "recipeName";
-    String recipeImage = "recipeImage";
+    private static String KEY_NAME = "name";
+    private static String KEY_IMAGE = "image";
+    private static String KEY_INGREDIENTS = "ingredients";
+    private static String KEY_ALL_INGREDIENTS = "allIngredients";
+    private static String KEY_INSTRUCTIONS = "directions";
+    private static String KEY_CONTAINS_INGREDIENTS = "ingredients";
 
+    // Constructor
     public Recipe() {}
 
-    // get food category
+    // Recipe Name
     public String getName() {
-        return getString(recipeName);
+        return getString(KEY_NAME);
     }
 
-    public void setRecipe(String name) { put(recipeName, name); }
+    public void setRecipe(String name) { put(this.KEY_NAME, name); }
 
-    // get food category image
+    // Recipe Image
     public ParseFile getImage() {
-        return getParseFile(recipeImage);
+        return getParseFile(KEY_IMAGE);
     }
 
     public void setImage(ParseFile Image) {
-        put(recipeImage, Image);
+        put(this.KEY_IMAGE, Image);
     }
+
+    // Recipe All Ingredients
+    public String getAllIngredients() { return getString(KEY_ALL_INGREDIENTS); }
+
+    public void setAllIngredients(String allIngredients) { put(this.KEY_ALL_INGREDIENTS, allIngredients);}
+
+    // Recipe Instructions
+    public String getInstructions() { return getString(KEY_INSTRUCTIONS); }
+
+    public void setInstructions(String instructions) { put(this.KEY_INSTRUCTIONS, instructions); }
+
+    // Recipe Contains
+    public List<Ingredient> getContainsIngredients() { return getList(KEY_CONTAINS_INGREDIENTS); }
+
+    public void setContainsIngredients(ArrayList<Ingredient> containsIngredients) { put(this.KEY_CONTAINS_INGREDIENTS, containsIngredients); }
 
     public static class Query extends ParseQuery<Recipe> {
         public Query() {
             super(Recipe.class);
+        }
+
+        public Recipe.Query withIngredients(ArrayList<Ingredient> ingredients){
+            whereContainedIn(KEY_INGREDIENTS, ingredients  );
+            return this;
+        }
+
+        public Query withRecipeID(String ID) {
+            whereEqualTo("objectId", ID);
+            return this;
+        }
+
+        public Recipe.Query withOneIngredient(Ingredient ingredient) {
+            ArrayList<Ingredient> tempIngredientArrayList = new ArrayList<Ingredient>();
+            tempIngredientArrayList.add(ingredient);
+            whereContainedIn(KEY_INGREDIENTS, tempIngredientArrayList);
+            return this;
+        }
+
+        public Query containsIngredients(){
+            include(KEY_CONTAINS_INGREDIENTS);
+            return this;
+
         }
     }
 }

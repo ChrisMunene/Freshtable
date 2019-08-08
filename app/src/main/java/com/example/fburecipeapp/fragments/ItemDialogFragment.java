@@ -19,7 +19,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.Recipes;
+import com.example.fburecipeapp.models.Recipe;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -127,11 +127,11 @@ public class ItemDialogFragment extends DialogFragment {
             ImageView recipeThreeImageView = (ImageView) customView.findViewById(R.id.iv_recipeThree);
 
 
-            Recipes.Query query = new Recipes.Query();
+            Recipe.Query query = new Recipe.Query();
             query.withOneIngredient(ingredients.get(position));
-            query.findInBackground(new FindCallback<Recipes>() {
+            query.findInBackground(new FindCallback<Recipe>() {
                 @Override
-                public void done(List<Recipes> recipes, ParseException e) {
+                public void done(List<Recipe> recipes, ParseException e) {
                     if (e == null) {
 
                         if (recipes.size() == 0) {
