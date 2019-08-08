@@ -20,12 +20,11 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameInput;
     private EditText passwordInput;
     private ParseUser currentUser;
-    private ProgressDialog pd;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         currentUser = ParseUser.getCurrentUser();
 
         // allows persistance of user when app is reopened
@@ -37,10 +36,10 @@ public class LoginActivity extends AppCompatActivity {
             setContentView(R.layout.activity_login);
 
             // Initialize Progress Dialog
-            pd = new ProgressDialog(this);
-            pd.setTitle("Loading...");
-            pd.setMessage("Please wait.");
-            pd.setCancelable(false);
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Loading...");
+            progressDialog.setMessage("Please wait.");
+            progressDialog.setCancelable(false);
 
             loginBtn = findViewById(R.id.loginBtn);
             usernameInput = findViewById(R.id.username_et);
@@ -64,25 +63,23 @@ public class LoginActivity extends AppCompatActivity {
 
     // creates new Parse user and logs in
     private void login(String username, String password) {
-        pd.show();
+        progressDialog.show();
         // Invoke background login
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             @Override
-            public void done(ParseUser user, ParseException e) {
+            public void done(ParseUser user, ParseException loginException) {
                 //on success -- Redirect to CreatePostActivity
-                if(e == null){
+                if (loginException == null) {
                     Log.d("LoginActivity", "Login Successful");
                     final Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
-
                 } else {
-                    // on failure
                     Log.e("LoginActivity", "Login Failure");
-                    e.printStackTrace();
+                    loginException.printStackTrace();
                 }
 
-                pd.dismiss();
+                progressDialog.dismiss();
             }
         });
     }

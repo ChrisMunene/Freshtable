@@ -14,11 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fburecipeapp.R;
-
 import com.example.fburecipeapp.adapters.ItemsAdapter;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.Receipt;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -33,10 +31,10 @@ public class KitchenMenuActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<Ingredient> items;
-    protected ItemsAdapter itemsAdapter;
+    private ItemsAdapter itemsAdapter;
     private CheckBox checkBox;
     private Button saveBtn;
-    private ProgressDialog pd;
+    private ProgressDialog progressDialog;
     private static final String TAG = KitchenMenuActivity.class.getSimpleName();
 
     @Override
@@ -45,10 +43,10 @@ public class KitchenMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_kitchen_menu);
 
         // need this view to access the checkbox on a separate xml
-        View v = LayoutInflater.from(this).inflate(R.layout.single_food_option, null);
+        View singleView = LayoutInflater.from(this).inflate(R.layout.single_food_option, null);
 
         recyclerView = findViewById(R.id.rvItemMenu);
-        checkBox = v.findViewById(R.id.checkBox);
+        checkBox = singleView.findViewById(R.id.checkBox);
         saveBtn = findViewById(R.id.kitchenSaveBtn);
 
         layoutManager = new LinearLayoutManager(this);
@@ -59,10 +57,10 @@ public class KitchenMenuActivity extends AppCompatActivity {
         recyclerView.setAdapter(itemsAdapter);
 
         // Initialize Progress Dialog
-        pd = new ProgressDialog(this);
-        pd.setTitle("Loading...");
-        pd.setMessage("Please wait.");
-        pd.setCancelable(false);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading...");
+        progressDialog.setMessage("Please wait.");
+        progressDialog.setCancelable(false);
 
         // objectId tells us which food  category was chosen so we can show the corresponding item list
         objectId = getIntent().getStringExtra("objectId");
@@ -85,14 +83,13 @@ public class KitchenMenuActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(KitchenMenuActivity.this, HomeActivity.class);
                 startActivity(intent);
-
             }
         });
     }
 
     // loads the specific items for the food category
     public void loadItems(String id) {
-        pd.show();
+        progressDialog.show();
         FoodType.Query foodTypeQuery = new FoodType.Query();
         foodTypeQuery.whereEqualTo("objectId", id);
         foodTypeQuery.findInBackground(new FindCallback<FoodType>() {
@@ -105,7 +102,7 @@ public class KitchenMenuActivity extends AppCompatActivity {
                 }
                 else {
                     e.printStackTrace();
-                    pd.dismiss();
+                    progressDialog.dismiss();
                 }
             }
         });
@@ -126,7 +123,7 @@ public class KitchenMenuActivity extends AppCompatActivity {
                     Log.e(TAG, "Error fetching ingredients", e);
                 }
 
-                pd.dismiss();
+                progressDialog.dismiss();
             }
         });
     }

@@ -27,7 +27,7 @@
         android:layout_marginBottom="24dp"
         android:background="@drawable/login_button"
         android:text="Save"
-        android:textColor="#F8F2F2"
+        android:textColor="#FFFFFF"
         android:textSize="17sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

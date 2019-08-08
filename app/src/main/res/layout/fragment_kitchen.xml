@@ -9,8 +9,8 @@
 
     <ImageButton
         android:id="@+id/logoutBtn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="#00FFFFFF"
@@ -18,7 +18,7 @@
         android:tint="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logout_icon" />
+        app:srcCompat="@drawable/logout_foreground" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSaved"
@@ -34,8 +34,8 @@
 
     <ImageButton
         android:id="@+id/addFoodBtn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="#00FFFFFF"
@@ -62,13 +62,14 @@
 
     <ImageView
         android:id="@+id/imageView11"
-        android:layout_width="256dp"
-        android:layout_height="77dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="275dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="28dp"
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_fresh_table_logo_white" />

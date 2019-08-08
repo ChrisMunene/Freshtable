@@ -36,7 +36,10 @@
             android:layout_gravity="top|left"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="19sp"
+            android:textStyle="bold" />
 
         <com.example.fburecipeapp.helpers.ExpandableItemIndicator
             android:id="@+id/indicator"

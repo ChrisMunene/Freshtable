@@ -56,7 +56,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         RequestOptions requestOptions = new RequestOptions()
-                .placeholder(R.drawable.ic_launcher_background);
+                .placeholder(R.drawable.placeholder_foreground);
 
         Recipes recipe = mRecipes.get(position);
 

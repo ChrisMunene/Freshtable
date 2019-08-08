@@ -30,6 +30,8 @@
     <color name="snackbar_action_color_done">#ffccccff</color>
 
     <color name="filter_color">#b7d6ec</color>
+    <color name="selected_color">#009acd</color>
+    <color name="ripple_color">#0a509e</color>
 
 
 </resources>

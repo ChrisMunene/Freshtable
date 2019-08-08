@@ -22,9 +22,12 @@
 
     <ImageButton
         android:id="@+id/returnBtn"
-        android:layout_width="62dp"
-        android:layout_height="54dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:background="#00FFFFFF"
+        android:scaleType="centerCrop"
         android:tint="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -32,9 +35,9 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="221dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="240dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

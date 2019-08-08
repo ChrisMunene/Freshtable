@@ -129,10 +129,6 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
         });
     }
 
-    private void loadCurrentIngredients() {
-        loadRecipes();
-    }
-
     private void showEditDialog(){
         FragmentManager fm = getFragmentManager();
         if(fm != null){

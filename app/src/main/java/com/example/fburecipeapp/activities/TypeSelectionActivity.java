@@ -26,20 +26,19 @@ public class TypeSelectionActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    protected ArrayList<FoodType> types;
-    protected TypeAdapter typeAdapter;
-    public ImageButton addBtn;
-    public CardView card;
-    public ImageButton logoutBtn;
+    private ArrayList<FoodType> types;
+    private TypeAdapter typeAdapter;
+    private ImageButton addBtn;
+    private CardView card;
+    private ImageButton logoutBtn;
     private ParseUser currentUser;
-    public ImageButton addFoodBtn;
-    public ImageButton returnBtn;
+    private ImageButton addFoodBtn;
+    private ImageButton returnBtn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selection_type);
-
 
         recyclerView = findViewById(R.id.rvTypes);
         addBtn = findViewById(R.id.addBtn);
@@ -50,7 +49,6 @@ public class TypeSelectionActivity extends AppCompatActivity {
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
 
         types = new ArrayList<>();
         typeAdapter = new TypeAdapter(types);
@@ -66,7 +64,6 @@ public class TypeSelectionActivity extends AppCompatActivity {
         });
     }
 
-
     private void loadTypes() {
         FoodType.Query query = new FoodType.Query();
         query.findInBackground(new FindCallback<FoodType>() {
@@ -78,6 +75,7 @@ public class TypeSelectionActivity extends AppCompatActivity {
                 }
                 else {
                     e.printStackTrace();
+                    Log.d("Type selection", "Error in query for foodType");
                 }
             }
         });

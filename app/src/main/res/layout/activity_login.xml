@@ -30,10 +30,10 @@
         style="@style/Widget.AppCompat.Button"
         android:layout_width="285dp"
         android:layout_height="50dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="28dp"
         android:background="@drawable/login_button"
         android:text="Log In"
-        android:textColor="#F8F2F2"
+        android:textColor="#FFFFFF"
         android:textSize="17sp"
         android:textStyle="bold"
         app:backgroundTint="#2196F3"
@@ -41,7 +41,6 @@
         app:layout_constraintHorizontal_bias="0.523"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password_et" />
-
 
     <EditText
         android:id="@+id/password_et"

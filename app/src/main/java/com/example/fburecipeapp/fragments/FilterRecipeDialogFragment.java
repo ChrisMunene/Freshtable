@@ -33,6 +33,7 @@ public class FilterRecipeDialogFragment extends DialogFragment {
     private ArrayList<Ingredient> ingredients;
     private LinearLayout linearLayout;
     private ChipGroup chipGroup;
+    private ChipGroup chipGroupTwo;
     private ArrayList<String> selectedChipGroup;
     private ArrayList<String> names;
     private ImageButton addFiltersBtn;
@@ -60,6 +61,7 @@ public class FilterRecipeDialogFragment extends DialogFragment {
 
         hScroll = view.findViewById(R.id.hscrollview);
         linearLayout = view.findViewById(R.id.chipLinearLayout);
+        chipGroupTwo = view.findViewById(R.id.chipGroup2);
         chipGroup = view.findViewById(R.id.chipGroup);
         addFiltersBtn = view.findViewById(R.id.addFiltersBtn);
         selectedChipGroup = new ArrayList<>();
@@ -75,7 +77,7 @@ public class FilterRecipeDialogFragment extends DialogFragment {
         addFiltersBtn.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
-                 Toast.makeText(getContext(), "filter clicked", Toast.LENGTH_SHORT).show();
+                 Toast.makeText(getContext(), "Recipes Filtered", Toast.LENGTH_SHORT).show();
                  Log.d("filter", selectedChipGroup.toString());
                  sendBackResult(selectedChipGroup);
             }
@@ -103,39 +105,8 @@ public class FilterRecipeDialogFragment extends DialogFragment {
 
                         // create and style chips fot all saved user ingredients
                         for (int i=0; i < ingredients.size(); i++){
-                            Chip chip = new Chip(getContext()); //(new ContextThemeWrapper(getContext(), R.style.Widget_MaterialComponents_Chip_Filter));
-                            ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null, 0, R.style.Widget_MaterialComponents_Chip_Filter);
-                            chip.setChipDrawable(chipDrawable);
-                            ViewGroup.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            chip.setLayoutParams(lp);
-                            chip.setText((ingredients.get(i)).getName());
-                            chip.setId(i);
-                            chip.isCheckable();
-                            chip.setCheckedIconVisible(true);
-                            chip.setCloseIconVisible(true);
-                            chip.setCloseIconTint(getResources().getColorStateList(R.color.colorWhite));
-                            chip.setChipEndPadding(12);
-                            chip.setChipStartPadding(12);
-                            chip.setTextStartPadding(12);
-                            chip.setChipBackgroundColor(getResources().getColorStateList(R.color.filter_color));
-                            chip.setTextColor(getResources().getColorStateList(R.color.colorWhite));
-                            chip.setTypeface(chip.getTypeface(), Typeface.BOLD);
-
-                            // adds ingredient to filter list if that ingredient's chip is checked
-                            chip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                @Override
-                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                    if (isChecked) {
-                                        selectedChipGroup.add((chip.getText()).toString());
-                                    } else {
-                                        selectedChipGroup.remove((chip.getText()).toString());
-                                    }
-                                }
-                            });
-
-                            chipGroup.addView(chip);
+                            createChip(i, ingredients);
                         }
-
                     }
                 }
             }
@@ -150,5 +121,47 @@ public class FilterRecipeDialogFragment extends DialogFragment {
         FilterRecipeDialogFragment.Listener listener = (FilterRecipeDialogFragment.Listener) getTargetFragment();
         listener.onFinishEditingList(selectedChipGroup);
         dismiss();
+    }
+
+    public void createChip(int i, ArrayList<Ingredient> ingredients) {
+        Chip chip = new Chip(getContext()); //(new ContextThemeWrapper(getContext(), R.style.Widget_MaterialComponents_Chip_Filter));
+        ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null, 0, R.style.Widget_MaterialComponents_Chip_Filter);
+        chip.setChipDrawable(chipDrawable);
+        ViewGroup.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        chip.setLayoutParams(lp);
+        chip.setText((ingredients.get(i)).getName());
+        chip.setId(i);
+        chip.isCheckable();
+        chip.setCheckedIconVisible(false);
+        chip.setCloseIconVisible(false);
+        chip.setCloseIconTint(getResources().getColorStateList(R.color.colorWhite));
+        chip.setChipEndPadding(12);
+        chip.setChipStartPadding(12);
+        chip.setTextStartPadding(16);
+        chip.setChipBackgroundColor(getResources().getColorStateList(R.color.filter_color));
+        chip.setTextColor(getResources().getColorStateList(R.color.colorWhite));
+        chip.setTypeface(chip.getTypeface(), Typeface.BOLD);
+
+        // adds ingredient to filter list if that ingredient's chip is checked
+        chip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    selectedChipGroup.add((chip.getText()).toString());
+                    chipGroup.removeView(chip);
+                    chip.setChipBackgroundColor(getResources().getColorStateList(R.color.selected_color));
+                    chip.setCloseIconVisible(true);
+                    chipGroupTwo.addView(chip);
+                } else {
+                    selectedChipGroup.remove((chip.getText()).toString());
+                    chipGroupTwo.removeView(chip);
+                    chip.setChipBackgroundColor(getResources().getColorStateList(R.color.filter_color));
+                    chip.setCloseIconVisible(false);
+                    chipGroup.addView(chip);
+                }
+            }
+        });
+
+        chipGroup.addView(chip);
     }
 }

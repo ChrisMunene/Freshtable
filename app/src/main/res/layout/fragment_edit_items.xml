@@ -29,7 +29,7 @@
         android:layout_marginBottom="10dp"
         android:background="@drawable/login_button"
         android:text="Submit"
-        android:textColor="#F8F2F2"
+        android:textColor="#FFFFFF"
         android:textSize="17sp"
         android:textStyle="bold"
 
@@ -98,7 +98,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="Receipt Items"
-        android:textColor="#F8F2F2"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
