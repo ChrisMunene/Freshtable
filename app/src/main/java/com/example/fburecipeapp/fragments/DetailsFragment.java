@@ -1,5 +1,6 @@
 package com.example.fburecipeapp.fragments;
 
+import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,26 +22,24 @@ import com.example.fburecipeapp.models.Recipe;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
 import java.util.List;
 
+@TargetApi(26)
 public class DetailsFragment extends Fragment {
 
     private String recipeID;
-    private String name;
-    private ParseFile image;
-    private String allIngredients;
-    private String instructions;
-    private List<Ingredient> containsIngredients;
-    private String containsIngredientDetails;
+
     private TextView tvRecipeName;
     private ImageView ivRecipeImage;
     private TextView tvRecipeIngredients;
     private TextView tvRecipeInstructions;
     private TextView tvRecipeContains;
+    private YouTubePlayerView youTubePlayerView;
 
     public DetailsFragment(String recipeID) {
         this.recipeID = recipeID;
@@ -62,6 +61,10 @@ public class DetailsFragment extends Fragment {
         tvRecipeIngredients = view.findViewById(R.id.tv_recipeAllIngredients);
         tvRecipeInstructions = view.findViewById(R.id.tv_recipeInstructions);
         tvRecipeContains = view.findViewById(R.id.containsIngredientsDetails);
+        youTubePlayerView = view.findViewById(R.id.youtube_player_view);
+
+        // Add player to lifecycle
+        getLifecycle().addObserver(youTubePlayerView);
 
         getRecipeDetails();
     }
@@ -74,27 +77,35 @@ public class DetailsFragment extends Fragment {
             public void done(List<Recipe> recipes, ParseException e) {
                 if (e == null) {
                     Recipe recipe = recipes.get(0);
-                    name = recipe.getName();
-                    image = recipe.getImage();
-                    allIngredients = recipe.getAllIngredients();
-                    instructions = recipe.getInstructions();
-                    containsIngredients = recipe.getContainsIngredients();
-                    containsIngredientDetails = "";
-
-                    for (int i = 0; i < containsIngredients.size() - 1; i++) {
-                        Ingredient ingredient = containsIngredients.get(i);
-                        containsIngredientDetails += (ingredient.getName() + ", ");
+                    ParseFile image = recipe.getImage();
+                    List<Ingredient> containsIngredients = recipe.getContainsIngredients();
+                    List<String> ingredients = new ArrayList<String>();
+                    for(Ingredient ingredient: containsIngredients){
+                        ingredients.add(ingredient.getName());
                     }
-                    containsIngredientDetails += containsIngredients.get(containsIngredients.size() - 1).getName();
+                    String ingredientNameList = String.join(", ", ingredients);
 
-                    tvRecipeName.setText(name);
+                    // Set text
+                    tvRecipeName.setText(recipe.getName());
+                    tvRecipeIngredients.setText(recipe.getAllIngredients());
+                    tvRecipeInstructions.setText(recipe.getInstructions());
+
+                    // Load image
                     Glide.with(getContext())
                             .load(image.getUrl())
                             .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(15)))
                             .into(ivRecipeImage);
-                    tvRecipeIngredients.setText(allIngredients);
-                    tvRecipeInstructions.setText(instructions);
-                    tvRecipeContains.setText(containsIngredientDetails);
+                    tvRecipeContains.setText(ingredientNameList);
+
+                    // Initialize youtube player
+                    youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+                        @Override
+                        public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                            youTubePlayer.loadVideo(recipe.getVideoId(), 0);
+                            youTubePlayer.pause();
+                        }
+                    });
+
                 } else {
                     e.printStackTrace();
                 }

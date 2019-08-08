@@ -17,6 +17,8 @@ public class Recipe extends ParseObject {
     private static String KEY_ALL_INGREDIENTS = "allIngredients";
     private static String KEY_INSTRUCTIONS = "directions";
     private static String KEY_CONTAINS_INGREDIENTS = "ingredients";
+    private static String KEY_VIDEO_ID = "youtubeVideoId";
+
 
     // Constructor
     public Recipe() {}
@@ -26,7 +28,7 @@ public class Recipe extends ParseObject {
         return getString(KEY_NAME);
     }
 
-    public void setRecipe(String name) { put(this.KEY_NAME, name); }
+    public void setRecipe(String name) { put(KEY_NAME, name); }
 
     // Recipe Image
     public ParseFile getImage() {
@@ -34,23 +36,26 @@ public class Recipe extends ParseObject {
     }
 
     public void setImage(ParseFile Image) {
-        put(this.KEY_IMAGE, Image);
+        put(KEY_IMAGE, Image);
     }
 
     // Recipe All Ingredients
     public String getAllIngredients() { return getString(KEY_ALL_INGREDIENTS); }
+    public void setAllIngredients(String allIngredients) { put(KEY_ALL_INGREDIENTS, allIngredients);}
 
-    public void setAllIngredients(String allIngredients) { put(this.KEY_ALL_INGREDIENTS, allIngredients);}
 
     // Recipe Instructions
     public String getInstructions() { return getString(KEY_INSTRUCTIONS); }
-
-    public void setInstructions(String instructions) { put(this.KEY_INSTRUCTIONS, instructions); }
+    public void setInstructions(String instructions) { put(KEY_INSTRUCTIONS, instructions); }
 
     // Recipe Contains
     public List<Ingredient> getContainsIngredients() { return getList(KEY_CONTAINS_INGREDIENTS); }
+    public void setContainsIngredients(ArrayList<Ingredient> containsIngredients) { put(KEY_CONTAINS_INGREDIENTS, containsIngredients); }
 
-    public void setContainsIngredients(ArrayList<Ingredient> containsIngredients) { put(this.KEY_CONTAINS_INGREDIENTS, containsIngredients); }
+
+    // Recipe videos
+    public String getVideoId(){return getString(KEY_VIDEO_ID);}
+
 
     public static class Query extends ParseQuery<Recipe> {
         public Query() {

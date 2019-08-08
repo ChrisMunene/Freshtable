@@ -74,8 +74,7 @@ dependencies {
     annotationProcessor 'org.parceler:parceler:1.1.12'
 
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
-    // firebase
-    //implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.3'
     // carousel
     implementation 'com.synnapps:carouselview:0.1.5'
 }
