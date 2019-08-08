@@ -16,13 +16,17 @@
 
         <TextView
             android:id="@+id/tv_recipeTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="@font/voltaire"
             android:text="Recipe Name"
-            android:textColor="@android:color/black"
-            android:textSize="30sp"
+            android:textAlignment="center"
+            android:textColor="@color/dark_white"
+            android:textSize="45sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -45,9 +49,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:fontFamily="@font/telex"
             android:text="Recipe Ingredients:"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:textColor="@color/dark_white"
+            android:textSize="22sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_recipeImage" />
 
@@ -57,8 +63,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:textColor="@android:color/black"
+
+            android:layout_marginEnd="16dp"
+            android:fontFamily="@font/telex"
+            android:textColor="@color/light_black"
+            android:textSize="16sp"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_ingredientsText" />
 
@@ -69,9 +79,12 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:fontFamily="@font/telex"
             android:text="Recipe Instructions:"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:textColor="@color/dark_white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_recipeAllIngredients" />
 
@@ -80,9 +93,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:textColor="@android:color/black"
-            app:layout_constraintEnd_toEndOf="parent"
+
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="@font/telex"
+            android:textColor="@color/light_black"
+            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_instructionsText" />
 
@@ -112,7 +128,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:text="Video Tutorial:"
-            android:textColor="@android:color/black"
+            android:fontFamily="@font/telex"
+            android:textColor="@color/dark_white"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@+id/youtube_player_view"
             app:layout_constraintStart_toStartOf="parent"
