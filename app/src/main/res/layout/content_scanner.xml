@@ -8,23 +8,23 @@
     tools:context=".activities.HomeActivity"
     tools:showIn="@layout/fragment_scanner">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/uploadFileBtn"
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginStart="55dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="56dp"
-        android:background="@drawable/login_button"
         android:text="Upload from Gallery"
-        android:textColor="#FFFFFF"
+        android:fontFamily="@font/telex"
+        android:textColor="@color/dark_white"
         android:textSize="17sp"
         android:textStyle="bold"
-        app:backgroundTint="#2196F3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivPreview" />
+        app:layout_constraintTop_toBottomOf="@+id/ivPreview"
+        style="@style/AppTheme.RoundedCornerMaterialButton"/>
 
     <ImageView
         android:id="@+id/ivPreview"

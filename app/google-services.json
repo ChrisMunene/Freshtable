@@ -1,42 +1,63 @@
 {
   "project_info": {
-    "project_number": "359049825630",
-    "firebase_url": "https://fbu-2019.firebaseio.com",
-    "project_id": "fbu-2019",
-    "storage_bucket": "fbu-2019.appspot.com"
+    "project_number": "809186813052",
+    "firebase_url": "https://mlkit-demo-d4f52.firebaseio.com",
+    "project_id": "mlkit-demo-d4f52",
+    "storage_bucket": "mlkit-demo-d4f52.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:359049825630:android:73460fc7e23f802c",
+        "mobilesdk_app_id": "1:809186813052:android:73460fc7e23f802c",
         "android_client_info": {
           "package_name": "com.example.fburecipeapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "359049825630-819ujid9socdret67aistll036manqfl.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.fburecipeapp",
-            "certificate_hash": "51c9c06f489c264c2cd96ead0a1c142a98ac1fb7"
-          }
-        },
-        {
-          "client_id": "359049825630-d224bsbld1de1skimekaj5vtm24ubusn.apps.googleusercontent.com",
+          "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBy3P_AeBVO5cWBlPj9MSQo-Z0FY6IF1Zc"
+          "current_key": "AIzaSyDq4OEYydtMH3ozg1P5VECbpQPLwvPfPEk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "359049825630-d224bsbld1de1skimekaj5vtm24ubusn.apps.googleusercontent.com",
+              "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809186813052:android:09546560b4505797",
+        "android_client_info": {
+          "package_name": "com.google.firebase.samples.apps.mlkit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq4OEYydtMH3ozg1P5VECbpQPLwvPfPEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809186813052-neakag5pgqj2la9hnhgqkt5bd0rfco1o.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,9 +29,10 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
-public class KitchenFragment extends Fragment {
+public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsChangedListener{
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -60,8 +62,12 @@ public class KitchenFragment extends Fragment {
         addFoodBtn = view.findViewById(R.id.addFoodBtn);
         savedIngredients = new ArrayList<Ingredient>();
         removedItems = new ArrayList<Ingredient>();
-        kitchenAdapter = new KitchenAdapter(savedIngredients);
         recyclerView = view.findViewById(R.id.rvSaved);
+
+        // Adapter
+        kitchenAdapter = new KitchenAdapter(savedIngredients);
+        kitchenAdapter.setOnItemsChangedListener(this::onItemsChanged);
+
 
         recyclerView.setAdapter(kitchenAdapter);
 
@@ -70,7 +76,7 @@ public class KitchenFragment extends Fragment {
         currentUser = (User) ParseUser.getCurrentUser();
 
         // Initialize Progress Dialog
-        pd = new ProgressDialog(getContext());
+        pd = new ProgressDialog(getContext(), ProgressDialog.THEME_DEVICE_DEFAULT_LIGHT);
         pd.setTitle("Loading...");
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
@@ -122,5 +128,19 @@ public class KitchenFragment extends Fragment {
                 pd.dismiss();
             }
         });
+    }
+
+    @Override
+    public void onItemsChanged(Ingredient ingredient) {
+
+        LinkedHashSet<Ingredient> ingredients = new LinkedHashSet<Ingredient>();
+        ingredients.add(ingredient);
+
+        FragmentManager fm = getFragmentManager();
+        if (fm != null) {
+            ItemDialogFragment frag = ItemDialogFragment.newInstance(ingredients);
+            frag.setTargetFragment(this, 0);
+            frag.show(fm, "item_dialog_details");
+        }
     }
 }

@@ -32,9 +32,41 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
     private TextView savedItem;
     private List<Ingredient> removedItems;
     private User currentUser;
+    public onItemsChangedListener mListener;
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public KitchenAdapter (List<Ingredient> savedIngredients) {
+        this.savedIngredients = savedIngredients;
+    }
+
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+
+        View postView = inflater.inflate(R.layout.kitchen_item, parent, false);
+        KitchenAdapter.ViewHolder viewHolder = new KitchenAdapter.ViewHolder(postView);
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Ingredient ingredient = savedIngredients.get(position);
+        ParseFile image = ingredient.getImage();
+        String name = ingredient.getName();
+
+        savedItem.setText(name);
+        if (image != null) {
+            Glide.with(context).load(image.getUrl()).into(savedItemImage); // setting ParseFile image to our layout
+        }
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return savedIngredients.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -68,37 +100,25 @@ public class KitchenAdapter extends RecyclerView.Adapter<KitchenAdapter.ViewHold
                 }
             });
 
-        }
-    }
+            savedItemImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Gets item position
+                    int position = getAdapterPosition();
+                    Ingredient ingredient = savedIngredients.get(position);
 
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-
-        View postView = inflater.inflate(R.layout.kitchen_item, parent, false);
-        KitchenAdapter.ViewHolder viewHolder = new KitchenAdapter.ViewHolder(postView);
-        return viewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Ingredient ingredient = savedIngredients.get(position);
-        ParseFile image = ingredient.getImage();
-        String name = ingredient.getName();
-
-        savedItem.setText(name);
-        if (image != null) {
-            Glide.with(context).load(image.getUrl()).into(savedItemImage); // setting ParseFile image to our layout
+                    mListener.onItemsChanged(ingredient);
+                }
+            });
         }
 
     }
 
-    @Override
-    public int getItemCount() {
-        return savedIngredients.size();
+    public void setOnItemsChangedListener(onItemsChangedListener listener) {
+        this.mListener = listener;
     }
 
-    public KitchenAdapter (List<Ingredient> ingredients) {
-        savedIngredients = ingredients;
+    public interface onItemsChangedListener {
+        void onItemsChanged(Ingredient ingredient);
     }
 }

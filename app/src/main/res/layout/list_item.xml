@@ -37,7 +37,8 @@
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
-            tools:ignore="RtlHardcoded" />
+            android:fontFamily="@font/telex"
+            tools:ignore="RtlHardcoded"/>
 
     </FrameLayout>
 

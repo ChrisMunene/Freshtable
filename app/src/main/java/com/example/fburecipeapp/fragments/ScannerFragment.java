@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,8 +18,10 @@ import androidx.annotation.Nullable;
 
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Receipt;
-import com.example.fburecipeapp.models.ReceiptItem;
 import com.example.fburecipeapp.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
@@ -35,30 +38,29 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.fburecipeapp.R;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.document.FirebaseVisionCloudDocumentRecognizerOptions;
+import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
+import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.firebase.ml.vision.text.RecognizedLanguage;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import cz.msebera.android.httpclient.Header;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -75,7 +77,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public final static int PICK_PHOTO_CODE = 1046;
     private File photoFile;
-    private Bitmap selectedImage;
+    private Bitmap receiptImageBmp;
     private Uri photoUri;
 
     @Nullable
@@ -112,7 +114,7 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         client =  new AsyncHttpClient();
 
         // Initialize Progress Dialog
-        pd = new ProgressDialog(getContext());
+        pd = new ProgressDialog(getContext(), ProgressDialog.THEME_DEVICE_DEFAULT_LIGHT);
         pd.setTitle("Loading...");
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
@@ -121,7 +123,6 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
 
     // Creates a new post in Parse
     private void postReceipt(String title, String description, ParseFile image, ParseUser user, List<Ingredient> receiptItems){
-        pd.show();
         Receipt newReceipt = new Receipt();
         newReceipt.setTitle(title);
         newReceipt.setDescription(description);
@@ -174,69 +175,6 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         });
     }
 
-    private void scanReceipt(){
-        if(!pd.isShowing()) {
-            pd.setTitle("Processing Receipt....");
-            pd.show();
-        }
-
-        RequestParams params = new RequestParams();
-
-        try {
-            params.put("file", photoFile );
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        params.put("isCreateSearchablePdf", false);
-        params.put("isSearchablePdfHideTextLayer", false);
-        params.put("filetype", "jpg");
-        params.put("isTable", true);
-        client.addHeader("apikey", "25e4ce8d0788957");
-        client.post(OCR_URL,params, new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                try {
-                    JSONArray results = response.getJSONArray("ParsedResults");
-                    String parsedText = results.getJSONObject(0).getString("ParsedText");
-                    String[] lines = parsedText.split("\n");
-                    Log.d(TAG, parsedText);
-                    Log.d(TAG, "--------------------------------");
-                    List<ReceiptItem> receiptItems = new ArrayList<>();
-                    for (String line: lines) {
-                        Pattern p = Pattern.compile("([a-zA-Z0-9]*)\\s+([a-zA-Z\\s]*[a-zA-Z0-9]+)\\s+([$]*\\d*\\.+\\s*\\d*)+");
-                        Matcher m = p.matcher(line);
-                        if(m.find()){
-                            ReceiptItem item = new ReceiptItem(String.format("%s %s", m.group(1), m.group(2)), m.group(3));
-                            receiptItems.add(item);
-                            item.print();
-                        }
-                    }
-                    pd.dismiss();
-                    showEditDialog(receiptItems);
-                } catch (JSONException e) {
-                    String message = e.getMessage();
-                    Log.e(TAG, message);
-                    pd.dismiss();
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "Scan failed", throwable);
-                pd.dismiss();
-                showEditDialog(null);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "Scan failed", throwable);
-                pd.dismiss();
-                showEditDialog(null);
-            }
-        });
-
-    }
 
     // Launch Camera
     public void onLaunchCamera(View view) {
@@ -300,21 +238,23 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         switch (requestCode){
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-                     // by this point we have the camera photo on disk
-                     Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                    // Set uri -- Used to send photo through intents
+                    photoUri = Uri.fromFile(photoFile);
+
                      // Rotate the image to the correct orientation
-                     Bitmap rotatedImage = rotateBitmapOrientation(photoFile.getAbsolutePath());
+                     receiptImageBmp = rotateBitmapOrientation(photoFile.getAbsolutePath());
 
-                     // TODO - Resize Bitmap
-                    // Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rotatedImage, SOME_WIDTH);
+                     // Create Image for MLKit
+                     FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(receiptImageBmp);
 
-                     // Load the taken image into a preview
-                    ivPreview.setImageBitmap(rotatedImage);
+                    processImage(firebaseVisionImage);
 
-                    scanReceipt();
+                    // Load the taken image into a preview
+                    ivPreview.setImageBitmap(receiptImageBmp);
 
                 } else { // Result was a failure
                     Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
@@ -328,26 +268,21 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
                     // Do something with the photo based on Uri
                     try {
                         // Get bitmap from Uri
-                        selectedImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+                        receiptImageBmp = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
 
-                        // Create new file
-                        photoFile = getPhotoFileUri(generateUniqueFileName());
+                        // Create Image for MLKit
+                        FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(receiptImageBmp);
 
-                        // Write bitmap to file
-                        FileOutputStream fOut = new FileOutputStream(photoFile);
-                        selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-                        fOut.flush();
-                        fOut.close();
+                        processImage(firebaseVisionImage);
+
+                        // Load the selected image into a preview
+                        ivPreview.setImageBitmap(receiptImageBmp);
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    // Load the selected image into a preview
-                    ivPreview.setImageBitmap(selectedImage);
 
-                    // Initiate scanning
-                    scanReceipt();
                 } else {
                     Toast.makeText(getContext(), "Problem picking image", Toast.LENGTH_SHORT).show();
                 }
@@ -356,6 +291,61 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
             default:
                 return;
         }
+    }
+
+    private void processImage(FirebaseVisionImage image){
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.show();
+
+        // Initialize OCR MLkit
+        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
+                .getOnDeviceTextRecognizer();
+
+        // Perform processing
+        Task<FirebaseVisionText> result =
+                detector.processImage(image)
+                        .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                            @Override
+                            public void onSuccess(FirebaseVisionText result) {
+                                // Task completed successfully
+                                // ...
+                                List<String> receiptItems = processRecognizedText(result);
+                                pd.dismiss();
+                                String photoFilePath = photoFile != null ? photoFile.getAbsolutePath() : null;
+                                showEditDialog(receiptItems, photoFilePath);
+                            }
+                        })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Task failed with an exception
+                                        // ...
+                                        pd.dismiss();
+                                        Log.e(TAG, "Error processing text", e);
+                                    }
+                                });
+    }
+
+    // Callback for successful OCR operation
+    private List<String> processRecognizedText(FirebaseVisionText result) {
+        List<String> receiptItems = new ArrayList<String>();
+
+        for (FirebaseVisionText.TextBlock block: result.getTextBlocks()) {
+            for (FirebaseVisionText.Line line: block.getLines()) {
+                for (FirebaseVisionText.Element element: line.getElements()) {
+                    String elementText = element.getText();
+
+                    // Get all words that are in all Caps(Most receipts use ALL CAPS keywords for receipt items).
+                    if(elementText.matches("^([A-Z]{2,})*$")){
+                        receiptItems.add(elementText);
+                    }
+                }
+            }
+        }
+
+        return receiptItems;
     }
 
     // Rotates imagefile to device orientation
@@ -388,10 +378,11 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
     }
 
 
-    private void showEditDialog(List<ReceiptItem> receiptItems){
+    private void showEditDialog(List<String> receiptItems, String photoFilePath){
         FragmentManager fm = getFragmentManager();
         if(fm != null){
-            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance(receiptItems, photoUri);
+            IngredientListDialogFragment frag = IngredientListDialogFragment.newInstance(receiptItems, photoUri, photoFilePath);
+            frag.setCancelable(false);
             frag.setTargetFragment(this, 0);
             frag.show(fm, "fragment_edit_items");
         }
@@ -399,9 +390,24 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
 
     @Override
     public void onFinishEditingList(String title, String description, List<Ingredient> foodItems) {
+        // Show Progress dialog
+        pd.setTitle("Loading...");
+        pd.setMessage("Please wait.");
+        pd.show();
+
+        // Get current user
         final ParseUser user = ParseUser.getCurrentUser();
-        final ParseFile file = new ParseFile(photoFile);
-        postReceipt(title, description, file, user, foodItems);
+
+        // Convert Bitmap to ByteArray -- To be used when creating a parsefile
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        receiptImageBmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        receiptImageBmp.recycle();
+
+        // Covert ByteArray to ParseFile
+        ParseFile receiptImage = new ParseFile(generateUniqueFileName(), byteArray);
+
+        postReceipt(title, description, receiptImage, user, foodItems);
     }
 
     private void redirectToFragment(Fragment destination){
@@ -411,5 +417,6 @@ public class ScannerFragment extends Fragment implements IngredientListDialogFra
         ft.addToBackStack(null);
         ft.commit();
     }
+
 
 }

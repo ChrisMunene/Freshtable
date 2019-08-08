@@ -33,8 +33,9 @@
                 android:layout_below="@+id/recipeImg"
                 android:layout_marginTop="8dp"
                 android:text="Recipe Title"
-                android:textColor="#9E302E2E"
+                android:textColor="@color/light_black"
                 android:textSize="15dp"
+                android:fontFamily="@font/telex"
                 android:textStyle="bold" />
 
         </RelativeLayout>

@@ -16,6 +16,7 @@ public class Ingredient extends ParseObject {
     private static final String KEY_IMAGE = "image";
     private static final String KEY_FOODTYPE = "foodType";
     private static final String KEY_OBJECT_ID = "objectId";
+    private static final String KEY_RECEIPT_KEYWORDS = "receiptKeywords";
 
     private static final String KEY_SHELF_LIFE = "shelfLife";
 
@@ -48,6 +49,14 @@ public class Ingredient extends ParseObject {
         }
     }
 
+    public List<String> getKeywords(){
+        return getList(KEY_RECEIPT_KEYWORDS);
+    }
+
+    public void setKeywords(List<String> keywords){
+        put(KEY_RECEIPT_KEYWORDS, keywords);
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj == null)
@@ -59,10 +68,11 @@ public class Ingredient extends ParseObject {
             return false;
         }
         final Ingredient other = (Ingredient) obj;
-        if (this.getObjectId() == null ? other.getObjectId() != null : !this.getObjectId().equals(other.getObjectId()))
+        if (this.getObjectId() == null)
         {
-            return false;
+            return other.getObjectId() == null;
         }
-        return true;
+
+        return this.getObjectId().equals(other.getObjectId());
     }
 }

@@ -43,35 +43,29 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
 
     private ArrayList<Ingredient> myIngredients;
 
+
     public RecipeFragment() {
-
+        selectedChipGroup = new ArrayList<>();
+        savedIngredients = new ArrayList<>();
+        myIngredients = new ArrayList<Ingredient>();
+        client = new AsyncHttpClient();
     }
-
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "OnCreateView success");
         return inflater.inflate(R.layout.fragment_recipe, container, false);
-
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         searchBtn = view.findViewById(R.id.searchBtn);
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
-        selectedChipGroup = new ArrayList<>();
-        savedIngredients = new ArrayList<>();
 
         staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager(), this);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
-
-        // Initialize http client
-        client = new AsyncHttpClient();
-        myIngredients = new ArrayList<Ingredient>();
 
         loadUserIngredients();
 
@@ -85,7 +79,7 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
 
     private void loadRecipes() {
         Recipes.Query query = new Recipes.Query();
-        query.withOneIngredient(myIngredients);
+        query.withIngredients(myIngredients);
         query.findInBackground(new FindCallback<Recipes>() {
             @Override
             public void done(List<Recipes> objects, ParseException e) {
