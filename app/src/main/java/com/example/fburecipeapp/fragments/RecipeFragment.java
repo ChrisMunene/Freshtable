@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.adapters.StaggeredRecyclerViewAdapter;
 import com.example.fburecipeapp.models.Ingredient;
-import com.example.fburecipeapp.models.Recipes;
+import com.example.fburecipeapp.models.Recipe;
 import com.example.fburecipeapp.models.User;
 import com.loopj.android.http.AsyncHttpClient;
 import com.parse.FindCallback;
@@ -33,7 +33,7 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
     private static final String TAG = "RecipeFragment";
 
     private ArrayList<String> mImages = new ArrayList<>();
-    private ArrayList<Recipes> mRecipes = new ArrayList<>();
+    private ArrayList<Recipe> mRecipes = new ArrayList<>();
     private StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter;
     private AsyncHttpClient client;
     private ImageButton searchBtn;
@@ -78,11 +78,11 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
     }
 
     private void loadRecipes() {
-        Recipes.Query query = new Recipes.Query();
+        Recipe.Query query = new Recipe.Query();
         query.withIngredients(myIngredients);
-        query.findInBackground(new FindCallback<Recipes>() {
+        query.findInBackground(new FindCallback<Recipe>() {
             @Override
-            public void done(List<Recipes> objects, ParseException e) {
+            public void done(List<Recipe> objects, ParseException e) {
                 if (e == null) {
                     Log.d("item count", String.format("%s", objects.size()));
                     mRecipes.removeAll(mRecipes);

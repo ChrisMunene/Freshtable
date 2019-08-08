@@ -1,8 +1,6 @@
 package com.example.fburecipeapp.fragments;
 
 import android.os.Bundle;
-import android.telecom.Call;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,35 +16,31 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.fburecipeapp.R;
+import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Recipe;
-import com.example.fburecipeapp.models.Recipes;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 
-import org.parceler.Parcel;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.List;
 
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
-
 public class DetailsFragment extends Fragment {
 
-    Recipe recipe;
     private String recipeID;
     private String name;
     private ParseFile image;
-    private String ingredients;
+    private String allIngredients;
     private String instructions;
-
-
-//    public DetailsFragment(String name, ParseFile image, String ingredients, String instructions) {
-//        this.name = name;
-//        this.image = image;
-//        this.ingredients = ingredients;
-//        this.instructions = instructions;
-//    }
+    private List<Ingredient> containsIngredients;
+    private String containsIngredientDetails;
+    private TextView tvRecipeName;
+    private ImageView ivRecipeImage;
+    private TextView tvRecipeIngredients;
+    private TextView tvRecipeInstructions;
+    private TextView tvRecipeContains;
 
     public DetailsFragment(String recipeID) {
         this.recipeID = recipeID;
@@ -63,34 +57,44 @@ public class DetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView tvRecipeName = view.findViewById(R.id.tv_recipeTitle);
-        ImageView ivRecipeImage = view.findViewById(R.id.iv_recipeImage);
-        TextView tvRecipeIngredients = view.findViewById(R.id.tv_recipeAllIngredients);
-        TextView tvRecipeInstructions = view.findViewById(R.id.tv_recipeInstructions);
+        tvRecipeName = view.findViewById(R.id.tv_recipeTitle);
+        ivRecipeImage = view.findViewById(R.id.iv_recipeImage);
+        tvRecipeIngredients = view.findViewById(R.id.tv_recipeAllIngredients);
+        tvRecipeInstructions = view.findViewById(R.id.tv_recipeInstructions);
+        tvRecipeContains = view.findViewById(R.id.containsIngredientsDetails);
 
-        getRecipeDetails(tvRecipeName, ivRecipeImage, tvRecipeIngredients, tvRecipeInstructions);
+        getRecipeDetails();
     }
 
-    private void getRecipeDetails(TextView tvRecipeName, ImageView ivRecipeImage, TextView tvRecipeIngredients, TextView tvRecipeInstructions) {
-        Recipes.Query query = new Recipes.Query();
-        query.withRecipeID(recipeID);
-        query.findInBackground(new FindCallback<Recipes>() {
+    private void getRecipeDetails() {
+        Recipe.Query query = new Recipe.Query();
+        query.withRecipeID(recipeID).containsIngredients();
+        query.findInBackground(new FindCallback<Recipe>() {
             @Override
-            public void done(List<Recipes> recipes, ParseException e) {
+            public void done(List<Recipe> recipes, ParseException e) {
                 if (e == null) {
-                    Recipes recipe = recipes.get(0);
+                    Recipe recipe = recipes.get(0);
                     name = recipe.getName();
                     image = recipe.getImage();
-                    ingredients = recipe.getAllIngredients();
+                    allIngredients = recipe.getAllIngredients();
                     instructions = recipe.getInstructions();
+                    containsIngredients = recipe.getContainsIngredients();
+                    containsIngredientDetails = "";
+
+                    for (int i = 0; i < containsIngredients.size() - 1; i++) {
+                        Ingredient ingredient = containsIngredients.get(i);
+                        containsIngredientDetails += (ingredient.getName() + ", ");
+                    }
+                    containsIngredientDetails += containsIngredients.get(containsIngredients.size() - 1).getName();
 
                     tvRecipeName.setText(name);
                     Glide.with(getContext())
                             .load(image.getUrl())
                             .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(15)))
                             .into(ivRecipeImage);
-                    tvRecipeIngredients.setText(ingredients);
+                    tvRecipeIngredients.setText(allIngredients);
                     tvRecipeInstructions.setText(instructions);
+                    tvRecipeContains.setText(containsIngredientDetails);
                 } else {
                     e.printStackTrace();
                 }
