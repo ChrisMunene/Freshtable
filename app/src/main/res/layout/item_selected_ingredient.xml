@@ -36,4 +36,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/ivSelectedItemImg"
         app:layout_constraintStart_toStartOf="@+id/ivSelectedItemImg" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
