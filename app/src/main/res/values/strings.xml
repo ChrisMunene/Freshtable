@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FBU Recipe App</string>
+    <string name="app_name">FreshTable</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
