@@ -56,6 +56,7 @@ public class ReceiptFragment extends Fragment {
     // queries for receipt data from Parse
     private void loadReceipts() {
         Receipt.Query query = new Receipt.Query();
+        query.descending();
         query.findInBackground(new FindCallback<Receipt>() {
             public void done(List<Receipt> receipt, ParseException e) {
                 if (e == null) {
