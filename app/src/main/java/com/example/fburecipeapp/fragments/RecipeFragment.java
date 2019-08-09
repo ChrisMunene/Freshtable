@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.adapters.StaggeredRecyclerViewAdapter;
+import com.example.fburecipeapp.helpers.RVDataObserver;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.Recipe;
 import com.example.fburecipeapp.models.User;
@@ -61,8 +62,10 @@ public class RecipeFragment extends Fragment implements FilterRecipeDialogFragme
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         searchBtn = view.findViewById(R.id.searchBtn);
         RecyclerView recyclerView = view.findViewById(R.id.rvRecipes);
+        View emptyView = view.findViewById(R.id.emptyView);
 
         staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(mRecipes, mImages, getContext(), getFragmentManager(), this);
+        staggeredRecyclerViewAdapter.registerAdapterDataObserver(new RVDataObserver(recyclerView, emptyView));
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);

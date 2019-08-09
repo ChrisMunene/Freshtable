@@ -36,5 +36,6 @@
 
     <color name="light_black">#383838</color>
     <color name="dark_white">#F5F5F5</color>
+    <color name="empty_item">#F5F5F5</color>
 
 </resources>
