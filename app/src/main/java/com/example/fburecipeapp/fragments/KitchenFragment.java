@@ -21,6 +21,7 @@ import com.example.fburecipeapp.R;
 import com.example.fburecipeapp.activities.ExpandableActivity;
 import com.example.fburecipeapp.activities.LoginActivity;
 import com.example.fburecipeapp.adapters.KitchenAdapter;
+import com.example.fburecipeapp.helpers.RVDataObserver;
 import com.example.fburecipeapp.models.FoodType;
 import com.example.fburecipeapp.models.Ingredient;
 import com.example.fburecipeapp.models.User;
@@ -36,6 +37,7 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
+    private View emptyView;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<FoodType> types;
     private KitchenAdapter kitchenAdapter;
@@ -63,10 +65,14 @@ public class KitchenFragment extends Fragment implements KitchenAdapter.onItemsC
         savedIngredients = new ArrayList<Ingredient>();
         removedItems = new ArrayList<Ingredient>();
         recyclerView = view.findViewById(R.id.rvSaved);
+        emptyView = view.findViewById(R.id.emptyView);
 
         // Adapter
         kitchenAdapter = new KitchenAdapter(savedIngredients);
         kitchenAdapter.setOnItemsChangedListener(this::onItemsChanged);
+
+        // Set data observer for conditional rendering
+        kitchenAdapter.registerAdapterDataObserver(new RVDataObserver(recyclerView, emptyView));
 
 
         recyclerView.setAdapter(kitchenAdapter);
