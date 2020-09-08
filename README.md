@@ -1,9 +1,12 @@
 # FBU Final Project - 2019
 
-**Freshtable** is a grocery management app created to help users keep track of the groceries they buy and store in their homes and their expiry dates.
+**Freshtable** is a grocery management app created to help users keep track of the groceries they buy and their expiry dates.
+
 
 Built as the final project for my internship at Facebook in 2019.
 
+## Goal
+The goal of the project was to help combat household food waste by alerting users and sending them recipe recommendations for ingredients that were about to expire.
 
 ## Video Walkthrough
 
@@ -13,12 +16,22 @@ Here's a walkthrough of implemented user stories:
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
+
+## App Features
+- **Kitchen tab** with list of available ingredients
+- **Receipt input tab** with camera and gallery functionality
+- **OCR API integration** and **Regex parser** to extract ingredients from selected receipts
+- **Calendar tab** with expiry dates
+- **Recipe tab** with list of ingredients
+- **History tab** with list of previous receipts
+- **Parse Backend** for authentication and storage
+- **Push Notifications** for prompting users with recipes
+
 ## Credits
-
 List an 3rd party libraries, icons, graphics, or other assets you used in your app.
-
-- [Android Async Http Client](http://loopj.com/android-async-http/) - networking library
+- [Android Async Http Client](http://loopj.com/android-async-http/) - Networking library
 - [Parse API library ](https://parseplatform.org/) - Backend library
+- [Free OCR API](https://ocr.space/OCRAPI) - Receipt Processing
 
 
 
