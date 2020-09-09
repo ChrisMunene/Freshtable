@@ -28,7 +28,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 - **Push Notifications** for prompting users with recipes
 
 ## Credits
-List an 3rd party libraries, icons, graphics, or other assets you used in your app.
+List of 3rd party libraries, icons, graphics, or other assets used in the app.
 - [Android Async Http Client](http://loopj.com/android-async-http/) - Networking library
 - [Parse API library ](https://parseplatform.org/) - Backend library
 - [Free OCR API](https://ocr.space/OCRAPI) - Receipt Processing
