@@ -3,7 +3,7 @@
 **Freshtable** is a grocery management app created to help users keep track of the groceries they buy and their expiry dates.
 
 
-Built as the final project for my internship at Facebook in 2019.
+Built with a team of 2 interns as the final project for our internship at Facebook in 2019.
 
 ## Goal
 The goal of the project was to help combat household food waste by alerting users and sending them recipe recommendations for ingredients that were about to expire.
